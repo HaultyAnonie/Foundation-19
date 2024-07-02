@@ -5,7 +5,6 @@
 	icon = 'icons/obj/computer.dmi'
 	icon_state = "computer"
 
-	core_skill = SKILL_PILOT
 	var/skill_offset = SKILL_TRAINED - 1 //After which skill level it starts to matter. -1, because we have to index from zero
 
 	icon_keyboard = "rd_key"
@@ -54,9 +53,9 @@
 		middle = M
 		back = B
 		if(is_valid_setup())
-			GLOB.destroyed_event.register(F, src, .proc/release_links)
-			GLOB.destroyed_event.register(M, src, .proc/release_links)
-			GLOB.destroyed_event.register(B, src, .proc/release_links)
+			RegisterSignal(F, COMSIG_PARENT_QDELETING, PROC_REF(release_links))
+			RegisterSignal(M, COMSIG_PARENT_QDELETING, PROC_REF(release_links))
+			RegisterSignal(B, COMSIG_PARENT_QDELETING, PROC_REF(release_links))
 			return TRUE
 	return FALSE
 
@@ -68,9 +67,9 @@
 	return FALSE
 
 /obj/machinery/computer/ship/disperser/proc/release_links()
-	GLOB.destroyed_event.unregister(front, src, .proc/release_links)
-	GLOB.destroyed_event.unregister(middle, src, .proc/release_links)
-	GLOB.destroyed_event.unregister(back, src, .proc/release_links)
+	UnregisterSignal(front, COMSIG_PARENT_QDELETING)
+	UnregisterSignal(middle, COMSIG_PARENT_QDELETING)
+	UnregisterSignal(back, COMSIG_PARENT_QDELETING)
 	front = null
 	middle = null
 	back = null

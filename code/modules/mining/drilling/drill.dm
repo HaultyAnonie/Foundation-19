@@ -276,11 +276,11 @@
 		return TRUE
 	if(isWrench(W))
 
-		if(istype(get_turf(src), /turf/space))
+		if(isspaceturf(get_turf(src)))
 			to_chat(user, SPAN_NOTICE("You can't anchor something to empty space. Idiot."))
 			return
 
-		playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
+		playsound(src.loc, 'sounds/items/Ratchet.ogg', 100, 1)
 		to_chat(user, SPAN_NOTICE("You [anchored ? "un" : ""]anchor the brace."))
 
 		anchored = !anchored

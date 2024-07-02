@@ -118,7 +118,7 @@
 		return 1
 	else if(ispath(path,/obj))
 		new path(get_turf(user.loc))
-		playsound(get_turf(usr),'sound/magic/charge.ogg',50,1)
+		playsound(get_turf(usr),'sounds/magic/charge.ogg',50,1)
 		return 1
 
 /obj/item/contract/boon/wizard
@@ -126,7 +126,7 @@
 
 /obj/item/contract/boon/wizard/artificer
 	path = /datum/spell/aoe_turf/conjure/construct
-	desc = "This contract has a passage dedicated to an entity known as 'Nar-Sie'."
+	desc = "This contract has a passage dedicated to an entity known as the 'Scarlet King'."
 
 /obj/item/contract/boon/wizard/fireball
 	path = /datum/spell/aimed/fireball
@@ -152,4 +152,3 @@
 /obj/item/contract/boon/wizard/charge
 	path = /datum/spell/aoe_turf/charge
 	desc = "This contract is made of 100% post-consumer wizard."
-

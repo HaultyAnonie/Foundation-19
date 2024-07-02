@@ -46,15 +46,15 @@
 	icon = 'maps/torch/icons/obj/solgov-decals.dmi'
 	icon_state = "solgovseal"
 
-/obj/structure/sign/double/solgovflag
-	name = "Sol Central Government Flag"
-	desc = "The flag of the Sol Central Government, a symbol of many things to many people."
+/obj/structure/sign/double/gocflag
+	name = "United Nations Flag"
+	desc = "The flag of the United Nations, a symbol of many things to many people."
 	icon = 'maps/torch/icons/obj/solgov-decals.dmi'
 
-/obj/structure/sign/double/solgovflag/left
+/obj/structure/sign/double/gocflag/left
 	icon_state = "solgovflag-left"
 
-/obj/structure/sign/double/solgovflag/right
+/obj/structure/sign/double/gocflag/right
 	icon_state = "solgovflag-right"
 
 /* Foundation 19 Edits for Reshuffling of files*/
@@ -159,3 +159,23 @@
 /obj/effect/landmark/corpse/classdescaped
 	name = "Class D"
 	corpse_outfits = list(/decl/hierarchy/outfit/zombie/classd)
+
+/obj/effect/landmark/corpse/classdescaped/rage_virus/AdditionalEffects(mob/living/carbon/human/H)
+	. = ..()
+	var/datum/disease/rage/D = new()
+	D.TryInfect(H, FALSE)
+
+/obj/effect/landmark/corpse/classdescaped/random_virus_weak/AdditionalEffects(mob/living/carbon/human/H)
+	. = ..()
+	var/datum/disease/advance/random/D = new(5, max_level = 3)
+	D.TryInfect(H, FALSE)
+
+/obj/effect/landmark/corpse/classdescaped/random_virus_medium/AdditionalEffects(mob/living/carbon/human/H)
+	. = ..()
+	var/datum/disease/advance/random/D = new(5, max_level = 6)
+	D.TryInfect(H, FALSE)
+
+/obj/effect/landmark/corpse/classdescaped/random_virus_strong/AdditionalEffects(mob/living/carbon/human/H)
+	. = ..()
+	var/datum/disease/advance/random/D = new(5, max_level = 9)
+	D.TryInfect(H, FALSE)

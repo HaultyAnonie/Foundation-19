@@ -24,16 +24,16 @@
 
 // Event listener for the marked pipe's destruction
 /datum/event/disposals_explosion/proc/pipe_destroyed()
-	GLOB.destroyed_event.unregister(bursting_pipe, src, .proc/pipe_destroyed)
+	UnregisterSignal(bursting_pipe, COMSIG_PARENT_QDELETING)
 
 	bursting_pipe = null
 	kill()
 
 /datum/event/disposals_explosion/setup()
 	var/list/area_predicates = GLOB.is_station_but_not_maint_area.Copy()
-	area_predicates += /proc/area_has_disposals_pipe
+	area_predicates += GLOBAL_PROC_REF(area_has_disposals_pipe)
 
-	var/turf/containing_turf = pick_area_and_turf(area_predicates, list(/proc/has_disposals_pipe))
+	var/turf/containing_turf = pick_area_and_turf(area_predicates, list(GLOBAL_PROC_REF(has_disposals_pipe)))
 	if(isnull(containing_turf))
 		log_debug("Couldn't find a turf containing a disposals pipe. Aborting.")
 		kill()
@@ -43,7 +43,7 @@
 		if(istype(A, /obj/structure/disposalpipe/segment))
 			bursting_pipe = A
 			// Subscribe to pipe destruction facts
-			GLOB.destroyed_event.register(A, src, .proc/pipe_destroyed)
+			RegisterSignal(A, COMSIG_PARENT_QDELETING, PROC_REF(pipe_destroyed))
 			break
 
 	if(isnull(bursting_pipe))
@@ -64,13 +64,13 @@
 
 	// Make some noise as a clue
 	if(prob(40) && bursting_pipe.get_current_health() < 5)
-		playsound(bursting_pipe, 'sound/machines/hiss.ogg', 40, 0, 0)
+		playsound(bursting_pipe, 'sounds/machines/hiss.ogg', 40, 0, 0)
 
 /datum/event/disposals_explosion/end()
 	if(isnull(bursting_pipe))
 		return
 
-	GLOB.destroyed_event.unregister(bursting_pipe, src, .proc/pipe_destroyed)
+	UnregisterSignal(bursting_pipe, COMSIG_PARENT_QDELETING)
 
 	if(bursting_pipe.get_current_health() < 5)
 		// Make a disposals holder for the trash

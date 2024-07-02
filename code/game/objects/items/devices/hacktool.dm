@@ -17,7 +17,7 @@
 /obj/item/device/multitool/hacktool/Destroy()
 	for(var/T in known_targets)
 		var/atom/target = T
-		GLOB.destroyed_event.unregister(target, src)
+		UnregisterSignal(target, COMSIG_PARENT_QDELETING)
 	known_targets.Cut()
 	qdel(hack_state)
 	hack_state = null
@@ -26,7 +26,7 @@
 /obj/item/device/multitool/hacktool/attackby(obj/W, mob/user)
 	if(isScrewdriver(W))
 		in_hack_mode = !in_hack_mode
-		playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Screwdriver.ogg', 50, 1)
 	else
 		..()
 
@@ -53,15 +53,15 @@
 
 	to_chat(user, SPAN_NOTICE("You begin hacking \the [target]..."))
 	is_hacking = 1
-	// Hackin takes roughly 15-25 seconds. Fairly small random span to avoid people simply aborting and trying again.
-	var/hack_result = do_after(user, (15 SECONDS + rand(0, 5 SECONDS) + rand(0, 5 SECONDS)), do_flags = DO_DEFAULT & ~DO_SHOW_PROGRESS)
+	// Hackin takes roughly 20-30 seconds. Fairly small random span to avoid people simply aborting and trying again.
+	var/hack_result = do_after(user, 20 SECONDS + rand(0, 5 SECONDS) + rand(0, 5 SECONDS), bonus_percentage = 25, do_flags = DO_DEFAULT & ~DO_SHOW_USER)
 	is_hacking = 0
 
 	if(hack_result && in_hack_mode)
 		to_chat(user, SPAN_NOTICE("Your hacking attempt was succesful!"))
-		user.playsound_local(get_turf(src), 'sound/piano/A#6.ogg', 50)
+		user.playsound_local(get_turf(src), 'sounds/piano/A#6.ogg', 50)
 		known_targets.Insert(1, target)	// Insert the newly hacked target first,
-		GLOB.destroyed_event.register(target, src, /obj/item/device/multitool/hacktool/proc/on_target_destroy)
+		RegisterSignal(target, COMSIG_PARENT_QDELETING, TYPE_PROC_REF(/obj/item/device/multitool/hacktool, on_target_destroy))
 	else
 		to_chat(user, SPAN_WARNING("Your hacking attempt failed!"))
 	return 1
@@ -72,7 +72,7 @@
 	if(known_targets.len > max_known_targets)
 		for(var/i = (max_known_targets + 1) to known_targets.len)
 			var/atom/A = known_targets[i]
-			GLOB.destroyed_event.unregister(A, src)
+			UnregisterSignal(A, COMSIG_PARENT_QDELETING)
 		known_targets.Cut(max_known_targets + 1)
 
 /obj/item/device/multitool/hacktool/proc/on_target_destroy(target)

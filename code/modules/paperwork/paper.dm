@@ -45,6 +45,9 @@
 	var/is_memo = FALSE  //If TRUE, paper will act the same as readable = FALSE, but will also be unrenameable.
 	var/datum/language/language = LANGUAGE_ENGLISH // Language the paper was written in. Editable by users up until something's actually written
 
+	///Whether or not title should be show in the desc.
+	var/show_title = TRUE
+
 	var/const/deffont = "Verdana"
 	var/const/signfont = "Times New Roman"
 	var/const/crayonfont = "Comic Sans MS"
@@ -101,7 +104,7 @@
 
 /obj/item/paper/examine(mob/user, distance)
 	. = ..()
-	if(!is_memo && name != "sheet of paper")
+	if(!is_memo && name != "sheet of paper" && show_title)
 		to_chat(user, "It's titled '[name]'.")
 	if(distance <= 1)
 		show_content(usr)
@@ -162,10 +165,9 @@
 			can_read = ishuman(user) || issilicon(user)
 			if (can_read)
 				can_read = get_dist(src, user) < PAPER_EYEBALL_DISTANCE
-	var/html = "<html><head><title>[name]</title></head><body bgcolor='[color]'>"
+	var/html = ""
 	if (!can_read)
 		html += PAPER_META_BAD("The paper is too far away or you can't read.")
-		html += "<hr/></body></html>"
 	var/has_content = length(info)
 	var/has_language = force || (language in user.languages)
 	if (has_content && !has_language && !isghost(user))
@@ -185,9 +187,16 @@
 	else if (has_content)
 		html += PAPER_META("The paper is written in [language.name].")
 		html += "<hr/>" + info
-	html += "[stamps]</body></html>"
-	show_browser(user, html, "window=paper_[name]")
-	onclose(user, "paper_[name]")
+	html += "[stamps]"
+
+	// Ported to browser datum for IE11 feature parity
+	var/datum/browser/window = new(user, "paper_[name]")
+	window.stylesheets.Remove("common")
+	window.add_stylesheet("acs", 'html/acs.css')
+	window.add_head_content("<title>[name]</title><style>body { background-color: [color]; }</style>")
+	window.set_content(html)
+	window.open()
+
 	if(isnull(name))
 		crash_with("Paper failed a sanity check. It has no name. Report that! | Type: [type]")
 
@@ -354,6 +363,10 @@
 		t = replacetext(t, "\[/small\]", "")
 		t = replacetext(t, "\[list\]", "")
 		t = replacetext(t, "\[/list\]", "")
+		t = replacetext(t, "\[ulist\]", "")
+		t = replacetext(t, "\[/ulist\]", "")
+		t = replacetext(t, "\[olist\]", "")
+		t = replacetext(t, "\[/olist\]", "")
 		t = replacetext(t, "\[table\]", "")
 		t = replacetext(t, "\[/table\]", "")
 		t = replacetext(t, "\[row\]", "")
@@ -476,7 +489,7 @@
 
 		show_content(usr, editable = TRUE)
 
-		playsound(src, pick('sound/effects/pen1.ogg','sound/effects/pen2.ogg'), 10)
+		playsound(src, pick('sounds/effects/pen1.ogg','sounds/effects/pen2.ogg'), 10)
 		update_icon()
 
 
@@ -566,7 +579,7 @@
 		stamped += P.type
 		add_overlay(stampoverlay)
 
-		playsound(src, 'sound/effects/stamp.ogg', 50, 1)
+		playsound(src, 'sounds/effects/stamp.ogg', 50, 1)
 		to_chat(user, SPAN_NOTICE("You stamp the paper with your [P.name]."))
 
 	else if(istype(P, /obj/item/flame))
@@ -587,6 +600,32 @@
 /obj/item/paper/proc/show_info(mob/user)
 	return info
 
+// Coarse - Cramples the paper
+// 1:1 - Returns random paper type
+// Very Fine - Returns anomalous paper with various effects and blasts an EMP
+/obj/item/paper/Conversion914(mode = MODE_ONE_TO_ONE, mob/living/user = usr)
+	switch(mode)
+		if(MODE_COARSE)
+			if(icon_state == "scrap")
+				return
+			info = stars(info, 85)
+			icon_state = "scrap"
+			return src
+		if(MODE_ONE_TO_ONE)
+			return pick(typesof(/obj/item/paper))
+		if(MODE_VERY_FINE)
+			// You think you can just shove a shit-ton of paper in there? Fuck you, that's what you get
+			if(locate(/obj/item/paper/self_writing) in get_turf(src))
+				empulse(get_turf(src), 7, 14)
+				if(istype(user))
+					to_chat(user, SPAN_DANGER("You feel thousands of paper cuts appearing on your skin..."))
+					for(var/i = 1 to 10)
+						addtimer(CALLBACK(user, TYPE_PROC_REF(/mob/living, apply_damage), rand(3, 9), BRUTE, pick(BP_ALL_LIMBS), DAM_SHARP), i * (2 SECONDS))
+						addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(playsound), get_turf(user), 'sounds/weapons/bladeslice.ogg', rand(25, 50), TRUE), i * (2 SECONDS))
+				return null
+			empulse(get_turf(src), rand(0, 2), rand(2, 7))
+			return /obj/item/paper/self_writing
+	return ..()
 
 //For supply.
 /obj/item/paper/manifest

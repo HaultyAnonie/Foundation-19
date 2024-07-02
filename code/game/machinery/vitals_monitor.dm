@@ -54,12 +54,12 @@
 		var/obj/item/organ/internal/brain/brain = victim.internal_organs_by_name[BP_BRAIN]
 		if(istype(brain) && victim.stat != DEAD && !(victim.status_flags & FAKEDEATH))
 			if(user.skill_check(SKILL_MEDICAL, SKILL_BASIC))
-				switch(brain.get_current_damage_threshold())
-					if(0 to 2)
+				switch(round(brain.damage / brain.max_damage, 0.1))
+					if(0 to 0.2)
 						brain_activity = "normal"
-					if(3 to 5)
+					if(0.3 to 0.5)
 						brain_activity = "weak"
-					if(6 to INFINITY)
+					if(0.6 to INFINITY)
 						brain_activity = "extremely weak"
 			else
 				brain_activity = "some"
@@ -146,22 +146,22 @@
 				add_overlay(image(icon, icon_state = "pulse_flatline"))
 				add_overlay(image(icon, icon_state = "pulse_warning"))
 				if(beep)
-					playsound(src, 'sound/machines/flatline.ogg', 20)
+					playsound(src, 'sounds/machines/flatline.ogg', 20)
 				if(read_alerts)
 					alerts[PULSE_ALERT] = "Cardiac flatline detected!"
 			if(PULSE_SLOW, PULSE_NORM,)
 				add_overlay(image(icon, icon_state = "pulse_normal"))
 				if(beep)
-					playsound(src, 'sound/machines/quiet_beep.ogg', 40)
+					playsound(src, 'sounds/machines/quiet_beep.ogg', 40)
 			if(PULSE_FAST, PULSE_2FAST)
 				add_overlay(image(icon, icon_state = "pulse_veryfast"))
 				if(beep)
-					playsound(src, 'sound/machines/quiet_double_beep.ogg', 40)
+					playsound(src, 'sounds/machines/quiet_double_beep.ogg', 40)
 			if(PULSE_THREADY)
 				add_overlay(image(icon, icon_state = "pulse_thready"))
 				add_overlay(image(icon, icon_state = "pulse_warning"))
 				if(beep)
-					playsound(src, 'sound/machines/ekg_alert.ogg', 40)
+					playsound(src, 'sounds/machines/ekg_alert.ogg', 40)
 				if(read_alerts)
 					alerts[PULSE_ALERT] = "Heart-rate exceeding 250BPM, Possible Shock Detected! Patient Expiry likely!"
 	else
@@ -172,14 +172,14 @@
 		return
 	var/obj/item/organ/internal/brain/brain = victim.internal_organs_by_name[BP_BRAIN]
 	if(istype(brain) && victim.stat != DEAD && !(victim.status_flags & FAKEDEATH))
-		switch(brain.get_current_damage_threshold())
-			if(0 to 2)
+		switch(round(brain.damage / brain.max_damage, 0.1))
+			if(0 to 0.2)
 				add_overlay(image(icon, icon_state = "brain_ok"))
-			if(3 to 5)
+			if(0.3 to 0.5)
 				add_overlay(image(icon, icon_state = "brain_bad"))
 				if(read_alerts)
 					alerts[BRAIN_ALERT] = "Weak brain activity!"
-			if(6 to INFINITY)
+			if(0.6 to INFINITY)
 				add_overlay(image(icon, icon_state = "brain_verybad"))
 				add_overlay(image(icon, icon_state = "brain_warning"))
 				if(read_alerts)

@@ -60,7 +60,7 @@
 		return 0
 
 	//space check ~no flying space trains sorry
-	if(on && istype(destination, /turf/space))
+	if(on && isspaceturf(destination))
 		return 0
 
 	return ..()
@@ -108,9 +108,13 @@
 
 /obj/vehicle/train/cargo/engine/Bump(atom/Obstacle)
 	var/obj/machinery/door/D = Obstacle
+	var/obj/structure/stairs/S = Obstacle
 	var/mob/living/carbon/human/H = load
 	if(istype(D) && istype(H))
 		D.Bumped(H)		//a little hacky, but hey, it works, and respects access rights
+	if(istype(S))
+		S.Bumped(src)
+		H.forceMove(loc)
 
 	..()
 
@@ -170,7 +174,7 @@
 			SPAN_DANGER("You ran over [H]!")
 		)
 		attack_log += text("\[[time_stamp()]\] <font color='red'>ran over [H.name] ([H.ckey]), driven by [D.name] ([D.ckey])</font>")
-		msg_admin_attack("[D.name] ([D.ckey]) ran over [H.name] ([H.ckey]). (<A HREF='?_src_=holder;adminplayerobservecoodjump=1;X=[src.x];Y=[src.y];Z=[src.z]'>JMP</a>)")
+		msg_admin_attack("[D.name] ([D.ckey]) ran over [H.name] ([H.ckey]). [ADMIN_JMP(src)]")
 	else
 		attack_log += text("\[[time_stamp()]\] <font color='red'>ran over [H.name] ([H.ckey])</font>")
 

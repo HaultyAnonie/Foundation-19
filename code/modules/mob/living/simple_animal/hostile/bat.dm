@@ -1,5 +1,5 @@
 /mob/living/simple_animal/hostile/scarybat
-	name = "space bat swarm"
+	name = "bat swarm"
 	desc = "A swarm of cute little blood sucking bats that looks pretty upset."
 	icon = 'icons/mob/simple_animal/bats.dmi'
 	icon_state = "bat"
@@ -13,7 +13,7 @@
 	health = 20
 
 	attacktext = list("bitten")
-	attack_sound = 'sound/weapons/bite.ogg'
+	attack_sound = 'sounds/weapons/bite.ogg'
 
 	response_help = "pets the"
 	response_disarm = "gently pushes aside the"

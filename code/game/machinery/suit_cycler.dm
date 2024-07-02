@@ -99,7 +99,7 @@
 
 		visible_message(SPAN_NOTICE("[user] starts putting [G.affecting.name] into the suit cycler."), range = 3)
 
-		if(do_after(user, 20, src))
+		if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25))
 			if(!G || !G.affecting) return
 			var/mob/M = G.affecting
 			if (M.client)
@@ -296,13 +296,13 @@
 			if(radiation_level > 2)
 				helmet.decontaminate()
 			if(radiation_level > 1)
-				helmet.clean_blood()
+				helmet.clean()
 
 		if(suit)
 			if(radiation_level > 2)
 				suit.decontaminate()
 			if(radiation_level > 1)
-				suit.clean_blood()
+				suit.clean()
 
 	updateUsrDialog()
 

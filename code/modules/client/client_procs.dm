@@ -141,7 +141,7 @@
 
 	// Instantiate stat panel
 	stat_panel = new(src, "statbrowser")
-	stat_panel.subscribe(src, .proc/on_stat_panel_message)
+	stat_panel.subscribe(src, PROC_REF(on_stat_panel_message))
 
 	// Instantiate tgui panel
 	tgui_panel = new(src, "browseroutput")
@@ -265,7 +265,7 @@
 		inline_js = file("html/statbrowser.js"),
 		inline_css = file("html/statbrowser.css"),
 	)
-	addtimer(CALLBACK(src, .proc/check_panel_loaded), 30 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(check_panel_loaded)), 30 SECONDS)
 
 	// Initialize tgui panel
 	tgui_panel.initialize()
@@ -685,3 +685,20 @@
 		winset(usr, "mapwindow.status_bar", "is-visible=true")
 	else
 		winset(usr, "mapwindow.status_bar", "is-visible=false")
+
+// Creates the character out of client's preferences
+/client/proc/SpawnPrefsCharacter(turf/T)
+	var/mob/living/carbon/human/new_character = new(T)
+	new_character.lastarea = get_area(T)
+	prefs.copy_to(new_character)
+	new_character.dna.ready_dna(new_character)
+	new_character.dna.b_type = prefs.b_type
+	new_character.sync_organ_dna()
+	if(prefs.disabilities)
+		new_character.dna.SetSEState(GLOB.GLASSESBLOCK,1,0)
+		new_character.disabilities |= NEARSIGHTED
+	new_character.force_update_limbs()
+	new_character.update_eyes()
+	new_character.regenerate_icons()
+	new_character.ckey = ckey
+	return new_character

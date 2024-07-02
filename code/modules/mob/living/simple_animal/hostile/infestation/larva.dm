@@ -15,8 +15,8 @@
 	pass_flags = PASS_FLAG_TABLE | PASS_FLAG_GRILLE
 	movement_cooldown = 1.5
 
-	health = 20
-	maxHealth = 20
+	health = 10
+	maxHealth = 10
 
 	meat_type = /obj/item/reagent_containers/food/snacks/abominationmeat
 	meat_amount = 1
@@ -24,12 +24,13 @@
 	ai_holder_type = /datum/ai_holder/simple_animal/infestation/larva
 	say_list_type = /datum/say_list/infestation_larva
 	death_sounds = list(
-		'sound/simple_mob/abominable_infestation/larva/death_1.ogg',
-		'sound/simple_mob/abominable_infestation/larva/death_2.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/death_1.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/death_2.ogg',
 		)
 
 	transformation_types = list(
 		/mob/living/simple_animal/hostile/infestation/broodling = 30 SECONDS,
+		/mob/living/simple_animal/hostile/infestation/floatfly = 40 SECONDS,
 		/mob/living/simple_animal/hostile/infestation/spitter = 45 SECONDS,
 		/mob/living/simple_animal/hostile/infestation/eviscerator = 60 SECONDS,
 		/mob/living/simple_animal/hostile/infestation/assembler = 75 SECONDS,
@@ -41,14 +42,14 @@
 	emote_see = list("wriggles around")
 
 	emote_hear_sounds = list(
-		'sound/simple_mob/abominable_infestation/larva/ambient_1.ogg',
-		'sound/simple_mob/abominable_infestation/larva/ambient_2.ogg',
-		'sound/simple_mob/abominable_infestation/larva/ambient_3.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_1.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_2.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_3.ogg',
 		)
 	emote_see_sounds = list(
-		'sound/simple_mob/abominable_infestation/larva/ambient_1.ogg',
-		'sound/simple_mob/abominable_infestation/larva/ambient_2.ogg',
-		'sound/simple_mob/abominable_infestation/larva/ambient_3.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_1.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_2.ogg',
+		'sounds/simple_mob/abominable_infestation/larva/ambient_3.ogg',
 		)
 
 /datum/ai_holder/simple_animal/infestation/larva
@@ -110,6 +111,10 @@
 	transformation_time = null // We only evolve after implanting ourselves
 
 /mob/living/simple_animal/hostile/infestation/larva/implant/implanter/attack_target(atom/A)
+	if(!ishuman(A))
+		return
+	if(on_fire)
+		return
 	var/mob/living/carbon/human/H = A
 	var/list/valid_organs = list()
 	for(var/obj/item/organ/external/O in H.organs)
@@ -123,7 +128,7 @@
 		return
 
 	visible_message(SPAN_DANGER("[src] bites through [H]'s clothes and skin and wriggles inside!"))
-	playsound(src, 'sound/simple_mob/abominable_infestation/larva/implant.ogg', 50, TRUE)
+	playsound(src, 'sounds/simple_mob/abominable_infestation/larva/implant.ogg', 50, TRUE)
 	var/obj/item/organ/external/target_organ = pick(valid_organs)
 	target_organ.owner.apply_damage(15, BRUTE, target_organ.organ_tag)
 	forceMove(target_organ)

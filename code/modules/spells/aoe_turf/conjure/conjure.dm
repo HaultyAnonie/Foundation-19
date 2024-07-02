@@ -4,10 +4,7 @@ How they spawn stuff is decided by behaviour vars, which are explained below
 */
 
 /datum/spell/aoe_turf/conjure
-	name = "Conjure"
 	desc = "This spell conjures objs of the specified types in range."
-
-	school = "conjuration" //funny, that
 
 	var/list/summon_type = list() //determines what exactly will be summoned
 	//should NOT be text, like list(/obj/machinery/bot/ed209)
@@ -22,7 +19,7 @@ How they spawn stuff is decided by behaviour vars, which are explained below
 	var/list/newVars = list() //vars of the summoned objects will be replaced with those where they meet
 	//should have format of list("emagged" = 1,"name" = "Wizard's Justicebot"), for example
 
-	cast_sound = 'sound/magic/castsummon.ogg'
+	cast_sound = 'sounds/magic/castsummon.ogg'
 
 /datum/spell/aoe_turf/conjure/cast(list/targets, mob/user)
 

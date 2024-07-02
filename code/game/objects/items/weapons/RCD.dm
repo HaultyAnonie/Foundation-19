@@ -75,7 +75,7 @@
 		if(cartridge.remaining <= 0)
 			qdel(W)
 		cartridge.matter = list(MATERIAL_STEEL = 500 * cartridge.remaining,MATERIAL_GLASS = 250 * cartridge.remaining)
-		playsound(src.loc, 'sound/machines/click.ogg', 50, 1)
+		playsound(src.loc, 'sounds/machines/click.ogg', 50, 1)
 		to_chat(user, SPAN_NOTICE("The RCD now holds [stored_matter]/[max_stored_matter] matter-units."))
 		update_icon()
 		return
@@ -96,14 +96,14 @@
 	work_id++
 	work_mode = next_in_list(work_mode, work_modes)
 	to_chat(user, SPAN_NOTICE("Changed mode to '[work_mode]'"))
-	playsound(src.loc, 'sound/effects/pop.ogg', 50, 0)
+	playsound(src.loc, 'sounds/effects/pop.ogg', 50, 0)
 	if(prob(20)) src.spark_system.start()
 
 /obj/item/rcd/afterattack(atom/A, mob/user, proximity)
 	if(!proximity) return
 	if(disabled && !isrobot(user))
 		return 0
-	if(istype(get_area(A),/area/shuttle)||istype(get_area(A),/turf/space/transit))
+	if(istype(get_area(A), /area/shuttle) || isspaceturf(get_area(A)))
 		return 0
 	work_id++
 	work_mode.do_work(src, A, user)
@@ -206,16 +206,16 @@
 			rcd.lowAmmo(user)
 			return FALSE
 
-		playsound(get_turf(user), 'sound/machines/click.ogg', 50, 1)
+		playsound(get_turf(user), 'sounds/machines/click.ogg', 50, 1)
 		rcdm.work_message(target, user, rcd)
 
 		if(rcdm.delay)
 			var/work_id = rcd.work_id
-			if(!(do_after(user, rcdm.delay, target) && work_id == rcd.work_id && rcd.can_use(user, target) && rcdm.can_handle_work(rcd, target)))
+			if(!(do_after(user, rcdm.delay, target, bonus_percentage = 25) && work_id == rcd.work_id && rcd.can_use(user, target) && rcdm.can_handle_work(rcd, target)))
 				return FALSE
 
 		rcdm.do_handle_work(target)
-		playsound(get_turf(user), 'sound/items/Deconstruct.ogg', 50, 1)
+		playsound(get_turf(user), 'sounds/items/Deconstruct.ogg', 50, 1)
 		return TRUE
 
 	return FALSE

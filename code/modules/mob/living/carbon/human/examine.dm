@@ -9,6 +9,12 @@
 	var/skipeyes = 0
 	var/skipface = 0
 
+	//Skips this for humanoid SCPS
+	if(SCP)
+		to_chat(user, "[icon2html(src, user)] That's \a [src] [suffix]")
+		to_chat(user, desc)
+		return
+
 	//exosuits and helmets obscure our view and stuff.
 	if(wear_suit)
 		skipgloves = wear_suit.flags_inv & HIDEGLOVES
@@ -293,6 +299,9 @@
 
 			msg += "<span class = 'deptradio'>Criminal status:</span> <a href='?src=\ref[src];criminal=1'>\[[criminal]\]</a>\n"
 			msg += "<span class = 'deptradio'>Security records:</span> <a href='?src=\ref[src];secrecord=`'>\[View\]</a>\n"
+
+			if(GLOB.informants.is_antagonist(mind))	// hacky, but functional
+				msg += "<span class = 'deptradio'>Special information:</span> This D-class is listed as an INFORMANT. Protect him, but do not blow his cover."
 
 	if(hasHUD(user, HUD_MEDICAL))
 		var/perpname = "wot"

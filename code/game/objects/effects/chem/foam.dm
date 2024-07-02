@@ -19,11 +19,11 @@
 	..(loc)
 	icon_state = "[ismetal? "m" : ""]foam"
 	metal = ismetal
-	playsound(src, 'sound/effects/bubbles2.ogg', 80, 1, -3)
+	playsound(src, 'sounds/effects/bubbles2.ogg', 80, 1, -3)
 	spawn(3 + metal * 3)
 		Process()
 		checkReagents()
-	addtimer(CALLBACK(src, .proc/remove_foam), 12 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(remove_foam)), 12 SECONDS)
 
 /obj/effect/effect/foam/proc/remove_foam()
 	STOP_PROCESSING(SSobj, src)
@@ -180,4 +180,3 @@
 	if(air_group)
 		return 0
 	return !density
-

@@ -72,7 +72,7 @@
 	var/has_power = TRUE
 	var/spawn_module = null
 
-	var/spawn_sound = 'sound/voice/liveagain.ogg'
+	var/spawn_sound = 'sounds/voice/liveagain.ogg'
 	var/pitch_toggle = TRUE
 	var/list/req_access = list(ACCESS_ROBOTICS)
 	var/ident = 0
@@ -355,7 +355,7 @@
 /mob/living/silicon/robot/verb/toggle_panel_lock()
 	set name = "Toggle Panel Lock"
 	set category = "Silicon Commands"
-	if(!opened && has_power && do_after(usr, 60) && !opened && has_power)
+	if(!opened && has_power && do_after(usr, 7 SECONDS, bonus_percentage = 25) && !opened && has_power)
 		to_chat(src, "You [locked ? "un" : ""]lock your panel.")
 		locked = !locked
 
@@ -526,7 +526,7 @@
 		if(opened)
 			if(cell)
 				user.visible_message(SPAN_NOTICE("\The [user] begins clasping shut \the [src]'s maintenance hatch."), SPAN_NOTICE("You begin closing up \the [src]."))
-				if(do_after(user, 50, src))
+				if(do_after(user, 6 SECONDS, src, bonus_percentage = 25))
 					to_chat(user, SPAN_NOTICE("You close \the [src]'s maintenance hatch."))
 					opened = FALSE
 					update_icon()
@@ -538,7 +538,7 @@
 					return
 
 				user.visible_message(SPAN_NOTICE("\The [user] begins ripping [mmi] from [src]."), SPAN_NOTICE("You jam the crowbar into the robot and begin levering [mmi]."))
-				if(do_after(user, 50, src))
+				if(do_after(user, 6 SECONDS, src, bonus_percentage = 25))
 					dismantle(user)
 
 			else
@@ -571,7 +571,7 @@
 				to_chat(user, "The cover is locked and cannot be opened.")
 			else
 				user.visible_message(SPAN_NOTICE("\The [user] begins prying open \the [src]'s maintenance hatch."), SPAN_NOTICE("You start opening \the [src]'s maintenance hatch."))
-				if(do_after(user, 50, src))
+				if(do_after(user, 6 SECONDS, src, bonus_percentage = 25))
 					to_chat(user, SPAN_NOTICE("You open \the [src]'s maintenance hatch."))
 					opened = TRUE
 					update_icon()
@@ -857,7 +857,7 @@
 		if(module.type == /obj/item/robot_module/janitor)
 			var/turf/tile = loc
 			if(isturf(tile))
-				tile.clean_blood()
+				tile.clean()
 				if (istype(tile, /turf/simulated))
 					var/turf/simulated/S = tile
 					S.dirt = 0
@@ -867,23 +867,23 @@
 							qdel(A)
 					else if(istype(A, /obj/item))
 						var/obj/item/cleaned_item = A
-						cleaned_item.clean_blood()
+						cleaned_item.clean()
 					else if(istype(A, /mob/living/carbon/human))
 						var/mob/living/carbon/human/cleaned_human = A
 						if(cleaned_human.lying)
 							if(cleaned_human.head)
-								cleaned_human.head.clean_blood()
+								cleaned_human.head.clean()
 								cleaned_human.update_inv_head(0)
 							if(cleaned_human.wear_suit)
-								cleaned_human.wear_suit.clean_blood()
+								cleaned_human.wear_suit.clean()
 								cleaned_human.update_inv_wear_suit(0)
 							else if(cleaned_human.w_uniform)
-								cleaned_human.w_uniform.clean_blood()
+								cleaned_human.w_uniform.clean()
 								cleaned_human.update_inv_w_uniform(0)
 							if(cleaned_human.shoes)
-								cleaned_human.shoes.clean_blood()
+								cleaned_human.shoes.clean()
 								cleaned_human.update_inv_shoes(0)
-							cleaned_human.clean_blood(1)
+							cleaned_human.clean(1)
 							to_chat(cleaned_human, SPAN_WARNING("[src] cleans your face!"))
 		return
 

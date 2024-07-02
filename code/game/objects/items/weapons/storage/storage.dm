@@ -26,8 +26,11 @@
 	//the assoc value can either be the quantity, or a list whose first value is the quantity and the rest are args.
 	var/list/startswith
 	var/datum/storage_ui/storage_ui = /datum/storage_ui/default
-	var/opened = null
+	var/opened = FALSE
 	var/open_sound = null
+
+	///Open Icon (If populated storage icon will change to this on being opened)
+	var/open_icon
 
 /obj/item/storage/Destroy()
 	QDEL_NULL(storage_ui)
@@ -94,14 +97,17 @@
 		storage_ui.hide_from(user)
 
 /obj/item/storage/proc/open(mob/user as mob)
-	if(!opened)
-		playsound(src.loc, src.open_sound, 50, 0, -5)
-		show_sound_effect(get_turf(src), user, SFX_ICON_SMALL)
-		opened = 1
-		queue_icon_update()
-	if (src.use_sound)
+	if(src.use_sound)
 		playsound(src.loc, src.use_sound, 50, 0, -5)
 		show_sound_effect(get_turf(src), user, SFX_ICON_SMALL)
+	if(!opened)
+		if(open_icon)
+			set_icon_state(open_icon)
+		opened = TRUE
+		queue_icon_update()
+	else
+		close(user)
+		return
 	if (isrobot(user) && user.hud_used)
 		var/mob/living/silicon/robot/robot = user
 		if(robot.shown_robot_modules) //The robot's inventory is open, need to close it first.
@@ -115,7 +121,12 @@
 	storage_ui.prepare_ui()
 
 /obj/item/storage/proc/close(mob/user as mob)
+	opened = FALSE
 	hide_from(user)
+
+	if(open_icon)
+		set_icon_state(initial(icon_state))
+
 	if(storage_ui)
 		storage_ui.after_close(user)
 
@@ -210,12 +221,9 @@
 
 		if(!prevent_warning)
 			for(var/mob/M in viewers(usr, null))
-				if (M == usr)
-					to_chat(usr, SPAN_NOTICE("You put \the [W] into [src]."))
-				else if (M in range(1, src)) //If someone is standing close enough, they can tell what it is... TODO replace with distance check
-					M.show_message(SPAN_NOTICE("\The [usr] puts [W] into [src]."), VISIBLE_MESSAGE)
-				else if (W?.w_class >= ITEM_SIZE_NORMAL) //Otherwise they can only see large or normal items from a distance...
-					M.show_message(SPAN_NOTICE("\The [usr] puts [W] into [src]."), VISIBLE_MESSAGE)
+				// If we aren't the one inserting AND we can see the item AND we're close enough (enough being dependant on the size of the item), we notice the item
+				if (M != usr && M.can_see(src) && (get_dist(M, src) <= W.w_class))
+					M.show_message(SPAN_NOTICE("\The [usr] puts \the [W] into \the [src]."), VISIBLE_MESSAGE)
 
 		if(!NoUpdate)
 			update_ui_after_item_insertion()
@@ -451,3 +459,6 @@
 /obj/item/proc/get_storage_cost()
 	//If you want to prevent stuff above a certain w_class from being stored, use max_w_class
 	return BASE_STORAGE_COST(w_class)
+
+/obj/item/storage/AllowDrop()
+	return FALSE

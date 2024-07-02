@@ -23,17 +23,10 @@
 		href_list["datumrefresh"] = href_list["rename"]
 
 	else if(href_list["dressup"])
-		if(!check_rights(R_VAREDIT))	return
-
-		var/mob/living/carbon/human/H = locate(href_list["dressup"])
-		if(!istype(H))
-			to_chat(usr, "This can only be used on instances of type /mob/living/carbon/human")
-			return
-		var/decl/hierarchy/outfit/outfit = input("Select outfit.", "Select equipment.") as null|anything in outfits()
-		if(!outfit)
+		if(!check_rights(R_SPAWN))
 			return
 
-		dressup_human(H, outfit, TRUE)
+		DressUpMobTarget(locate(href_list["dressup"]))
 
 	else if(href_list["varnameedit"] && href_list["datumedit"])
 		if(!check_rights(R_VAREDIT))	return
@@ -244,7 +237,7 @@
 			to_chat(usr, "This can only be done to instances of type /datum")
 			return
 
-		src.holder.marked_datum_weak = weakref(D)
+		src.holder.marked_datum_weakref = weakref(D)
 		href_list["datumrefresh"] = href_list["mark_object"]
 
 	else if(href_list["rotatedatum"])
@@ -438,7 +431,7 @@
 			to_chat(usr, "This can only be done to instances of type /mob/living/carbon")
 			return
 
-		var/new_organ = input("Please choose an organ to add.","Organ",null) as null|anything in typesof(/obj/item/organ)-/obj/item/organ
+		var/new_organ = tgui_input_list(usr, "Please choose an organ to add.", "Organ", typesof(/obj/item/organ)-/obj/item/organ, null)
 		if(!new_organ) return
 
 		if(!M)
@@ -460,7 +453,7 @@
 			to_chat(usr, "This can only be done to instances of type /mob/living/carbon")
 			return
 
-		var/obj/item/organ/rem_organ = input("Please choose an organ to remove.","Organ",null) as null|anything in M.internal_organs
+		var/obj/item/organ/rem_organ = tgui_input_list(usr, "Please choose an organ to remove.", "Organ", M.internal_organs, null)
 
 		if(!M)
 			to_chat(usr, "Mob doesn't exist anymore")

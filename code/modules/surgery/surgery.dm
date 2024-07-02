@@ -178,7 +178,9 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 		return FALSE
 
 	// Check for multi-surgery drifting.
-	var/zone = user.zone_sel.selecting
+	var/zone = user.zone_sel?.selecting
+	if(!zone)
+		return FALSE
 	if(LAZYACCESS(M.surgeries_in_progress, zone))
 		to_chat(user, SPAN_WARNING("You can't operate on this area while surgery is already in progress."))
 		return TRUE
@@ -201,6 +203,7 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 		if(S && !user.skill_check_multiple(S.get_skill_reqs(user, M, src, zone)))
 			S = pick(possible_surgeries)
 
+	var/obj/item/gripper/gripper = user.get_active_hand()
 	// We didn't find a surgery, or decided not to perform one.
 	if(!istype(S))
 		// If we're on an optable, we are protected from some surgery fails. Bypass this for some items (like health analyzers).
@@ -216,7 +219,7 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 			return TRUE
 
 	// Otherwise we can make a start on surgery!
-	else if(istype(M) && !QDELETED(M) && user.a_intent != I_HURT && user.get_active_hand() == src)
+	else if(istype(M) && !QDELETED(M) && user.a_intent != I_HURT && (user.get_active_hand() == src || (istype(gripper) && gripper.wrapped == src)))
 		// Double-check this in case it changed between initial check and now.
 		if(zone in M.surgeries_in_progress)
 			to_chat(user, SPAN_WARNING("You can't operate on this area while surgery is already in progress."))
@@ -227,7 +230,7 @@ GLOBAL_LIST_INIT(surgery_tool_exception_cache, new)
 				S.begin_step(user, M, zone, src)
 				var/skill_reqs = S.get_skill_reqs(user, M, src, zone)
 				var/duration = user.skill_delay_mult(skill_reqs[1]) * rand(S.min_duration, S.max_duration)
-				if(prob(S.success_chance(user, M, src, zone)) && do_after(user, duration, M))
+				if(prob(S.success_chance(user, M, src, zone)) && do_after(user, duration, M, bonus_percentage = 25))
 					if (S.can_use(user, M, zone, src))
 						S.end_step(user, M, zone, src)
 						handle_post_surgery()

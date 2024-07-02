@@ -40,7 +40,6 @@
 		/obj/item/clothing/glasses/welding/superior,
 		/obj/item/device/holowarrant,
 		/obj/item/clothing/suit/armor/pcarrier/light,
-		/obj/item/storage/box/secret_project_disks/science,
 		new /datum/atom_creator/weighted(list(/obj/item/storage/backpack/toxins)),
 		new /datum/atom_creator/simple(/obj/item/storage/backpack/messenger/tox, 50)
 	)
@@ -151,8 +150,6 @@
 /obj/structure/closet/secure_closet/guard/WillContain()
 	return list(
 		/obj/item/clothing/under/rank/guard,
-		/obj/item/clothing/suit/armor/pcarrier/medium/nt,
-		/obj/item/clothing/head/helmet/nt/guard,
 		/obj/item/clothing/head/soft/sec/corp/guard,
 		/obj/item/clothing/head/beret/guard,
 		/obj/item/clothing/accessory/armband/whitered,
@@ -184,7 +181,7 @@
 	)
 
 /obj/structure/closet/secure_closet/scpscience/directorofscience
-	name = "Research Director's Locker"
+	name = "research director's locker"
 	req_access = list(ACCESS_SCIENCE_LVL5)
 	icon_state = "dslocked"
 	icon_closed = "dsunlocked"

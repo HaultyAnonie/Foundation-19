@@ -20,7 +20,7 @@
 	var/material/padding_material
 	var/base_icon = "bed"
 	var/material_alteration = MATERIAL_ALTERATION_ALL
-	var/buckling_sound = 'sound/effects/buckle.ogg'
+	var/buckling_sound = 'sounds/effects/buckle.ogg'
 
 /obj/structure/bed/New(newloc, new_material = DEFAULT_FURNITURE_MATERIAL, new_padding_material)
 	..(newloc)
@@ -89,7 +89,7 @@
 
 /obj/structure/bed/attackby(obj/item/W as obj, mob/user as mob)
 	if(isWrench(W))
-		playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
 		dismantle()
 		qdel(src)
 	else if(istype(W,/obj/item/stack))
@@ -122,14 +122,14 @@
 			to_chat(user, "\The [src] has no padding to remove.")
 			return
 		to_chat(user, "You remove the padding from \the [src].")
-		playsound(src, 'sound/items/Wirecutter.ogg', 100, 1)
+		playsound(src, 'sounds/items/Wirecutter.ogg', 100, 1)
 		remove_padding()
 
 	else if(istype(W, /obj/item/grab))
 		var/obj/item/grab/G = W
 		var/mob/living/affecting = G.affecting
 		user.visible_message(SPAN_NOTICE("[user] attempts to buckle [affecting] into \the [src]!"))
-		if(do_after(user, 20, src))
+		if(do_after(user, 3 SECONDS, src, bonus_percentage = 25))
 			if(user_buckle_mob(affecting, user))
 				qdel(W)
 	else

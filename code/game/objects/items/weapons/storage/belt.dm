@@ -53,8 +53,8 @@
 	storage_slots = 2
 	overlay_flags = BELT_OVERLAY_ITEMS|BELT_OVERLAY_HOLSTER
 	var/list/can_holster //List of objects which this item can store in the designated holster slot(if unset, it will default to any holsterable items)
-	var/sound_in = 'sound/effects/holster/holsterin.ogg'
-	var/sound_out = 'sound/effects/holster/holsterout.ogg'
+	var/sound_in = 'sounds/effects/holster/holsterin.ogg'
+	var/sound_out = 'sounds/effects/holster/holsterout.ogg'
 	can_hold = list(
 		/obj/item/melee/baton,
 		/obj/item/melee/telebaton
@@ -301,7 +301,7 @@
 	new /obj/item/gun/projectile/pistol/mk9(src)
 	new /obj/item/ammo_magazine/scp/mk9(src)
 	new /obj/item/ammo_magazine/scp/mk9(src)
-	new /obj/item/ammo_magazine/box/mk9(src)
+	new /obj/item/ammo_magazine/box/a9mm(src)
 	new /obj/item/handcuffs(src)
 	update_icon()
 
@@ -528,8 +528,8 @@
 		/obj/item/device/flash
 		)
 	can_holster = list(/obj/item/material/hatchet/machete)
-	sound_in = 'sound/effects/holster/sheathin.ogg'
-	sound_out = 'sound/effects/holster/sheathout.ogg'
+	sound_in = 'sounds/effects/holster/sheathin.ogg'
+	sound_out = 'sounds/effects/holster/sheathout.ogg'
 
 /obj/item/storage/belt/soulstone
 	name = "soul stone belt"
@@ -614,3 +614,16 @@
 		/obj/item/extinguisher/mini,
 		/obj/item/grenade/chem_grenade/water = 2
 	)
+
+/obj/item/storage/belt/ci
+	name = "military belt"
+	desc = "A tactical tan russian belt, used by military forces."
+	icon_state = "ci_belt"
+	item_state = "ci_belt"
+
+/obj/item/storage/belt/ci/rig
+	name = "military rig"
+	desc = "A tactical tan russian rig, used by military forces."
+	icon_state = "ci_webbing"
+	item_state = "ci_webbing"
+	storage_slots = 10

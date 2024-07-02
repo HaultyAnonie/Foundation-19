@@ -34,7 +34,7 @@
 	mob_size =                MOB_LARGE
 	strength =                STR_HIGH
 
-	speech_sounds = list('sound/voice/chime.ogg')
+	speech_sounds = list('sounds/voice/chime.ogg')
 	speech_chance = 25
 
 	cold_level_1 = SYNTH_COLD_LEVEL_1
@@ -45,7 +45,7 @@
 	heat_level_2 = SYNTH_HEAT_LEVEL_2
 	heat_level_3 = SYNTH_HEAT_LEVEL_3
 
-	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_MINOR_CUT
+	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_MINOR_CUT | SPECIES_FLAG_NO_DISEASE
 	spawn_flags =   SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN
 
 	appearance_flags = HAS_EYE_COLOR | HAS_BASE_SKIN_COLOURS
@@ -56,16 +56,13 @@
 
 	available_cultural_info = list(
 		TAG_CULTURE = list(
-			CULTURE_ADHERENT
+			CULTURE_OTHER
 		),
 		TAG_HOMEWORLD = list(
-			HOME_SYSTEM_ADHERENT,
-			HOME_SYSTEM_ADHERENT_MOURNER
+			HOME_SYSTEM_OTHER
 		),
 		TAG_FACTION = list(
-			FACTION_ADHERENT_PRESERVERS,
-			FACTION_ADHERENT_LOYALISTS,
-			FACTION_ADHERENT_SEPARATISTS
+			FACTION_OTHER
 		),
 		TAG_RELIGION =  list(
 			RELIGION_OTHER

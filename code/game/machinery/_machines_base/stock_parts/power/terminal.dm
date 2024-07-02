@@ -73,15 +73,15 @@
 		unset_terminal(machine, terminal)
 	terminal = new_terminal
 	terminal.master = src
-	GLOB.destroyed_event.register(terminal, src, .proc/unset_terminal)
+	RegisterSignal(terminal, COMSIG_PARENT_QDELETING, PROC_REF(unset_terminal))
+	RegisterSignal(machine, COMSIG_MOVED, PROC_REF(machine_moved))
 
-	set_extension(src, /datum/extension/event_registration/shuttle_stationary, GLOB.moved_event, machine, .proc/machine_moved, get_area(src))
 	set_status(machine, PART_STAT_CONNECTED)
 	start_processing(machine)
 
 /obj/item/stock_parts/power/terminal/proc/machine_moved(obj/machinery/machine, turf/old_loc, turf/new_loc)
 	if(!terminal)
-		GLOB.moved_event.unregister(machine, src, .proc/machine_moved)
+		UnregisterSignal(machine, COMSIG_MOVED)
 		return
 	if(istype(new_loc) && (terminal.loc == get_step(new_loc, terminal_dir)))
 		return     // This location is fine
@@ -97,8 +97,8 @@
 	set_terminal(machine, new_terminal)
 
 /obj/item/stock_parts/power/terminal/proc/unset_terminal(obj/machinery/power/old_terminal, obj/machinery/machine)
-	remove_extension(src, /datum/extension/event_registration/shuttle_stationary)
-	GLOB.destroyed_event.unregister(old_terminal, src)
+	UnregisterSignal(machine, COMSIG_MOVED)
+	UnregisterSignal(old_terminal, COMSIG_PARENT_QDELETING)
 	if(!machine && istype(loc, /obj/machinery))
 		machine = loc
 	if(machine)
@@ -136,8 +136,8 @@
 			return TRUE
 		user.visible_message(SPAN_WARNING("\The [user] adds cables to the \the [machine]."), \
 							"You start adding cables to \the [machine] frame...")
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
-		if(do_after(user, 20, machine))
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
+		if(do_after(user, 2.5 SECONDS, machine, bonus_percentage = 25))
 			if(C.can_use(10) && !terminal && (machine == loc) && machine.components_are_accessible(type) && !blocking_terminal_at_loc(machine, T, user))
 				var/obj/structure/cable/N = T.get_cable_node()
 				if (prob(50) && electrocute_mob(user, N, N))
@@ -162,8 +162,8 @@
 			return TRUE
 		user.visible_message(SPAN_WARNING("\The [user] dismantles the power terminal from \the [machine]."), \
 							"You begin to cut the cables...")
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
-		if(do_after(user, 50, machine))
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
+		if(do_after(user, 7 SECONDS, machine, bonus_percentage = 25))
 			if(terminal && (machine == loc) && machine.components_are_accessible(type))
 				if (prob(50) && electrocute_mob(user, terminal.powernet, terminal))
 					var/datum/effect/effect/system/spark_spread/s = new /datum/effect/effect/system/spark_spread

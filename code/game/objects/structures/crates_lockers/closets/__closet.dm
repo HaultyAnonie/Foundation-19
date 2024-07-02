@@ -1,7 +1,7 @@
 /obj/structure/closet
 	name = "closet"
 	desc = "It's a basic storage unit."
-	icon = 'icons/obj/closet.dmi'
+	icon = 'icons/obj/closet_new.dmi'
 	icon_state = "closed"
 	density = TRUE
 	w_class = ITEM_SIZE_NO_CONTAINER
@@ -20,8 +20,8 @@
 	var/breakout = 0 //if someone is currently breaking out. mutex
 	var/storage_capacity = 2 * MOB_MEDIUM //This is so that someone can't pack hundreds of items in a locker/crate
 							  //then open it in a populated area to crash clients.
-	var/open_sound = 'sound/effects/locker_open.ogg'
-	var/close_sound = 'sound/effects/locker_close.ogg'
+	var/open_sound = 'sounds/effects/locker_open.ogg'
+	var/close_sound = 'sounds/effects/locker_close.ogg'
 
 	var/storage_types = CLOSET_STORAGE_ALL
 	var/setup = CLOSET_CAN_BE_WELDED
@@ -292,7 +292,7 @@
 			var/datum/effect/effect/system/spark_spread/spark_system = new /datum/effect/effect/system/spark_spread()
 			spark_system.set_up(5, 0, src.loc)
 			spark_system.start()
-			playsound(src.loc, 'sound/weapons/blade1.ogg', 50, 1)
+			playsound(src.loc, 'sounds/weapons/blade1.ogg', 50, 1)
 			playsound(src.loc, SFX_SPARK, 50, 1)
 			open()
 	else if(istype(W, /obj/item/stack/package_wrap))
@@ -425,9 +425,10 @@
 
 	visible_message(SPAN_DANGER("\The [src] begins to shake violently!"))
 
+	// TODO: fix this shit, what the fuck
 	breakout = 1 //can't think of a better way to do this right now.
 	for(var/i in 1 to (6*breakout_time * 2)) //minutes * 6 * 5seconds * 2
-		if(!do_after(escapee, 50, incapacitation_flags = INCAPACITATION_DEFAULT & ~INCAPACITATION_RESTRAINED)) //5 seconds
+		if(!do_after(escapee, 7 SECONDS, incapacitation_flags = INCAPACITATION_DEFAULT & ~INCAPACITATION_RESTRAINED, bonus_percentage = 25))
 			breakout = 0
 			return
 		//Perform the same set of checks as above for weld and lock status to determine if there is even still a point in 'resisting'...
@@ -435,7 +436,7 @@
 			breakout = 0
 			return
 
-		playsound(src.loc, 'sound/effects/grillehit.ogg', 100, 1)
+		playsound(src.loc, 'sounds/effects/grillehit.ogg', 100, 1)
 		animate_shake()
 		add_fingerprint(escapee)
 
@@ -443,7 +444,7 @@
 	breakout = 0
 	to_chat(escapee, SPAN_WARNING("You successfully break out!"))
 	visible_message(SPAN_DANGER("\The [escapee] successfully broke out of \the [src]!"))
-	playsound(src.loc, 'sound/effects/grillehit.ogg', 100, 1)
+	playsound(src.loc, 'sounds/effects/grillehit.ogg', 100, 1)
 	break_open()
 	animate_shake()
 
@@ -479,7 +480,7 @@
 /obj/structure/closet/proc/togglelock(mob/user, obj/item/card/id/id_card)
 	if(!(setup & CLOSET_HAS_LOCK))
 		return FALSE
-	if(!CanPhysicallyInteract(user))
+	if(!CanInteract(user, GLOB.physical_no_access_state))
 		return FALSE
 	if(src.opened)
 		to_chat(user, SPAN_NOTICE("Close \the [src] first."))
@@ -557,4 +558,7 @@
 	broken = TRUE
 	locked = FALSE
 	desc += " It appears to be broken."
+	return TRUE
+
+/obj/structure/closet/AllowDrop()
 	return TRUE

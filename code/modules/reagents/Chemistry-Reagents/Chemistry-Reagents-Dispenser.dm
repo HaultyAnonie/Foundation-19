@@ -8,6 +8,7 @@
 	color = "#808080"
 	metabolism = REM * 0.2
 	value = DISPENSER_REAGENT_VALUE
+	accelerant_quality = 3
 
 /datum/reagent/acetone/affect_blood(mob/living/carbon/M, alien, removed)
 	if(alien == IS_NABBER)
@@ -84,7 +85,7 @@
 			ingested.remove_reagent(R.type, removed * effect)
 
 /datum/reagent/carbon/touch_turf(turf/T)
-	if(!istype(T, /turf/space))
+	if(!isspaceturf(T))
 		var/obj/effect/decal/cleanable/dirt/dirtoverlay = locate(/obj/effect/decal/cleanable/dirt, T)
 		if (!dirtoverlay)
 			dirtoverlay = new/obj/effect/decal/cleanable/dirt(T)
@@ -120,6 +121,11 @@
 	glass_name = "ethanol"
 	glass_desc = "A well-known alcohol with a variety of applications."
 	value = DISPENSER_REAGENT_VALUE
+	accelerant_quality = 5
+
+/datum/reagent/ethanol/New()
+	addiction_types = list(/datum/addiction/alcohol = max(0.5, 50 / strength)) // Higher strength is somehow weaker, go figure
+	return ..()
 
 /datum/reagent/ethanol/touch_mob(mob/living/L, amount)
 	if(istype(L))
@@ -233,7 +239,7 @@
 
 /datum/reagent/lithium/affect_blood(mob/living/carbon/M, alien, removed)
 	if(alien != IS_DIONA)
-		if(istype(M.loc, /turf/space))
+		if(isspaceturf(M.loc))
 			M.SelfMove(pick(GLOB.cardinal))
 		if(prob(5))
 			M.emote(pick("twitch", "drool", "moan"))
@@ -248,7 +254,7 @@
 
 /datum/reagent/mercury/affect_blood(mob/living/carbon/M, alien, removed)
 	if(alien != IS_DIONA)
-		if(istype(M.loc, /turf/space))
+		if(isspaceturf(M.loc))
 			M.SelfMove(pick(GLOB.cardinal))
 		if(prob(5))
 			M.emote(pick("twitch", "drool", "moan"))
@@ -291,7 +297,7 @@
 
 /datum/reagent/radium/touch_turf(turf/T)
 	if(volume >= 3)
-		if(!istype(T, /turf/space))
+		if(!isspaceturf(T))
 			var/obj/effect/decal/cleanable/greenglow/glow = locate(/obj/effect/decal/cleanable/greenglow, T)
 			if(!glow)
 				new /obj/effect/decal/cleanable/greenglow(T)
@@ -317,10 +323,15 @@
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
 		if((H.chem_doses[GLOB.scp3349_precedent] > 4.4) && (H.chem_doses[GLOB.scp3349_fake_precedent] < 0.6))
-			H.RegisterSignal(H, COMSIG_CARBON_LIFE, /mob/living/carbon/human/proc/handle_3349, TRUE)
+			H.RegisterSignal(H, COMSIG_CARBON_LIFE, TYPE_PROC_REF(/mob/living/carbon/human, handle_3349), TRUE)
 
 			var/obj/item/organ/internal/heart/heart = H.internal_organs_by_name[BP_HEART]
-			heart.scp3349_induced = TRUE
+			heart.SCP = new /datum/scp(
+				src, // Ref to actual SCP atom
+				"", //Name (Should not be the scp desg, more like what it can be described as to viewers)
+				SCP_KETER, //Obj Class
+				"3349-1" //Numerical Designation
+			)
 
 /datum/reagent/sugar
 	name = "Sugar"

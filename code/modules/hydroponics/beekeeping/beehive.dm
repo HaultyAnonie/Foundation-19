@@ -120,7 +120,7 @@
 			to_chat(user, SPAN_NOTICE("You can't dismantle \the [src] with these bees inside."))
 			return
 		to_chat(user, SPAN_NOTICE("You start dismantling \the [src]..."))
-		playsound(loc, 'sound/items/Screwdriver.ogg', 50, 1)
+		playsound(loc, 'sounds/items/Screwdriver.ogg', 50, 1)
 		if(do_after(user, 30, src))
 			user.visible_message(SPAN_NOTICE("\The [user] dismantles \the [src]."), SPAN_NOTICE("You dismantle \the [src]."))
 			new /obj/item/beehive_assembly(loc)
@@ -253,7 +253,7 @@
 
 /obj/item/beehive_assembly/attack_self(mob/user)
 	to_chat(user, SPAN_NOTICE("You start assembling \the [src]..."))
-	if(do_after(user, 30, src))
+	if(do_after(user, 4 SECONDS, src, bonus_percentage = 25))
 		user.visible_message(SPAN_NOTICE("\The [user] constructs a beehive."), SPAN_NOTICE("You construct a beehive."))
 		new /obj/machinery/beehive(get_turf(user))
 		qdel(src)

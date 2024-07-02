@@ -65,6 +65,7 @@ var/list/admin_verbs_admin = list(
 	/datum/admins/proc/toggleoocdead,	//toggles ooc on/off for everyone who is dead,
 	/datum/admins/proc/toggledsay,		//toggles dsay on/off for everyone,
 	/datum/admins/proc/toggletimelocks,	//toggles timelocks on jobs for the server. DOES NOT TURN OFF TIME TRACKING,
+	/datum/admins/proc/togglecrosscomms, //toggles cross-server communications,
 	/client/proc/game_panel,			//game panel, allows to change game-mode etc,
 	/client/proc/cmd_admin_say,			//admin-only ooc chat,
 	/datum/admins/proc/togglehubvisibility, //toggles visibility on the BYOND Hub,
@@ -127,7 +128,8 @@ var/list/admin_verbs_fun = list(
 	/datum/admins/proc/call_supply_drop,
 	/datum/admins/proc/call_drop_pod,
 	/client/proc/create_dungeon,
-	/datum/admins/proc/ai_hologram_set
+	/datum/admins/proc/ai_hologram_set,
+	/client/proc/smite
 	)
 
 var/list/admin_verbs_spawn = list(
@@ -169,6 +171,7 @@ var/list/admin_verbs_debug = list(
 	/client/proc/cmd_debug_make_powernets,
 	/client/proc/debug_controller,
 	/client/proc/debug_antagonist_template,
+	/client/proc/pathfind,
 	/client/proc/cmd_debug_mob_lists,
 	/client/proc/cmd_admin_delete,
 	/client/proc/cmd_debug_del_all,
@@ -309,7 +312,8 @@ var/list/admin_verbs_mod = list(
 	/datum/admins/proc/view_txt_log,
 	/client/proc/game_panel,
 	/client/proc/free_slot_crew,
-	/client/proc/cmd_admin_create_centcom_report
+	/client/proc/cmd_admin_create_centcom_report,
+	/datum/admins/proc/DressUpMob,
 )
 var/list/admin_verbs_mentors = list(
 	/client/proc/cmd_mentor_say,
@@ -923,7 +927,7 @@ var/list/admin_verbs_mentors = list(
 
 	for (var/mob/T as mob in SSmobs.mob_list)
 		to_chat(T, "<br><center><span class='notice'><b><font size=4>Man up.<br> Deal with it.</font></b><br>Move on.</span></center><br>")
-		sound_to(T, 'sound/voice/ManUp1.ogg')
+		sound_to(T, 'sounds/voice/ManUp1.ogg')
 
 	log_and_message_staff("told everyone to man up and deal with it.")
 
@@ -934,8 +938,44 @@ var/list/admin_verbs_mentors = list(
 
 	if(!check_rights(R_FUN)) return
 
-	var/datum/spell/S = input("Choose the spell to give to that guy", "ABRAKADABRA") as null|anything in spells
-	if(!S) return
+	var/datum/spell/S = input("Choose the spell to give to that guy", "ABRAKADABRA") as null|anything in GLOB.spells_by_categories
+	if(!S)
+		return
 	T.add_spell(new S)
 	SSstatistics.add_field_details("admin_verb","GS") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 	log_and_message_staff("gave [key_name(T)] the spell [S].")
+
+// Right click panel
+/datum/admins/proc/DressUpMob(mob/M as mob in GLOB.player_list)
+	set category = null
+	set name = "Dressup"
+	set desc = "Changes outfit of a target mob. If it is a ghost - spawns their character first."
+
+	if(!check_rights(R_SPAWN))
+		return
+
+	DressUpMobTarget(M)
+
+/proc/DressUpMobTarget(mob/M)
+	if(!check_rights(R_SPAWN))
+		return
+
+	if(!ishuman(M) && !isghost(M))
+		to_chat(usr, SPAN_DANGER("This can only be used on instances of type /mob/living/carbon/human or /mob/observer/ghost"))
+		return
+
+	var/decl/hierarchy/outfit/outfit = input("Select outfit.", "Select equipment.") as null|anything in outfits()
+	if(!outfit)
+		return
+
+	if(QDELETED(M) || isnull(M))
+		to_chat(usr, SPAN_DANGER("The target mob has been deleted while you were choosing the outfit!"))
+		return
+
+	if(isghost(M))
+		if(!M.client)
+			M = new /mob/living/carbon/human(get_turf(M))
+		else
+			M = M.client.SpawnPrefsCharacter(get_turf(M))
+
+	dressup_human(M, outfit, TRUE)

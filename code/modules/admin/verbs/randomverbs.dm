@@ -490,7 +490,7 @@ Ccomp's first proc.
 
 	var/show_log = alert(src, "Show ion message?", "Message", "Yes", "No")
 	if(show_log == "Yes")
-		command_announcement.Announce("Ion storm detected near the [station_name()]. Please check all AI-controlled equipment for errors.", "Anomaly Alert", new_sound = 'sound/AI/ionstorm.ogg')
+		command_announcement.Announce("Ion storm detected near the [station_name()]. Please check all AI-controlled equipment for errors.", "Anomaly Alert", new_sound = 'sounds/AI/ionstorm.ogg')
 	SSstatistics.add_field_details("admin_verb","IONC") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 /client/proc/cmd_admin_rejuvenate(mob/living/M as mob in SSmobs.mob_list)
@@ -826,7 +826,7 @@ Ccomp's first proc.
 
 	switch(tgui_alert(mob, "Do you wish to send an admin alert to this user?", "Admin Aalert", list("Yes","No","Custom")))
 		if("Yes")
-			show_blurb(M, 15, "An admin is trying to talk to you!<br>Check your chat window and click their name to respond or you may be banned!", null, "center", "center", COLOR_RED, null, null, 1)
+			show_blurb(M.client, 15, "An admin is trying to talk to you!<br>Check your chat window and click their name to respond or you may be banned!", null, "center", "center", COLOR_RED, null, null, 1)
 			log_admin("[key_name(src)] sent a default admin alert to [key_name(M)].")
 			message_staff("[key_name(src)] sent a default admin alert to [key_name(M)].")
 
@@ -839,6 +839,6 @@ Ccomp's first proc.
 			if(!new_color)
 				return
 
-			show_blurb(M, 15, message, null, "center", "center", new_color, null, null, 1)
+			show_blurb(M.client, 15, message, null, "center", "center", new_color, null, null, 1)
 			log_admin("[key_name(src)] sent an admin alert to [key_name(M)] with custom message [message].")
 			message_staff("[key_name(src)] sent an admin alert to [key_name(M)] with custom message [message].")

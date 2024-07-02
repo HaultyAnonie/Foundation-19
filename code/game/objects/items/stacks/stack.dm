@@ -38,7 +38,7 @@
 	if(!plural_name)
 		plural_name = "[singular_name]s"
 	if (!mapload && isturf(loc))
-		addtimer(CALLBACK(src, .proc/stack_new), 0)
+		addtimer(CALLBACK(src, PROC_REF(stack_new)), 0)
 
 /obj/item/stack/proc/stack_new()
 	for (var/obj/item/stack/S in loc)
@@ -256,6 +256,10 @@
 	if (!amount)
 		return null
 
+	tamount = Floor(tamount)	// sanity check to prevent duping
+	if(tamount <= 0)				// if tamount was rounded to 0 (or below, somehow) just quit here
+		return null
+
 	var/transfer = max(min(tamount, src.amount, initial(max_amount)), 0)
 
 	var/orig_amount = src.amount
@@ -324,7 +328,7 @@
 		. = ceil(. * amount / max_amount)
 
 /obj/item/stack/Crossed(obj/o)
-	addtimer(CALLBACK(src, .proc/stack_crossed, o), 0)
+	addtimer(CALLBACK(src, PROC_REF(stack_crossed), o), 0)
 	. = ..()
 
 /obj/item/stack/proc/stack_crossed(obj/o)

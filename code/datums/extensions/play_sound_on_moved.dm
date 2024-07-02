@@ -10,9 +10,9 @@
 	var/always_play = FALSE
 	/// A list of paths to sound files. When `atom_holder` is moved, one of these will play, picked at random.
 	var/list/move_sounds = list(
-		'sound/effects/metalscrape1.ogg',
-		'sound/effects/metalscrape2.ogg',
-		'sound/effects/metalscrape3.ogg'
+		'sounds/effects/metalscrape1.ogg',
+		'sounds/effects/metalscrape2.ogg',
+		'sounds/effects/metalscrape3.ogg'
 	)
 	/// The volume of the sound to be played.
 	var/move_volume = 75
@@ -24,10 +24,10 @@
 		move_volume = volume_override
 	if (sounds_override)
 		move_sounds = sounds_override
-	GLOB.moved_event.register(atom_holder, src, .proc/DoMoveSound)
+	RegisterSignal(atom_holder, COMSIG_MOVED, PROC_REF(DoMoveSound))
 
 /datum/extension/play_sound_on_moved/Destroy()
-	GLOB.moved_event.unregister(atom_holder, src, .proc/DoMoveSound)
+	UnregisterSignal(atom_holder, COMSIG_MOVED)
 	..()
 
 /// Plays a random sound from `move_sounds` at volume `move_volume`, centered at the turf of `atom_holder`.

@@ -129,7 +129,7 @@ var/list/global/tank_gauge_cache = list()
 			to_chat(user, SPAN_WARNING("The valve is stuck. You can't move it at all!"))
 			return
 		var/reduction = round(user.get_skill_value(SKILL_ATMOS) * 0.5) //0,1,1,2,2
-		if (do_after(user, (5 - reduction) SECONDS, src))
+		if (do_after(user, (6 - reduction) SECONDS, src, bonus_percentage = 25 + (5 * reduction)))
 			if (GET_FLAGS(tank_flags, TANK_FLAG_WELDED))
 				to_chat(user, SPAN_WARNING("The valve is stuck. You can't move it at all!"))
 				return
@@ -160,7 +160,7 @@ var/list/global/tank_gauge_cache = list()
 		if(GET_FLAGS(tank_flags, TANK_FLAG_WIRED) && proxyassembly.assembly)
 
 			to_chat(user, SPAN_NOTICE("You carefully begin clipping the wires that attach to the tank."))
-			if(do_after(user, 100,src))
+			if(do_after(user, 12 SECONDS, src, bonus_percentage = 25))
 				CLEAR_FLAGS(tank_flags, TANK_FLAG_WIRED)
 				to_chat(user, SPAN_NOTICE("You cut the wire and remove the device."))
 
@@ -184,7 +184,7 @@ var/list/global/tank_gauge_cache = list()
 					proxyassembly.receive_signal()
 
 		else if(GET_FLAGS(tank_flags, TANK_FLAG_WIRED))
-			if(do_after(user, 10, src))
+			if(do_after(user, 1 SECOND, src, bonus_percentage = 100))
 				to_chat(user, SPAN_NOTICE("You quickly clip the wire from the tank."))
 				CLEAR_FLAGS(tank_flags, TANK_FLAG_WIRED)
 				update_icon(TRUE)
@@ -196,7 +196,7 @@ var/list/global/tank_gauge_cache = list()
 		if(GET_FLAGS(tank_flags, TANK_FLAG_WIRED))
 			add_fingerprint(user)
 			to_chat(user, SPAN_NOTICE("You begin attaching the assembly to \the [src]."))
-			if(do_after(user, 50, src))
+			if(do_after(user, 7 SECONDS, src, bonus_percentage = 25))
 				to_chat(user, SPAN_NOTICE("You finish attaching the assembly to \the [src]."))
 				GLOB.bombers += "[key_name(user)] attached an assembly to a wired [src]. Temp: [air_contents.temperature-T0C]"
 				log_and_message_staff("attached an assembly to a wired [src]. Temp: [air_contents.temperature-T0C]", user)
@@ -215,7 +215,7 @@ var/list/global/tank_gauge_cache = list()
 			add_fingerprint(user)
 			if(!GET_FLAGS(tank_flags, TANK_FLAG_WELDED))
 				to_chat(user, SPAN_NOTICE("You begin welding the \the [src] emergency pressure relief valve."))
-				if(do_after(user, 40,src))
+				if(do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 					to_chat(user, SPAN_NOTICE("You carefully weld \the [src] emergency pressure relief valve shut.</span><span class='warning'> \The [src] may now rupture under pressure!"))
 					SET_FLAGS(tank_flags, TANK_FLAG_WELDED)
 					CLEAR_FLAGS(tank_flags, TANK_FLAG_LEAKING)
@@ -240,13 +240,6 @@ var/list/global/tank_gauge_cache = list()
 				var/new_temperature = total_energy / total_capacity
 
 				src.air_contents.temperature = new_temperature
-
-	if(istype(W, /obj/item/flamethrower))
-		var/obj/item/flamethrower/F = W
-		if(!F.status || F.tank || !user.unEquip(src, F))
-			return
-		master = F
-		F.tank = src
 
 /obj/item/tank/attack_self(mob/user as mob)
 	add_fingerprint(user)
@@ -498,7 +491,7 @@ var/list/global/tank_gauge_cache = list()
 			if(!T)
 				return
 			//T.assume_air(air_contents) // Commented out until hot air is "rebalanced". ~Tsurupeta
-			playsound(get_turf(src), 'sound/weapons/gunshot/shotgun.ogg', 20, 1)
+			playsound(get_turf(src), 'sounds/weapons/gunshot/shotgun.ogg', 20, 1)
 			visible_message("[icon2html(src, viewers(get_turf(src)))] <span class='danger'>\The [src] flies apart!</span>", SPAN_WARNING("You hear a bang!"))
 			T.hotspot_expose(air_contents.temperature, 70, 1)
 
@@ -531,7 +524,7 @@ var/list/global/tank_gauge_cache = list()
 			T.assume_air(leaked_gas)
 			if(!GET_FLAGS(tank_flags, TANK_FLAG_LEAKING))
 				visible_message("[icon2html(src, viewers(get_turf(src)))] <span class='warning'>\The [src] relief valve flips open with a hiss!</span>", "You hear hissing.")
-				playsound(loc, 'sound/effects/spray.ogg', 10, 1, -3)
+				playsound(loc, 'sounds/effects/spray.ogg', 10, 1, -3)
 				SET_FLAGS(tank_flags, TANK_FLAG_LEAKING)
 				#ifdef FIREDBG
 				log_debug(SPAN_WARNING("[x],[y] tank is leaking: [pressure] kPa, integrity [integrity]"))

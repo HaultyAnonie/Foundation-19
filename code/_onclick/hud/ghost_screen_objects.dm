@@ -1,5 +1,5 @@
 /obj/screen/ghost
-	icon = 'icons/mob/screen_ghost.dmi'
+	icon = 'icons/hud/screen_ghost.dmi'
 
 /obj/screen/ghost/orbit
 	name = "Orbit"
@@ -7,9 +7,26 @@
 
 /obj/screen/ghost/orbit/Click()
 	var/mob/observer/ghost/G = usr
-	var/mob/fh = tgui_input_list(G, "Choose a player to orbit", "Orbit", GLOB.player_list)
+	var/list/A
+	A += GLOB.living_mob_list_
+	A += GLOB.SCP_list
+	A += GLOB.player_list
+	var/mob/fh = tgui_input_list(G, "Choose a player to orbit", "Orbit", A)
 	if(istype(fh))
 		G.follow(fh)
+	else
+		var/turf/T = get_turf(fh)
+		G.ghost_to_turf(T)
+
+/obj/screen/ghost/become_scp
+	name = "Become an SCP"
+	icon_state = "become_scp"
+
+/obj/screen/ghost/become_scp/Click()
+	var/mob/observer/ghost/G = usr
+	if(!istype(G))
+		return
+	G?.become_scp()
 
 /obj/screen/ghost/reenter_corpse
 	name = "Reenter corpse"

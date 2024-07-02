@@ -24,7 +24,7 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	id = MODE_CULTIST
 	role_text = "Cultist"
 	role_text_plural = "Cultists"
-	blacklisted_jobs = list(/datum/job/ai, /datum/job/classd, /datum/job/captain, /datum/job/hos, /datum/job/rd, /datum/job/ethicsliaison, /datum/job/tribunal, /datum/job/commsofficer, /datum/job/enlistedofficerez, /datum/job/enlistedofficerlcz, /datum/job/enlistedofficerhcz, /datum/job/ncoofficerez, /datum/job/ncoofficerlcz, /datum/job/ncoofficerhcz, /datum/job/ltofficerez, /datum/job/ltofficerlcz, /datum/job/ltofficerhcz, /datum/job/goirep)
+	blacklisted_jobs = list(/datum/job/ai, /datum/job/classd, /datum/job/captain, /datum/job/hos, /datum/job/rd, /datum/job/ethicsliaison, /datum/job/tribunal, /datum/job/commsofficer, /datum/job/enlistedofficerez, /datum/job/enlistedofficerlcz, /datum/job/enlistedofficerhcz, /datum/job/ncoofficerez, /datum/job/ncoofficerlcz, /datum/job/ncoofficerhcz, /datum/job/ltofficerez, /datum/job/ltofficerlcz, /datum/job/ltofficerhcz, /datum/job/goirep, /datum/job/raisa)
 	feedback_tag = "cult_objective"
 	antag_indicator = "hudcultist"
 	welcome_text = "You have a tome in your possession; one that will help you start the cult. Use it well and remember - there are others."
@@ -32,7 +32,7 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	loss_text = "The staff managed to stop the cult!"
 	victory_feedback_tag = "win - cult win"
 	loss_feedback_tag = "loss - staff stopped the cult"
-	flags = ANTAG_SUSPICIOUS | ANTAG_RANDSPAWN | ANTAG_VOTABLE
+	flags = ANTAG_RANDSPAWN | ANTAG_VOTABLE
 	hard_cap = 5
 	hard_cap_round = 6
 	initial_spawn_req = 4
@@ -49,7 +49,7 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	var/cult_rating = 0
 	var/list/cult_rating_bounds = list(CULT_RUNES_1, CULT_RUNES_2, CULT_RUNES_3, CULT_GHOSTS_1, CULT_GHOSTS_2, CULT_GHOSTS_3)
 	var/max_cult_rating = 0
-	var/conversion_blurb = "You catch a glimpse of the Realm of Nar-Sie, the Geometer of Blood. You now see how flimsy the world is, you see that it should be open to the knowledge of That Which Waits. Assist your new compatriots in their dark dealings. Their goals are yours, and yours are theirs. You serve the Dark One above all else. Bring It back."
+	var/conversion_blurb = "You catch a glimpse of the Realm of the Scarlet King. You now see how flimsy the world is, you see that it should be open to the knowledge of Him. Assist your new compatriots in their dark dealings. Their goals are yours, and yours are theirs. You serve the King of the Darkness Below above all else."
 
 	faction = "cult"
 
@@ -156,10 +156,8 @@ GLOBAL_DATUM_INIT(cult, /datum/antagonist/cultist, new)
 	if(!iscultist(M) || !M.mind)
 		return
 
-	to_chat(M, SPAN_OCCULT("Do you want to abandon the cult of Nar'Sie? <a href='?src=\ref[src];confirmleave=1'>ACCEPT</a>"))
-
-/datum/antagonist/cultist/Topic(href, href_list)
-	if(href_list["confirmleave"])
+	var/choice = tgui_alert(M, "Do you want to abandon the cult of the Scarlet King?", "Uncult Offer", list("ACCEPT"))
+	if(choice == "ACCEPT")
 		GLOB.cult.remove_antagonist(usr.mind, 1)
 
 /datum/antagonist/cultist/proc/remove_cultiness(amount)

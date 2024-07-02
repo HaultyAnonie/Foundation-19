@@ -24,7 +24,7 @@
 	spawn_flags = SPECIES_IS_RESTRICTED
 	genders = list(NEUTER)
 	force_cultural_info = list(
-		TAG_CULTURE = CULTURE_STARLIGHT
+		TAG_CULTURE = CULTURE_OTHER
 	)
 
 /datum/species/starlight/handle_death_check(mob/living/carbon/human/H)
@@ -33,7 +33,7 @@
 	return FALSE
 
 /datum/species/starlight/handle_death(mob/living/carbon/human/H)
-	addtimer(CALLBACK(H,/mob/proc/dust),0)
+	addtimer(CALLBACK(H,TYPE_PROC_REF(/mob, dust)),0)
 
 /datum/species/starlight/starborn
 	name = "Starborn"
@@ -74,7 +74,7 @@
 
 	total_health = 250
 	body_temperature = T0C + 500 //We are being of fire and light.
-	species_flags = SPECIES_FLAG_NO_MINOR_CUT | SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_EMBED | SPECIES_FLAG_NO_TANGLE | SPECIES_FLAG_NO_PAIN
+	species_flags = SPECIES_FLAG_NO_MINOR_CUT | SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_EMBED | SPECIES_FLAG_NO_TANGLE | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_DISEASE
 
 	base_auras = list(
 		/obj/aura/starborn
@@ -106,10 +106,10 @@
 	oxy_mod = 0
 	toxins_mod = 0
 	radiation_mod = 0
-	species_flags = SPECIES_FLAG_NO_MINOR_CUT | SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_EMBED | SPECIES_FLAG_NO_TANGLE
+	species_flags = SPECIES_FLAG_NO_MINOR_CUT | SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_POISON | SPECIES_FLAG_NO_EMBED | SPECIES_FLAG_NO_TANGLE | SPECIES_FLAG_NO_DISEASE
 
 	override_organ_types = list(BP_EYES = /obj/item/organ/internal/eyes/blueforged)
 
 /datum/species/starlight/blueforged/handle_death(mob/living/carbon/human/H)
 	..()
-	new /obj/effect/temporary(get_turf(H),11, 'icons/mob/mob.dmi', "liquify")
+	new /obj/effect/temp_visual/temporary(get_turf(H),11, 'icons/mob/mob.dmi', "liquify")

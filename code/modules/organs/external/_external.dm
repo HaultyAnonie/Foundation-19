@@ -385,7 +385,7 @@
 			return 0
 
 	user.setClickCooldown(DEFAULT_ATTACK_COOLDOWN)
-	if(!do_after(user, 1 SECOND, owner))
+	if(!do_after(user, 1 SECOND, owner, bonus_percentage = 100))
 		to_chat(user, SPAN_WARNING("You must stand still to do that."))
 		return 0
 
@@ -464,7 +464,7 @@ This function completely restores a damaged organ to perfect condition.
 
 	if(BP_IS_CRYSTAL(src) && (damage >= 15 || prob(1)))
 		type = SHATTER
-		playsound(loc, 'sound/effects/hit_on_shattered_glass.ogg', 40, 1) // Crash!
+		playsound(loc, 'sounds/effects/hit_on_shattered_glass.ogg', 40, 1) // Crash!
 
 	//moved these before the open_wound check so that having many small wounds for example doesn't somehow protect you from taking internal damage (because of the return)
 	//Brute damage can possibly trigger an internal wound, too.
@@ -590,7 +590,7 @@ the actual time is dependent on RNG.
 INFECTION_LEVEL_ONE		below this germ level nothing happens, and the infection doesn't grow
 INFECTION_LEVEL_TWO		above this germ level the infection will start to spread to internal and adjacent organs and rest will be required to recover
 INFECTION_LEVEL_THREE	above this germ level the player will take additional toxin damage per second, and will die in minutes without
-						antitox. also, above this germ level you will need to overdose on spaceacillin and get rest to reduce the germ_level.
+						antitox. also, above this germ level you will need to overdose on penicillin and get rest to reduce the germ_level.
 
 Note that amputating the affected organ does in fact remove the infection from the player's body.
 */
@@ -630,7 +630,7 @@ Note that amputating the affected organ does in fact remove the infection from t
 	if(germ_level < INFECTION_LEVEL_TWO)
 		return ..()
 
-	var/antibiotics = owner.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
+	var/antibiotics = owner.reagents.get_reagent_amount(/datum/reagent/medicine/penicillin)
 
 	if(germ_level >= INFECTION_LEVEL_TWO)
 		//spread the infection to internal organs

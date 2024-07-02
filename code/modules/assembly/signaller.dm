@@ -36,7 +36,7 @@
 /obj/item/device/assembly/signaller/activate()
 	if(cooldown > 0)	return 0
 	cooldown = 2
-	addtimer(CALLBACK(src, .proc/process_cooldown), 1 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(process_cooldown)), 1 SECONDS)
 
 	signal()
 	return 1
@@ -135,7 +135,7 @@
 	pulse(TRUE)
 
 	if(!holder)
-		playsound(loc, 'sound/machines/twobeep.ogg', 15)
+		playsound(loc, 'sounds/machines/twobeep.ogg', 15)
 	return TRUE
 
 

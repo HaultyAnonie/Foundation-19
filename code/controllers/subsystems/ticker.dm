@@ -38,6 +38,8 @@ SUBSYSTEM_DEF(ticker)
 	var/station_time_rate_multiplier = 12 //factor of station time progressal vs real time.
 	var/round_start_time = 0
 
+	var/news_report
+
 /datum/controller/subsystem/ticker/Initialize()
 	if(start_ASAP)
 		to_world(SPAN_INFO("<B>The game will start as soon as possible due to configuration!</B>"))
@@ -133,7 +135,7 @@ SUBSYSTEM_DEF(ticker)
 	if(mode_finished && game_finished())
 		Master.SetRunLevel(RUNLEVEL_POSTGAME)
 		end_game_state = END_GAME_READY_TO_END
-		INVOKE_ASYNC(src, .proc/declare_completion)
+		INVOKE_ASYNC(src, PROC_REF(declare_completion))
 
 	else if(mode_finished && (end_game_state <= END_GAME_NOT_OVER))
 		end_game_state = END_GAME_MODE_FINISH_DONE
@@ -506,3 +508,23 @@ Helpers
 		return
 	Master.SetRunLevel(RUNLEVEL_SETUP)
 	return 1
+
+/datum/controller/subsystem/ticker/proc/send_news_report()
+	var/news_message
+	var/news_source = "[GLOB.using_map.company_name] News"
+	switch(news_report)
+		if(FACILITY_EVACUATED)
+			news_message = "The employes of [station_name()] have been evacuated amid unconfirmed reports of enemy activity."
+
+		if(FACILITY_DESTROYED_NUKE)
+			news_message = "We would like to reassure all employees that the reports of a nuclear explosion on [station_name()] are, in fact, a hoax. Have a secure day!"
+
+		if(FACILITY_DESTROYED_SELF_DESTRUCT)
+			news_message = "Unconfirmed reports claim that [station_name()] has been destroyed with a self-destruct mechanism. [GLOB.using_map.company_short] officials have dispatched a rescue team to search for any potential survivors."
+
+	if(news_message)
+		var/list/payload = list()
+		var/network_name = config.cross_comms_network
+		if(network_name)
+			payload["network"] = network_name
+		send2otherserver(news_source, news_message, "News_Report", additional_data = payload)

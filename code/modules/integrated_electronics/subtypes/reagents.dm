@@ -58,7 +58,7 @@
 			var/location = get_turf(src)
 			var/datum/effect/effect/system/smoke_spread/chem/S = new
 			S.attach(location)
-			playsound(location, 'sound/effects/smoke.ogg', 50, 1, -3)
+			playsound(location, 'sounds/effects/smoke.ogg', 50, 1, -3)
 			if(S)
 				S.set_up(reagents, smoke_radius, 0, location)
 				if(!notified)
@@ -196,7 +196,7 @@
 			L.visible_message(SPAN_DANGER("\The [acting_object] is trying to inject [L]!"), \
 								SPAN_DANGER("\The [acting_object] is trying to inject you!"))
 			busy = TRUE
-			addtimer(CALLBACK(src, .proc/inject_after, weakref(L)), injection_delay)
+			addtimer(CALLBACK(src, PROC_REF(inject_after), weakref(L)), injection_delay)
 			return
 		else
 			if(!AM.is_open_container())
@@ -226,7 +226,7 @@
 			C.visible_message(SPAN_DANGER("\The [acting_object] is trying to take a blood sample from [C]!"), \
 								SPAN_DANGER("\The [acting_object] is trying to take a blood sample from you!"))
 			busy = TRUE
-			addtimer(CALLBACK(src, .proc/draw_after, weakref(C), tramount), injection_delay)
+			addtimer(CALLBACK(src, PROC_REF(draw_after), weakref(C), tramount), injection_delay)
 			return
 
 		else

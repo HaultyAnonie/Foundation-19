@@ -224,9 +224,9 @@
 		to_chat(user, SPAN_WARNING("You cannot unwrench \the [src], it is too exerted due to internal pressure."))
 		add_fingerprint(user)
 		return 1
-	playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+	playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
 	to_chat(user, SPAN_NOTICE("You begin to unfasten \the [src]..."))
-	if (do_after(user, 40, src))
+	if (do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 		user.visible_message( \
 			SPAN_NOTICE("\The [user] unfastens \the [src]."), \
 			SPAN_NOTICE("You have unfastened \the [src]."), \
@@ -251,17 +251,17 @@
 /decl/public_access/public_method/open_valve
 	name = "open valve"
 	desc = "Sets the valve to open."
-	call_proc = /obj/machinery/atmospherics/valve/proc/open
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/valve, open)
 
 /decl/public_access/public_method/close_valve
 	name = "open valve"
 	desc = "Sets the valve to open."
-	call_proc = /obj/machinery/atmospherics/valve/proc/close
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/valve, close)
 
 /decl/public_access/public_method/toggle_valve
 	name = "toggle valve"
 	desc = "Toggles whether the valve is open or closed."
-	call_proc = /obj/machinery/atmospherics/valve/proc/toggle
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/valve, toggle)
 
 /obj/machinery/atmospherics/valve/digital		// can be controlled by AI
 	name = "digital valve"

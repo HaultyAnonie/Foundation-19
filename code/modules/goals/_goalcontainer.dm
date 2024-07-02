@@ -4,15 +4,17 @@
 
 /datum/component/goalcontainer/New()
 	. = ..()
-	RegisterSignal(SSdcs, COMSIG_ROUND_ENDED, .proc/goal_recap)
+	RegisterSignal(SSdcs, COMSIG_ROUND_ENDED, PROC_REF(goal_recap))
 
 /datum/component/goalcontainer/RegisterWithParent()
-	RegisterSignal(parent, COMSIG_MIND_POST_INIT, .proc/recalculate_goals)
+	RegisterSignal(parent, COMSIG_MIND_POST_INIT, PROC_REF(recalculate_goals))
 
 /datum/component/goalcontainer/UnregisterFromParent()
 	UnregisterSignal(parent, COMSIG_MIND_POST_INIT)
 
 /datum/component/goalcontainer/Destroy()
+	QDEL_LIST_ASSOC_VAL(goal_list)
+	goal_list = null
 	return ..()
 
 /datum/component/goalcontainer/proc/add_goal_by_type(type, category, autofill_rewards = FALSE)
@@ -76,9 +78,11 @@
 	if(goal_list.len)
 		var/list/goal_list_descriptions = list()
 
-		for(var/thing in goal_list)
-			var/datum/goal/goal = thing
-			goal_list_descriptions += goal.description
+		for(var/cat_name in goal_list)
+			var/list/category = goal_list[cat_name]
+			for(var/thing in category)
+				var/datum/goal/goal = thing
+				goal_list_descriptions += goal.description
 
 		message += "You did not complete the following goals:<br> [jointext(goal_list_descriptions, "<br>")]<br>"
 

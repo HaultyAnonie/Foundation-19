@@ -51,11 +51,11 @@
 	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN | SPECIES_NO_ROBOTIC_INTERNAL_ORGANS
 	appearance_flags = HAS_HAIR_COLOR | HAS_LIPS | HAS_UNDERWEAR | HAS_SKIN_COLOR | HAS_EYE_COLOR
 
-	flesh_color = "#34af10"
+	flesh_color = "#383838"
 
 	reagent_tag = IS_UNATHI
-	base_color = "#066000"
-	blood_color = "#f24b2e"
+	base_color = "#383838"
+	blood_color = "#9beea2"
 	organs_icon = 'icons/mob/human_races/species/unathi/organs.dmi'
 
 	move_trail = /obj/effect/decal/cleanable/blood/tracks/claw
@@ -73,7 +73,7 @@
 		"You feel sluggish and cold.",
 		"Your scales bristle against the cold."
 		)
-	breathing_sound = 'sound/voice/lizard.ogg'
+	breathing_sound = 'sounds/voice/lizard.ogg'
 
 	base_auras = list(
 		/obj/aura/regenerating/human/unathi
@@ -96,42 +96,22 @@
 
 	available_cultural_info = list(
 		TAG_CULTURE = list(
-			CULTURE_UNATHI_POLAR,
-			CULTURE_UNATHI_DIAMOND_PEAKS,
-			CULTURE_UNATHI_DESERT,
-			CULTURE_UNATHI_SAVANNAH,
-			CULTURE_UNATHI_SALT_SWAMP,
-			CULTURE_UNATHI_SPACE,
-			CULTURE_UNATHI_TERSTEN,
+			CULTURE_OTHER
 		),
 		TAG_HOMEWORLD = list(
-			HOME_SYSTEM_MOGHES,
-			HOME_SYSTEM_OUERE,
-			HOME_SYSTEM_UNATHI_TERSTEN,
-			HOME_SYSTEM_OFFWORLD
+			HOME_SYSTEM_OTHER
 		),
 		TAG_FACTION = list(
-			FACTION_UNATHI_HEGEMONY,
-			FACTION_UNATHI_TERSTEN_HEGEMONY,
-			FACTION_UNATHI_SSEN_UUMA,
-			FACTION_UNATHI_BAASK,
-			FACTION_UNATHI_GRESIS,
-			FACTION_UNATHI_INDEPENDENT
+			FACTION_OTHER
 		),
 		TAG_RELIGION =  list(
-			RELIGION_UNATHI_STRATAGEM,
-			RELIGION_UNATHI_PRECURSOR,
-			RELIGION_UNATHI_VINE,
-			RELIGION_UNATHI_LIGHTS,
-			RELIGION_UNATHI_MARKESHELI,
-			RELIGION_UNATHI_ANCESTOR,
 			RELIGION_OTHER
 		)
 	)
 	default_cultural_info = list(
-		TAG_CULTURE   = CULTURE_UNATHI_POLAR,
-		TAG_HOMEWORLD = HOME_SYSTEM_MOGHES,
-		TAG_FACTION   = FACTION_UNATHI_INDEPENDENT,
+		TAG_CULTURE   = CULTURE_OTHER,
+		TAG_HOMEWORLD = HOME_SYSTEM_OTHER,
+		TAG_FACTION   = FACTION_OTHER,
 		TAG_RELIGION  = RELIGION_OTHER
 	)
 	pain_emotes_with_pain_level = list(

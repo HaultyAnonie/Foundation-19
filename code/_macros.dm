@@ -16,8 +16,6 @@ var/const/NEGATIVE_INFINITY = -1#INF // win: -1.#INF, lin: -inf
 
 #define isnan(N) (isnum(N) && (N) != (N))
 
-#define get_turf(A) get_step(A,0)
-
 #define get_x(A) (get_step(A, 0)?.x || 0)
 
 #define get_y(A) (get_step(A, 0)?.y || 0)
@@ -49,6 +47,8 @@ var/const/NEGATIVE_INFINITY = -1#INF // win: -1.#INF, lin: -inf
 #define isEye(A) istype(A, /mob/observer/eye)
 
 #define ishuman(A) istype(A, /mob/living/carbon/human)
+
+#define ismonkey(A) isspecies(A, "Monkey")
 
 #define isid(A) istype(A, /obj/item/card/id)
 
@@ -211,23 +211,21 @@ var/const/NEGATIVE_INFINITY = -1#INF // win: -1.#INF, lin: -inf
 
 #define crash_with(X) crash_at(X, __FILE__, __LINE__)
 
-#define isscp106(A) istype(A, /mob/living/carbon/human/scp_106)
+#define isscp106(A) istype(A, /mob/living/carbon/human/scp106)
 
 #define isscp049(A) istype(A, /mob/living/carbon/human/scp049)
 
 #define isscp343(A) istype(A, /mob/living/carbon/human/scp343)
 
-#define isscp049_1(A) (istype(A, /mob/living/carbon/human) && A.scp_049_instance)
+#define isscp999(A) istype(A, /mob/living/scp999)
 
-#define isscp999(A) istype(A, /mob/living/simple_animal/scp_999)
+#define isscp131(A) istype(A, /mob/living/simple_animal/friendly/scp131)
 
-#define isscp131(A) istype(A, /mob/living/simple_animal/scp_131)
+#define isscp529(A) istype(A, /mob/living/simple_animal/cat/fluff/scp529)
 
-#define isscp529(A) istype(A, /mob/living/simple_animal/cat/fluff/scp_529)
+#define isscp527(A) istype(A, /mob/living/carbon/human/scp527)
 
-#define isscp527(A) istype(A, /mob/living/carbon/human/scp_527)
-
-#define isscp173(A) istype(A, /mob/living/scp_173)
+#define isscp173(A) istype(A, /mob/living/scp173)
 
 #define isstructure(A) istype(A, /obj/structure)
 
@@ -245,4 +243,4 @@ var/const/NEGATIVE_INFINITY = -1#INF // win: -1.#INF, lin: -inf
 
 #define istimer(O) istype(O, /obj/item/device/assembly/timer)
 
-#define isscp2343(A) istype(A, /mob/living/carbon/human/scp2343)
+#define isscp2343(A) istype(A, /mob/living/carbon/human/scp343/scp2343)

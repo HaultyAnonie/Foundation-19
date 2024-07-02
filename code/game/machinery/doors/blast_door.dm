@@ -22,8 +22,8 @@
 	var/icon_state_open_broken = null
 	var/icon_state_closed_broken = null
 
-	var/open_sound = 'sound/machines/blastdoor_open.ogg'
-	var/close_sound = 'sound/machines/blastdoor_close.ogg'
+	var/open_sound = 'sounds/machines/blastdoor_open.ogg'
+	var/close_sound = 'sounds/machines/blastdoor_close.ogg'
 
 	var/open_plane = DEFAULT_PLANE
 	var/closed_plane = OBJ_PLANE
@@ -151,7 +151,7 @@
 	if(isCrowbar(C) || (istype(C, /obj/item/material/twohanded/fireaxe) && C:wielded == 1))
 		if(((stat & NOPOWER) || (stat & BROKEN)) && !( operating ))
 			to_chat(user, SPAN_NOTICE("You begin prying at \the [src]..."))
-			if(do_after(user, 2 SECONDS, src))
+			if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25))
 				force_toggle()
 		else
 			to_chat(user, SPAN_NOTICE("[src]'s motors resist your effort."))
@@ -166,7 +166,7 @@
 			to_chat(user, SPAN_WARNING("You don't have enough sheets to repair this! You need at least [amt] sheets."))
 			return
 		to_chat(user, SPAN_NOTICE("You begin repairing \the [src]..."))
-		if(do_after(user, 5 SECONDS, src))
+		if(do_after(user, 7 SECONDS, src, bonus_percentage = 25))
 			if(P.use(amt))
 				to_chat(user, SPAN_NOTICE("You have repaired \the [src]."))
 				repair()
@@ -227,7 +227,7 @@
 /decl/public_access/public_method/close_door_delayed
 	name = "delayed close door"
 	desc = "Closes the door if possible, after a short delay."
-	call_proc = /obj/machinery/door/blast/proc/delayed_close
+	call_proc = TYPE_PROC_REF(/obj/machinery/door/blast, delayed_close)
 
 /decl/stock_part_preset/radio/receiver/blast_door
 	frequency = BLAST_DOORS_FREQ
@@ -299,8 +299,8 @@
 	icon_state_open_broken = "shutter_open_broken"
 	icon_state_closed_broken = "shutter_closed_broken"
 
-	open_sound = 'sound/machines/shutters_open.ogg'
-	close_sound = 'sound/machines/shutters_close.ogg'
+	open_sound = 'sounds/machines/shutters_open.ogg'
+	close_sound = 'sounds/machines/shutters_close.ogg'
 	open_plane = OBJ_PLANE
 	plane = OBJ_PLANE
 	min_force = 15

@@ -459,7 +459,7 @@
 		else //Just a normal vend, then
 			R.get_product(get_turf(src))
 			src.visible_message("\The [src] clunks as it vends \the [R.item_name].")
-			playsound(src, 'sound/machines/vending_machine.ogg', 25, 1)
+			playsound(src, 'sounds/machines/vending_machine.ogg', 25, 1)
 			show_sound_effect(src.loc, soundicon = SFX_ICON_SMALL)
 			if(prob(1)) //The vending gods look favorably upon you
 				sleep(3)
@@ -673,7 +673,7 @@
 /obj/machinery/vending/coffee
 	name = "\improper Hot Drinks machine"
 	desc = "A vending machine which dispenses hot drinks and hot drinks accessories."
-	product_ads = "Have a drink!;Drink up!;It's good for you!;Would you like a hot joe?;I'd kill for some coffee!;The best beans in the galaxy.;Only the finest brew for you.;Mmmm. Nothing like a coffee.;I like coffee, don't you?;Coffee helps you work!;Try some tea.;We hope you like the best!;Try our new chocolate!;Admin conspiracies"
+	product_ads = "Have a drink!;Drink up!;It's good for you!;Would you like a hot joe?;I'd kill for some coffee!;The best beans in the world.;Only the finest brew for you.;Mmmm. Nothing like a coffee.;I like coffee, don't you?;Coffee helps you work!;Try some tea.;We hope you like the best!;Try our new chocolate!;Admin conspiracies"
 	icon_state = "coffee"
 	icon_vend = "coffee-vend"
 	icon_deny = "coffee-deny"
@@ -1206,7 +1206,7 @@
 	vend_delay = 21
 	base_type = /obj/machinery/vending/engivend
 	req_access = list(list(ACCESS_ATMOSPHERICS,ACCESS_ENGINEERING_LVL2))
-	products = list(/obj/item/clothing/glasses/meson = 2,/obj/item/device/multitool = 4,/obj/item/device/geiger = 4,/obj/item/airlock_electronics = 10,/obj/item/module/power_control = 10,/obj/item/airalarm_electronics = 10,/obj/item/cell/standard = 10,/obj/item/clamp = 10)
+	products = list(/obj/item/clothing/glasses/meson = 2,/obj/item/device/multitool = 4,/obj/item/device/geiger = 4,/obj/item/airlock_electronics = 10,/obj/item/power_control_module = 10,/obj/item/airalarm_electronics = 10,/obj/item/cell/standard = 10,/obj/item/clamp = 10)
 	contraband = list(/obj/item/cell/high = 3)
 	premium = list(/obj/item/storage/belt/utility = 3)
 

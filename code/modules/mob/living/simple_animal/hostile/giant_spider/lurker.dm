@@ -10,8 +10,8 @@
 	icon_living = "lurker"
 	icon_dead = "lurker_dead"
 
-	maxHealth = 100
-	health = 100
+	maxHealth = 120
+	health = 120
 
 	poison_per_bite = 5
 
@@ -86,7 +86,7 @@
 		var/mob/living/L = A
 		L.Weaken(cloaked_weaken_amount)
 		to_chat(L, SPAN_DANGER("\The [src] ambushes you!"))
-		playsound(src, 'sound/weapons/spiderlunge.ogg', 75, 1)
+		playsound(src, 'sounds/weapons/spiderlunge.ogg', 75, 1)
 	uncloak()
 	..() // For the poison.
 

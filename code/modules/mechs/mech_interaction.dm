@@ -116,7 +116,7 @@
 			zone_sel.set_selected_zone(BP_CHEST)
 	// You may attack the target with your exosuit FIST if you're malfunctioning.
 	var/atom/movable/AM = A
-	var/fail_prob = (user != src && istype(AM) && AM.loc != src) ? (user.skill_check(SKILL_PILOT, HAS_PERK) ? 0: 15 ) : 0
+	var/fail_prob = (user != src && istype(AM) && AM.loc != src) ? (user.skill_check(SKILL_WEAPONS, HAS_PERK) ? 0: 15 ) : 0
 	var/failed = FALSE
 	if(prob(fail_prob))
 		to_chat(user, SPAN_DANGER("Your incompetence leads you to target the wrong thing with the exosuit!"))
@@ -236,7 +236,7 @@
 	if(!check_enter(user))
 		return
 	to_chat(user, SPAN_NOTICE("You start climbing into \the [src]..."))
-	if(!body || !do_after(user, body.climb_time))
+	if(!body || !do_after(user, body.climb_time, bonus_percentage = 25))
 		return
 	if(!body)
 		return
@@ -246,7 +246,7 @@
 	user.forceMove(src)
 	LAZYDISTINCTADD(pilots, user)
 	sync_access()
-	playsound(src, 'sound/machines/windowdoor.ogg', 50, 1)
+	playsound(src, 'sounds/machines/windowdoor.ogg', 50, 1)
 	if(user.client) user.client.screen |= hud_elements
 	LAZYDISTINCTADD(user.additional_vision_handlers, src)
 	update_pilots()
@@ -348,8 +348,8 @@
 					return
 
 				visible_message(SPAN_WARNING("\The [user] begins unwrenching the securing bolts holding \the [src] together."))
-				var/delay = 60 * user.skill_delay_mult(SKILL_DEVICES)
-				if(!do_after(user, delay) || !maintenance_protocols)
+				var/delay = 6 SECONDS * user.skill_delay_mult(SKILL_DEVICES)
+				if(!do_after(user, delay, bonus_percentage = 25) || !maintenance_protocols)
 					return
 				visible_message(SPAN_NOTICE("\The [user] loosens and removes the securing bolts, dismantling \the [src]."))
 				dismantle()
@@ -383,13 +383,13 @@
 				if(!body || !body.cell)
 					to_chat(user, SPAN_WARNING("There is no cell here for you to remove!"))
 					return
-				var/delay = 20 * user.skill_delay_mult(SKILL_DEVICES)
-				if(!do_after(user, delay) || !maintenance_protocols || !body || !body.cell)
+				var/delay = 2.5 SECONDS * user.skill_delay_mult(SKILL_DEVICES)
+				if(!do_after(user, delay, bonus_percentage = 25) || !maintenance_protocols || !body || !body.cell)
 					return
 
 				user.put_in_hands(body.cell)
 				to_chat(user, SPAN_NOTICE("You remove \the [body.cell] from \the [src]."))
-				playsound(user.loc, 'sound/items/Crowbar.ogg', 50, 1)
+				playsound(user.loc, 'sounds/items/Crowbar.ogg', 50, 1)
 				visible_message(SPAN_NOTICE("\The [user] pries out \the [body.cell] using \the [thing]."))
 				power = MECH_POWER_OFF
 				hud_power_control.queue_icon_update()
@@ -403,10 +403,10 @@
 					return
 				var/delay = min(50 * user.skill_delay_mult(SKILL_DEVICES), 50 * user.skill_delay_mult(SKILL_HAULING))
 				visible_message(SPAN_NOTICE("\The [user] starts forcing the \the [src]'s emergency [body.hatch_descriptor] release using \the [thing]."))
-				if(!do_after(user, delay, src, DO_DEFAULT | DO_PUBLIC_PROGRESS))
+				if(!do_after(user, delay, src))
 					return
 				visible_message(SPAN_NOTICE("\The [user] forces \the [src]'s [body.hatch_descriptor] open using the \the [thing]."))
-				playsound(user.loc, 'sound/machines/bolts_up.ogg', 25, 1)
+				playsound(user.loc, 'sounds/machines/bolts_up.ogg', 25, 1)
 				hatch_locked = FALSE
 				hatch_closed = FALSE
 				for(var/mob/pilot in pilots)
@@ -426,7 +426,7 @@
 					thing.forceMove(body)
 					body.cell = thing
 					to_chat(user, SPAN_NOTICE("You install \the [body.cell] into \the [src]."))
-					playsound(user.loc, 'sound/items/Screwdriver.ogg', 50, 1)
+					playsound(user.loc, 'sounds/items/Screwdriver.ogg', 50, 1)
 					visible_message(SPAN_NOTICE("\The [user] installs \the [body.cell] into \the [src]."))
 				return
 			else if(istype(thing, /obj/item/device/robotanalyzer))
@@ -445,7 +445,7 @@
 		else if(!hatch_closed)
 			var/mob/pilot = pick(pilots)
 			user.visible_message(SPAN_DANGER("\The [user] is trying to pull \the [pilot] out of \the [src]!"))
-			if(do_after(user, 30) && user.Adjacent(src) && (pilot in pilots) && !hatch_closed)
+			if(do_after(user, 3 SECONDS, bonus_percentage = 25) && user.Adjacent(src) && (pilot in pilots) && !hatch_closed)
 				user.visible_message(SPAN_DANGER("\The [user] drags \the [pilot] out of \the [src]!"))
 				eject(pilot, silent=1)
 		else if(hatch_closed)
@@ -461,8 +461,8 @@
 
 /mob/living/exosuit/attack_generic(mob/user, damage, attack_message = "smashes into")
 	if(..())
-		playsound(loc, 'sound/effects/metal_close.ogg', 40, 1)
-		playsound(loc, 'sound/weapons/tablehit1.ogg', 40, 1)
+		playsound(loc, 'sounds/effects/metal_close.ogg', 40, 1)
+		playsound(loc, 'sounds/weapons/tablehit1.ogg', 40, 1)
 
 /mob/living/exosuit/proc/attack_self(mob/user)
 	return visible_message("\The [src] pokes itself.")
@@ -481,3 +481,13 @@
 		if(hardpoints[h] == I)
 			return h
 	return 0
+
+/// Checks the mech for places to store the ore.
+/mob/living/exosuit/proc/getOreCarrier()
+	for(var/hardpoint in hardpoints)
+		if(istype(hardpoints[hardpoint], /obj/item/mech_equipment/clamp))
+			var/obj/item/mech_equipment/clamp/holder = hardpoints[hardpoint]
+			var/ore_box = locate(/obj/structure/ore_box) in holder.carrying
+			if(ore_box)
+				return ore_box
+	return null

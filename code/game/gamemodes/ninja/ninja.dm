@@ -1,6 +1,6 @@
 /datum/game_mode/ninja
 	name = "Ninja"
-	round_description = "An agent of the Spider Clan is onboard!"
+	round_description = "An agent of the Spider Clan is on site!"
 	extended_round_description = "What was that?! Was that a person or did your eyes just play tricks on you? \
 		You have no idea. That slim-suited, cryptic individual is an enigma to you and all of your knowledge. \
 		Their purpose is unknown. Their mission is unknown. How they arrived to this secure and isolated \
@@ -12,4 +12,4 @@
 	required_players = 5
 	required_enemies = 1
 	end_on_antag_death = FALSE
-	antag_tags = list(MODE_NINJA)
+	antag_tags = list(MODE_TRADER, MODE_INFORMANT, MODE_NINJA)

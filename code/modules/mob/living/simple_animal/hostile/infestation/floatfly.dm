@@ -1,4 +1,4 @@
-// Medium damage, Low health, Very high mobility
+// Medium damage, Low health, Very high mobility.
 // Ignores gravity and can "fly", temporarily turning non-dense
 // When attacked, can change its pixel position slightly, making it more difficult to hit
 
@@ -9,7 +9,7 @@
 	icon_living = "fly"
 	icon_dead = "fly_dead"
 	mob_size = MOB_SMALL
-	movement_cooldown = 2.5
+	movement_cooldown = 2.7
 
 	natural_weapon = /obj/item/natural_weapon/claws/floatfly
 
@@ -25,7 +25,7 @@
 
 	ai_holder_type = /datum/ai_holder/simple_animal/infestation/floatfly
 	say_list_type = /datum/say_list/infestation_floatfly
-	death_sounds = list('sound/simple_mob/abominable_infestation/floatfly/death.ogg')
+	death_sounds = list('sounds/simple_mob/abominable_infestation/floatfly/death.ogg')
 
 	var/fly_cooldown
 	var/fly_cooldown_time = 5 SECONDS
@@ -34,7 +34,7 @@
 /obj/item/natural_weapon/claws/floatfly
 	force = 14
 	armor_penetration = 10
-	hitsound = 'sound/weapons/alien_claw_flesh1.ogg'
+	hitsound = 'sounds/weapons/alien_claw_flesh1.ogg'
 
 /datum/say_list/infestation_floatfly
 	emote_hear = list("buzzes", "hisses")
@@ -47,9 +47,15 @@
 	animate(src, pixel_z = 0, time = 3)
 	return ..()
 
+/mob/living/simple_animal/hostile/infestation/floatfly/movement_delay()
+	. = ..()
+	// Faster while flying
+	if(!density)
+		. -= 0.5
+
 /mob/living/simple_animal/hostile/infestation/floatfly/adjustBruteLoss(amount)
 	. = ..()
-	if(world.time > fly_cooldown && prob(amount * 5))
+	if(!stat && world.time > fly_cooldown && prob(amount * 5))
 		animate(src, pixel_x = default_pixel_x + rand(-10, 10), pixel_y = default_pixel_y + rand(-10, 10), time = 2)
 
 /mob/living/simple_animal/hostile/infestation/floatfly/Allow_Spacemove()
@@ -59,11 +65,11 @@
 	if(!density || fly_cooldown >= world.time)
 		return FALSE
 	density = FALSE
-	playsound(src, 'sound/simple_mob/abominable_infestation/floatfly/fly.ogg', 75, TRUE, 6)
+	playsound(src, 'sounds/simple_mob/abominable_infestation/floatfly/fly.ogg', 75, TRUE, 6)
 	visible_message(SPAN_DANGER("\The [src] flies upwards!"))
 	animate(src, pixel_z = 16, time = 5)
 	default_pixel_z = 16
-	addtimer(CALLBACK(src, .proc/EndFlight), fly_duration)
+	addtimer(CALLBACK(src, PROC_REF(EndFlight)), fly_duration)
 
 /mob/living/simple_animal/hostile/infestation/floatfly/proc/EndFlight()
 	if(QDELETED(src) || stat == DEAD)

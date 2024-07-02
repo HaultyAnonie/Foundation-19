@@ -51,7 +51,7 @@
 		src.health -= aforce
 
 	//Play a fitting sound
-	playsound(src.loc, 'sound/effects/EMPulse.ogg', 75, 1)
+	playsound(src.loc, 'sounds/effects/EMPulse.ogg', 75, 1)
 
 	check_failure()
 	set_opacity(1)
@@ -106,7 +106,7 @@
 	src.health -= tforce
 
 	//This seemed to be the best sound for hitting a force field.
-	playsound(src.loc, 'sound/effects/EMPulse.ogg', 100, 1)
+	playsound(src.loc, 'sounds/effects/EMPulse.ogg', 100, 1)
 
 	check_failure()
 
@@ -166,14 +166,14 @@
 
 /obj/machinery/shieldgen/proc/create_shields()
 	for(var/turf/target_tile in range(8, src))
-		if ((istype(target_tile,/turf/space)|| istype(target_tile, /turf/simulated/open)) && !(locate(/obj/machinery/shield) in target_tile))
+		if ((isspaceturf(target_tile)|| istype(target_tile, /turf/simulated/open)) && !(locate(/obj/machinery/shield) in target_tile))
 			if (malfunction && prob(33) || !malfunction)
 				var/obj/machinery/shield/S = new/obj/machinery/shield(target_tile)
 				deployed_shields += S
 				use_power_oneoff(S.shield_generate_power)
 
 	for(var/turf/above in range(8, GetAbove(src)))//Probably a better way to do this.
-		if ((istype(above,/turf/space)|| istype(above, /turf/simulated/open)) && !(locate(/obj/machinery/shield) in above))
+		if ((isspaceturf(above)|| istype(above, /turf/simulated/open)) && !(locate(/obj/machinery/shield) in above))
 			if (malfunction && prob(33) || !malfunction)
 				var/obj/machinery/shield/A = new/obj/machinery/shield(above)
 				deployed_shields += A
@@ -283,7 +283,7 @@
 
 /obj/machinery/shieldgen/attackby(obj/item/W as obj, mob/user as mob)
 	if(isScrewdriver(W))
-		playsound(src.loc, 'sound/items/Screwdriver.ogg', 100, 1)
+		playsound(src.loc, 'sounds/items/Screwdriver.ogg', 100, 1)
 		if(is_open)
 			to_chat(user, SPAN_NOTICE("You close the panel."))
 			is_open = 0
@@ -294,8 +294,8 @@
 	else if(isCoil(W) && malfunction && is_open)
 		var/obj/item/stack/cable_coil/coil = W
 		to_chat(user, SPAN_NOTICE("You begin to replace the wires."))
-		//if(do_after(user, min(60, round( ((maxhealth/health)*10)+(malfunction*10) ))) //Take longer to repair heavier damage
-		if(do_after(user, 30,src))
+		//Take longer to repair heavier damage
+		if(do_after(user, round((max_health - health) + (malfunction * 50)), src, bonus_percentage = 25))
 			if (coil.use(1))
 				health = max_health
 				malfunction = 0
@@ -307,15 +307,15 @@
 			to_chat(user, "The bolts are covered, unlocking this would retract the covers.")
 			return
 		if(anchored)
-			playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
+			playsound(src.loc, 'sounds/items/Ratchet.ogg', 100, 1)
 			to_chat(user, SPAN_NOTICE("'You unsecure the [src] from the floor!"))
 			if(active)
 				to_chat(user, SPAN_NOTICE("The [src] shuts off!"))
 				src.shields_down()
 			anchored = FALSE
 		else
-			if(istype(get_turf(src), /turf/space)) return //No wrenching these in space!
-			playsound(src.loc, 'sound/items/Ratchet.ogg', 100, 1)
+			if(isspaceturf(get_turf(src))) return //No wrenching these in space!
+			playsound(src.loc, 'sounds/items/Ratchet.ogg', 100, 1)
 			to_chat(user, SPAN_NOTICE("You secure the [src] to the floor!"))
 			anchored = TRUE
 

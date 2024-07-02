@@ -20,6 +20,9 @@
 	///Value used to increment ex_act() if reactionary_explosions is on
 	var/explosion_block = 0
 
+	/// How this atom should react to having its pathfinding blocking checked
+	var/can_astar_pass = CANPATHINGPASS_DENSITY
+
 /atom/New(loc, ...)
 	//atom creation method that preloads variables at creation
 	if(GLOB.use_preloader && (src.type == GLOB._preloader.target_path))//in case the instanciated atom is creating other atoms in New()
@@ -81,6 +84,22 @@
 /atom/Destroy()
 	QDEL_NULL(reagents)
 	. = ..()
+
+/**
+ * An atom has entered this atom's contents
+ *
+ * Default behaviour is to send the [COMSIG_ATOM_ENTERED]
+ */
+/atom/Entered(atom/movable/enterer, atom/old_loc)
+	SEND_SIGNAL(src, COMSIG_ENTERED, enterer, old_loc)
+
+/**
+ * An atom has exited this atom's contents
+ *
+ * Default behaviour is to send the [COMSIG_ATOM_EXITED]
+ */
+/atom/Exited(atom/movable/exitee, atom/new_loc)
+	SEND_SIGNAL(src, COMSIG_EXITED, exitee, new_loc)
 
 /atom/proc/reveal_blood()
 	return
@@ -190,78 +209,6 @@
 			found += A.search_contents_for(path,filter_path)
 	return found
 
-
-
-
-/*
-Beam code by Gunbuddy
-
-Beam() proc will only allow one beam to come from a source at a time.  Attempting to call it more than
-once at a time per source will cause graphical errors.
-Also, the icon used for the beam will have to be vertical and 32x32.
-The math involved assumes that the icon is vertical to begin with so unless you want to adjust the math,
-its easier to just keep the beam vertical.
-*/
-/atom/proc/Beam(atom/BeamTarget,icon_state="b_beam",icon='icons/effects/beam.dmi',time=50, maxdistance=10)
-	//BeamTarget represents the target for the beam, basically just means the other end.
-	//Time is the duration to draw the beam
-	//Icon is obviously which icon to use for the beam, default is beam.dmi
-	//Icon_state is what icon state is used. Default is b_beam which is a blue beam.
-	//Maxdistance is the longest range the beam will persist before it gives up.
-	var/EndTime=world.time+time
-	while(BeamTarget&&world.time<EndTime&&get_dist(src,BeamTarget)<maxdistance&&z==BeamTarget.z)
-	//If the BeamTarget gets deleted, the time expires, or the BeamTarget gets out
-	//of range or to another z-level, then the beam will stop.  Otherwise it will
-	//continue to draw.
-
-		set_dir(get_dir(src,BeamTarget))	//Causes the source of the beam to rotate to continuosly face the BeamTarget.
-
-		for(var/obj/effect/overlay/beam/O in orange(10,src))	//This section erases the previously drawn beam because I found it was easier to
-			if(O.BeamSource==src)				//just draw another instance of the beam instead of trying to manipulate all the
-				qdel(O)							//pieces to a new orientation.
-		var/Angle=round(Get_Angle(src,BeamTarget))
-		var/icon/I=new(icon,icon_state)
-		I.Turn(Angle)
-		var/DX=(32*BeamTarget.x+BeamTarget.pixel_x)-(32*x+pixel_x)
-		var/DY=(32*BeamTarget.y+BeamTarget.pixel_y)-(32*y+pixel_y)
-		var/N=0
-		var/length=round(sqrt((DX)**2+(DY)**2))
-		for(N,N<length,N+=32)
-			var/obj/effect/overlay/beam/X=new(loc)
-			X.BeamSource=src
-			if(N+32>length)
-				var/icon/II=new(icon,icon_state)
-				II.DrawBox(null,1,(length-N),32,32)
-				II.Turn(Angle)
-				X.icon=II
-			else X.icon=I
-			var/Pixel_x=round(sin(Angle)+32*sin(Angle)*(N+16)/32)
-			var/Pixel_y=round(cos(Angle)+32*cos(Angle)*(N+16)/32)
-			if(DX==0) Pixel_x=0
-			if(DY==0) Pixel_y=0
-			if(Pixel_x>32)
-				for(var/a=0, a<=Pixel_x,a+=32)
-					X.x++
-					Pixel_x-=32
-			if(Pixel_x<-32)
-				for(var/a=0, a>=Pixel_x,a-=32)
-					X.x--
-					Pixel_x+=32
-			if(Pixel_y>32)
-				for(var/a=0, a<=Pixel_y,a+=32)
-					X.y++
-					Pixel_y-=32
-			if(Pixel_y<-32)
-				for(var/a=0, a>=Pixel_y,a-=32)
-					X.y--
-					Pixel_y+=32
-			X.pixel_x=Pixel_x
-			X.pixel_y=Pixel_y
-		sleep(3)	//Changing this to a lower value will cause the beam to follow more smoothly with movement, but it will also be more laggy.
-					//I've found that 3 ticks provided a nice balance for my use.
-	for(var/obj/effect/overlay/beam/O in orange(10,src)) if(O.BeamSource==src) qdel(O)
-
-
 // A type overriding /examine() should either return the result of ..() or return TRUE if not calling ..()
 // Calls to ..() should generally not supply any arguments and instead rely on BYOND's automatic argument passing
 // There is no need to check the return value of ..(), this is only done by the calling /examinate() proc to validate the call chain
@@ -291,6 +238,9 @@ its easier to just keep the beam vertical.
 	var/old_dir = dir
 	if(new_dir == old_dir)
 		return FALSE
+
+	SEND_SIGNAL(src, COMSIG_DIR_SET, new_dir, old_dir)
+
 	dir = new_dir
 	return TRUE
 
@@ -301,6 +251,16 @@ its easier to just keep the beam vertical.
 		update_icon()
 	else
 		icon_state = new_icon_state
+
+/atom/proc/SetName(new_name)
+	var/old_name = name
+	if(old_name != new_name)
+		name = new_name
+
+		//TODO: de-shitcodify
+		if(has_extension(src, /datum/extension/labels))
+			var/datum/extension/labels/L = get_extension(src, /datum/extension/labels)
+			name = L.AppendLabelsToName(name)
 
 /atom/proc/update_icon()
 	on_update_icon(arglist(args))
@@ -322,7 +282,7 @@ its easier to just keep the beam vertical.
 
 /atom/proc/lava_act()
 	visible_message(SPAN_DANGER("\The [src] sizzles and melts away, consumed by the lava!"))
-	playsound(src, 'sound/effects/flare_start.ogg', 100, 3)
+	playsound(src, 'sounds/effects/flare_start.ogg', 100, 3)
 	qdel(src)
 	. = TRUE
 
@@ -353,7 +313,8 @@ its easier to just keep the beam vertical.
 /mob/living/proc/handle_additional_vomit_reagents(obj/effect/decal/cleanable/vomit/vomit)
 	vomit.reagents.add_reagent(/datum/reagent/acid/stomach, 5)
 
-/atom/proc/clean_blood()
+/atom/proc/clean(clean_forensics = TRUE)
+	SHOULD_CALL_PARENT(TRUE)
 	if(!simulated)
 		return
 	fluorescent = 0
@@ -362,8 +323,8 @@ its easier to just keep the beam vertical.
 	gunshot_residue = null
 	if(istype(blood_DNA, /list))
 		blood_DNA = null
-		return 1
-
+		return TRUE
+	return FALSE
 /atom/proc/get_global_map_pos()
 	if (!islist(GLOB.global_map) || !length(GLOB.global_map))
 		return
@@ -386,7 +347,7 @@ its easier to just keep the beam vertical.
 	return pass_flags&passflag
 
 /atom/proc/isinspace()
-	if(istype(get_turf(src), /turf/space))
+	if(isspaceturf(get_turf(src)))
 		return 1
 	else
 		return 0
@@ -557,7 +518,7 @@ its easier to just keep the beam vertical.
 	user.visible_message(SPAN_WARNING("\The [user] starts climbing onto \the [src]!"))
 	LAZYDISTINCTADD(climbers,user)
 
-	if(!do_after(user,(issmall(user) ? MOB_CLIMB_TIME_SMALL : MOB_CLIMB_TIME_MEDIUM) * climb_speed_mult, src))
+	if(!do_after(user,(issmall(user) ? MOB_CLIMB_TIME_SMALL : MOB_CLIMB_TIME_MEDIUM) * climb_speed_mult, src, bonus_percentage = 25))
 		LAZYREMOVE(climbers,user)
 		return 0
 
@@ -644,3 +605,38 @@ its easier to just keep the beam vertical.
  */
 /atom/proc/handle_atom_del(atom/deleting_atom)
 	return
+
+/// Return TRUE if things should be dropped onto this atom
+/atom/proc/AllowDrop()
+	return FALSE
+
+///Where atoms should drop if taken from this atom
+/atom/proc/drop_location()
+	var/atom/location = loc
+	if(!location)
+		return null
+	return location.AllowDrop() ? location : location.drop_location()
+
+/**
+ * This proc is used for telling whether something can pass by this atom in a given direction, for use by the pathfinding system.
+ *
+ * Trying to generate one long path across the station will call this proc on every single object on every single tile that we're seeing if we can move through, likely
+ * multiple times per tile since we're likely checking if we can access said tile from multiple directions, so keep these as lightweight as possible.
+ *
+ * For turfs this will only be used if pathing_pass_method is TURF_PATHING_PASS_PROC
+ *
+ * Arguments:
+ * * ID- An ID card representing what access we have (and thus if we can open things like airlocks or windows to pass through them). The ID card's physical location does not matter, just the reference
+ * * to_dir- What direction we're trying to move in, relevant for things like directional windows that only block movement in certain directions
+ * * caller- The movable we're checking pass flags for, if we're making any such checks
+ * * no_id: When true, doors with public access will count as impassible
+ *
+ * IMPORTANT NOTE: /turf/proc/LinkBlockedWithAccess assumes that overrides of CanAStarPass will always return true if density is FALSE
+ * If this is NOT you, ensure you edit your can_astar_pass variable. Check __DEFINES/path.dm
+ **/
+/atom/proc/CanPathingPass(obj/item/card/id/ID, to_dir, atom/movable/caller, no_id = FALSE)
+	/*
+	if(caller && (caller.pass_flags & pass_flags_self))
+		return TRUE
+	*/
+	. = !density

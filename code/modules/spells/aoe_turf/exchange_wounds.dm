@@ -1,8 +1,6 @@
 /datum/spell/aoe_turf/exchange_wounds
 	name = "Exchange Wounds"
 	desc = "Syphon the wounds from your allies."
-	feedback = "EW"
-	school = "transmutation"
 	invocation = "Esh Yek Vai!"
 	invocation_type = INVOKE_SHOUT
 	charge_max = 400
@@ -17,17 +15,20 @@
 
 	hud_state = "wiz_exchange"
 
+	spell_cost = 2
+	mana_cost = 10
+
 /datum/spell/aoe_turf/exchange_wounds/perform()
 	amt_healed = 0
 	..()
 
 /datum/spell/aoe_turf/exchange_wounds/cast(list/targets, mob/living/user)
-	new /obj/effect/temporary(get_turf(user),10,'icons/effects/effects.dmi',"purple_electricity_constant")
+	new /obj/effect/temp_visual/temporary(get_turf(user),10,'icons/effects/effects.dmi',"purple_electricity_constant")
 	for(var/t in targets)
 		for(var/mob/living/L in t)
 			if(L.faction != user.faction)
 				continue
-			new /obj/effect/temporary(get_turf(L),10,'icons/effects/effects.dmi',"green_sparkles")
+			new /obj/effect/temp_visual/temporary(get_turf(L),10,'icons/effects/effects.dmi',"green_sparkles")
 			if(L.getBruteLoss() > 5)
 				L.adjustBruteLoss(-5)
 				user.adjustBruteLoss(2)

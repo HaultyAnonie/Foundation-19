@@ -149,7 +149,7 @@
 	var/Angle = round(Get_Angle(src,M))
 	var/matrix/rot_matrix = matrix()
 	rot_matrix.Turn(Angle)
-	addtimer(CALLBACK(src, .proc/finish_shot, target), rotation_speed)
+	addtimer(CALLBACK(src, PROC_REF(finish_shot), target), rotation_speed)
 	animate(src, transform = rot_matrix, rotation_speed, easing = SINE_EASING)
 
 	set_dir(transform.get_angle() > 0 ? NORTH : SOUTH)
@@ -172,7 +172,7 @@
 		return
 	//We throw a laser but it doesnt have to hit for meteor to explode
 	var/obj/item/projectile/beam/pointdefense/beam = new (get_turf(src))
-	playsound(src, 'sound/effects/heavy_cannon_blast.ogg', 75, 1)
+	playsound(src, 'sounds/effects/heavy_cannon_blast.ogg', 75, 1)
 	use_power_oneoff(idle_power_usage * 10)
 	beam.launch(M.loc)
 	M.make_debris()
@@ -256,6 +256,6 @@
 /obj/machinery/pointdefense/proc/Deactivate()
 	if(!active)
 		return FALSE
-	playsound(src, 'sound/machines/apc_nopower.ogg', 50, 0)
+	playsound(src, 'sounds/machines/apc_nopower.ogg', 50, 0)
 	active = FALSE
 	return TRUE

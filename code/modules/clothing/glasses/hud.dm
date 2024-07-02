@@ -7,8 +7,8 @@
 	gender = NEUTER
 	toggleable = TRUE
 	action_button_name = "Toggle HUD"
-	activation_sound = sound('sound/machines/boop1.ogg', volume = 10)
-	deactivation_sound = sound('sound/effects/compbeep1.ogg', volume = 30)
+	activation_sound = sound('sounds/machines/boop1.ogg', volume = 10)
+	deactivation_sound = sound('sounds/effects/compbeep1.ogg', volume = 30)
 
 	species_restricted = list("exclude", SPECIES_DIONA)
 
@@ -61,6 +61,23 @@
 	body_parts_covered = 0
 	var/global/list/jobs[0]
 	req_access = list(ACCESS_SECURITY_LVL1)
+
+/obj/item/clothing/glasses/hud/night/security
+	name = "security night vision goggles"
+	desc = "You can totally see in the dark now, AND see criminals!"
+	icon_state = "securityhudnight"
+	hud_type = HUD_SECURITY
+	body_parts_covered = 0
+	var/global/list/jobs[0]
+	req_access = list(ACCESS_SECURITY_LVL1)
+	origin_tech = list(TECH_MAGNET = 2)
+	darkness_view = 7
+	action_button_name = "Toggle Goggles"
+	toggleable = TRUE
+	see_invisible = SEE_INVISIBLE_NOLIGHTING
+	off_state = "denight"
+	electric = TRUE
+	species_restricted = list("exclude", SPECIES_DIONA)
 
 /obj/item/clothing/glasses/hud/security/prescription
 	name = "prescription security HUD"
@@ -130,18 +147,18 @@
 	see_invisible = SEE_INVISIBLE_NOLIGHTING
 	off_state = "denight"
 	electric = TRUE
-	var/faulty = FALSE
+	visual_insulation = V_INSL_PERFECT
 
 /obj/item/clothing/glasses/hud/scramble/Initialize()
 	. = ..()
 	overlay = GLOB.global_hud.scramble
 
 /obj/item/clothing/glasses/hud/scramble/process_hud(mob/M)
-	process_scramble_hud(M, faulty)
+	process_scramble_hud(M)
 
 
 /obj/item/clothing/glasses/hud/scramble/faulty // for admin shenanigans
-	faulty = TRUE
+	visual_insulation = V_INSL_IMPERFECT
 
 /obj/item/clothing/glasses/hud/scramble/experimental
 	name = "experimental SCRAMBLE goggles"
@@ -150,4 +167,5 @@
 /obj/item/clothing/glasses/hud/scramble/experimental/Initialize()
 	. = ..()
 	// 30% chance of being faulty
-	faulty = prob(30)
+	if(prob(30))
+		visual_insulation = V_INSL_IMPERFECT

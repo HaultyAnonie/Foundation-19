@@ -48,7 +48,7 @@
 	to_chat(user, "Planting explosives...")
 	user.do_attack_animation(target)
 
-	if(do_after(user, 50, target) && in_range(user, target))
+	if(do_after(user, 7 SECONDS, target, bonus_percentage = 25) && in_range(user, target))
 		if(!user.unequip_item())
 			return
 		src.target = target
@@ -92,9 +92,9 @@
 	while(T > 0)
 		sleep(1 SECOND)
 		if(target)
-			playsound(target, 'sound/items/timer.ogg', 50)
+			playsound(target, 'sounds/items/timer.ogg', 50)
 		else
-			playsound(loc, 'sound/items/timer.ogg', 50)
+			playsound(loc, 'sounds/items/timer.ogg', 50)
 		T--
 	explode(get_turf(target))
 

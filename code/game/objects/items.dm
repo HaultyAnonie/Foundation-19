@@ -89,6 +89,9 @@
 
 	var/attack_ignore_harm_check = FALSE
 
+	// Certain items may have mana stored in them, i.e. wands and mana crystals
+	var/datum/mana/mana = null
+
 /obj/item/New()
 	..()
 	if(randpixel && (!pixel_x && !pixel_y) && isturf(loc)) //hopefully this will prevent us from messing with mapper-set pixel_x/y
@@ -210,7 +213,7 @@
 	if (!user) return
 	if (anchored)
 		return ..()
-	if (hasorgans(user))
+	if (ishuman(user))
 		var/mob/living/carbon/human/H = user
 		var/obj/item/organ/external/temp = H.organs_by_name[BP_R_HAND]
 		if (user.hand)
@@ -246,7 +249,7 @@
 
 	if(user.put_in_active_hand(src))
 		if (isturf(old_loc))
-			var/obj/effect/temporary/item_pickup_ghost/ghost = new(old_loc, src)
+			var/obj/effect/temp_visual/item_pickup_ghost/ghost = new(old_loc, dir, src)	// named arguments don't work since we want this var in Initialize() not New()
 			ghost.animate_towards(user)
 		if(randpixel)
 			pixel_x = rand(-randpixel, randpixel)
@@ -301,6 +304,9 @@
 		if(user.r_hand)
 			user.r_hand.update_twohanding()
 
+	SEND_SIGNAL(src, COMSIG_DROPPED_ITEM, user)
+	SEND_SIGNAL(user, COMSIG_MOB_DROPPED_ITEM, src)
+
 // called just as an item is picked up (loc is not yet changed)
 /obj/item/proc/pickup(mob/user)
 	return
@@ -335,6 +341,9 @@
 		M.l_hand.update_twohanding()
 	if(M.r_hand)
 		M.r_hand.update_twohanding()
+
+	SEND_SIGNAL(src, COMSIG_ITEM_EQUIPPED, user, slot)
+	SEND_SIGNAL(user, COMSIG_MOB_EQUIPPED_ITEM, src, slot)
 
 //Defines which slots correspond to which slot flags
 var/list/global/slot_flags_enumeration = list(
@@ -540,7 +549,7 @@ var/list/global/slot_flags_enumeration = list(
 	if(parry_chance)
 		if(default_parry_check(user, attacker, damage_source) && prob(parry_chance))
 			user.visible_message(SPAN_DANGER("\The [user] parries [attack_text] with \the [src]!"))
-			playsound(user.loc, 'sound/weapons/punchmiss.ogg', 50, 1)
+			playsound(user.loc, 'sounds/weapons/punchmiss.ogg', 50, 1)
 			on_parry(damage_source)
 			return 1
 	return 0
@@ -561,7 +570,7 @@ var/list/global/slot_flags_enumeration = list(
 		return 0
 	attacker.apply_damage(force, damtype, attacker.hand ? BP_L_HAND : BP_R_HAND, used_weapon = src)
 	attacker.visible_message(SPAN_DANGER("[attacker] hurts \his hand on [src]!"))
-	playsound(target, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+	playsound(target, 'sounds/weapons/thudswoosh.ogg', 50, 1, -1)
 	playsound(target, hitsound, 50, 1, -1)
 	return 1
 
@@ -632,7 +641,7 @@ var/list/global/slot_flags_enumeration = list(
 	M.eye_blurry += rand(3,4)
 	return
 
-/obj/item/clean_blood()
+/obj/item/clean()
 	. = ..()
 	if(blood_overlay)
 		cut_overlay(blood_overlay)
@@ -755,11 +764,11 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 	user.client.view = viewsize
 	zoom = 1
 
-	GLOB.destroyed_event.register(src, src, /obj/item/proc/unzoom)
-	GLOB.moved_event.register(user, src, /obj/item/proc/unzoom)
-	GLOB.dir_set_event.register(user, src, /obj/item/proc/unzoom)
-	GLOB.item_unequipped_event.register(src, user, /mob/living/proc/unzoom)
-	GLOB.stat_set_event.register(user, src, /obj/item/proc/unzoom)
+	RegisterSignal(src, COMSIG_PARENT_QDELETING, TYPE_PROC_REF(/obj/item, unzoom))
+	RegisterSignal(user, COMSIG_MOVED, TYPE_PROC_REF(/obj/item, unzoom))
+	RegisterSignal(user, COMSIG_DIR_SET, TYPE_PROC_REF(/obj/item, unzoom))
+	RegisterSignal(user, COMSIG_SET_STAT, TYPE_PROC_REF(/obj/item, unzoom))
+	user.RegisterSignal(src, COMSIG_DROPPED_ITEM, TYPE_PROC_REF(/mob/living, unzoom))
 
 	user.visible_message("\The [user] peers through [zoomdevicename ? "the [zoomdevicename] of [src]" : "[src]"].")
 
@@ -772,17 +781,17 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 		return
 	zoom = 0
 
-	GLOB.destroyed_event.unregister(src, src, /obj/item/proc/unzoom)
-	GLOB.moved_event.unregister(user, src, /obj/item/proc/unzoom)
-	GLOB.dir_set_event.unregister(user, src, /obj/item/proc/unzoom)
-	GLOB.item_unequipped_event.unregister(src, user, /mob/living/proc/unzoom)
+	UnregisterSignal(src, COMSIG_PARENT_QDELETING)
+	UnregisterSignal(user, COMSIG_MOVED)
+	UnregisterSignal(user, COMSIG_DIR_SET)
+	user.UnregisterSignal(src, COMSIG_DROPPED_ITEM)
 
 	user = user == src ? loc : (user || loc)
 	if(!istype(user))
 		crash_with("[log_info_line(src)]: Zoom user lost]")
 		return
 
-	GLOB.stat_set_event.unregister(user, src, /obj/item/proc/unzoom)
+	UnregisterSignal(user, COMSIG_SET_STAT)
 
 	if(!user.client)
 		return
@@ -917,3 +926,141 @@ modules/mob/living/carbon/human/life.dm if you die, you will be zoomed out.
 
 /obj/item/proc/attack_message_name()
 	return "\a [src]"
+
+GLOBAL_LIST_EMPTY(items_by_convert_rating)
+// A list of types that will not be added to the auto-item-generator below;
+GLOBAL_LIST_INIT(items_conversion_blacklist, list(
+	/obj/item/card/id/syndicate/station_access,
+	/obj/item/card/id/captains_spare) \
+	+ typesof(/obj/item/spellbook) \
+	+ typesof(/obj/item/card/id/centcom) \
+	+ typesof(/obj/item/gun))
+
+// BEHOLD! THE TERROR! THE NIGHTMARE!!!
+// tl;dr - We build a path of ALL(yes, all) items by "damage rating" for 1:1 and fine modes
+/obj/item/Conversion914(mode = MODE_ONE_TO_ONE, mob/user = usr)
+	// Generate the BIG LIST!
+	if(!length(GLOB.items_by_convert_rating))
+		for(var/thing in subtypesof(/obj/item) - GLOB.items_conversion_blacklist)
+			var/obj/item/I = thing
+			if(!initial(I.icon_state) || initial(I.anchored) || !initial(I.mouse_opacity) || (initial(I.w_class) >= ITEM_SIZE_NO_CONTAINER) || (initial(I.w_class) <= 0))
+				continue
+			// Holy shit
+			var/rating = ""
+			// By weight
+			switch(initial(I.w_class))
+				if(ITEM_SIZE_TINY)
+					rating += "tiny "
+				if(ITEM_SIZE_SMALL)
+					rating += "small "
+				if(ITEM_SIZE_NORMAL)
+					rating += "normal-sized "
+				if(ITEM_SIZE_LARGE)
+					rating += "large "
+				if(ITEM_SIZE_HUGE)
+					rating += "bulky "
+				if(ITEM_SIZE_HUGE + 1 to INFINITY)
+					rating += "huge "
+			// By force
+			switch(initial(I.force))
+				if(-INFINITY to 5)
+					rating += "very weak "
+				if(5 to 10)
+					rating += "weak "
+				if(10 to 16)
+					rating += "damaging "
+				if(16 to 24)
+					rating += "dangerous "
+				if(24 to 36)
+					rating += "very dangerous "
+				if(36 to 50)
+					rating += "deadly "
+				if(50 to INFINITY)
+					rating += "very deadly "
+			// By attack speed
+			if(initial(I.attack_cooldown) == DEFAULT_WEAPON_COOLDOWN)
+				rating += "normal-speed "
+			else if(initial(I.attack_cooldown) > DEFAULT_WEAPON_COOLDOWN)
+				rating += "low-speed "
+			else
+				rating += "high-speed "
+			// Sharp/Edge
+			if(initial(I.sharp))
+				rating += "sharp "
+			if(initial(I.edge))
+				rating += "edge "
+			rating += "item"
+
+			if(!(rating in GLOB.items_by_convert_rating))
+				GLOB.items_by_convert_rating[rating] = list()
+			GLOB.items_by_convert_rating[rating] += I
+
+	switch(mode)
+		if(MODE_ONE_TO_ONE, MODE_FINE, MODE_VERY_FINE)
+			var/rating = Check914Rating(mode)
+			if(!(rating in GLOB.items_by_convert_rating) || !length(GLOB.items_by_convert_rating[rating]))
+				return src
+			var/item_path = pick(GLOB.items_by_convert_rating[rating])
+			return item_path
+
+	return ..()
+
+/obj/item/proc/Check914Rating(mode = MODE_ONE_TO_ONE)
+	var/rating = ""
+	var/my_force = force
+	var/my_w_class = w_class
+	switch(mode)
+		if(MODE_FINE)
+			my_force *= (prob(90) ? pick(1.25, 1.5) : 0.9)
+			my_w_class += prob(50)
+		if(MODE_VERY_FINE)
+			my_force *= (prob(50) ? pick(1.5, 2) : 0.75)
+			my_w_class += pick(-1, 0, 0, 1)
+	// By weight
+	switch(my_w_class)
+		if(-INFINITY to ITEM_SIZE_TINY)
+			rating += "tiny "
+		if(ITEM_SIZE_SMALL)
+			rating += "small "
+		if(ITEM_SIZE_NORMAL)
+			rating += "normal-sized "
+		if(ITEM_SIZE_LARGE)
+			rating += "large "
+		if(ITEM_SIZE_HUGE)
+			rating += "bulky "
+		if(ITEM_SIZE_HUGE + 1 to INFINITY)
+			rating += "huge "
+	// By force
+	switch(my_force)
+		if(-INFINITY to 4)
+			rating += "very weak "
+		if(4 to 8)
+			rating += "weak "
+		if(8 to 12)
+			rating += "slightly damaging "
+		if(12 to 14)
+			rating += "damaging "
+		if(14 to 18)
+			rating += "somewhat dangerous "
+		if(18 to 24)
+			rating += "dangerous "
+		if(24 to 36)
+			rating += "very dangerous "
+		if(36 to 50)
+			rating += "deadly "
+		if(50 to INFINITY)
+			rating += "very deadly "
+	// By attack speed
+	if(attack_cooldown == DEFAULT_WEAPON_COOLDOWN)
+		rating += "normal-speed "
+	else if(attack_cooldown > DEFAULT_WEAPON_COOLDOWN)
+		rating += "low-speed "
+	else
+		rating += "high-speed "
+	// Sharp/Edge
+	if(sharp || (mode == MODE_VERY_FINE && prob(35)))
+		rating += "sharp "
+	if(edge || (mode == MODE_VERY_FINE && prob(35)))
+		rating += "edge "
+	rating += "item"
+	return rating

@@ -273,7 +273,7 @@
 			SPAN_INFO("[wearer]'s suit emits a quiet hum as it begins to adjust its seals."), \
 			SPAN_INFO("With a quiet hum, the suit begins running checks and adjusting components."))
 
-			if(seal_delay && !do_after(wearer,seal_delay, src))
+			if(seal_delay && !do_after(wearer, seal_delay, src, bonus_percentage = 25))
 				failed_to_seal = 1
 
 		if(!wearer)
@@ -296,7 +296,7 @@
 
 				if(!failed_to_seal && wearer.back == src && piece == compare_piece)
 
-					if(seal_delay && !instant && !do_after(wearer, seal_delay, src, do_flags = DO_DEFAULT & ~DO_USER_SAME_HAND))
+					if(seal_delay && !instant && !do_after(wearer, seal_delay, src, do_flags = DO_DEFAULT & ~DO_USER_SAME_HAND, bonus_percentage = 25))
 						failed_to_seal = 1
 
 					piece.icon_state = "[initial(icon_state)][!seal_target ? "_sealed" : ""]"
@@ -320,7 +320,7 @@
 					var/datum/extension/armor/rig/armor_datum = get_extension(piece, /datum/extension/armor)
 					if(istype(armor_datum))
 						armor_datum.sealed = !seal_target
-					playsound(src, 'sound/machines/suitstorage_lockdoor.ogg', 10, 0)
+					playsound(src, 'sounds/machines/suitstorage_lockdoor.ogg', 10, 0)
 
 				else
 					failed_to_seal = 1
@@ -684,7 +684,7 @@
 		SPAN_INFO("[M] starts putting on \the [src]..."), \
 		SPAN_INFO("You start putting on \the [src]..."))
 
-		if(!do_after(M,seal_delay,src))
+		if(!do_after(M, seal_delay, src, bonus_percentage = 25))
 			if(M?.back == src)
 				if(!M.unEquip(src))
 					return

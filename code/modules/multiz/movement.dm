@@ -145,7 +145,7 @@
 // Entered() which is part of Move(), by spawn()ing we let that complete.  But we want to preserve if we were in client movement
 // or normal movement so other move behavior can continue.
 /atom/movable/proc/begin_falling(lastloc, below)
-	INVOKE_ASYNC(src, /atom/movable/proc/fall_callback, below)
+	INVOKE_ASYNC(src, TYPE_PROC_REF(/atom/movable, fall_callback), below)
 
 /atom/movable/proc/fall_callback(turf/below)
 	var/mob/M = src
@@ -209,10 +209,19 @@
 /atom/movable/proc/handle_fall(turf/landing)
 	forceMove(landing)
 	if(locate(/obj/structure/stairs) in landing)
+		if(isliving(src))
+			var/mob/living/L = src
+			if(L.pulling)
+				L.pulling.forceMove(landing)
+		if(ishuman(src))
+			var/mob/living/carbon/human/H = src
+			if(H.has_footsteps())
+				playsound(landing, 'sounds/effects/stairs_step.ogg', 50)
+				playsound(landing, 'sounds/effects/stairs_step.ogg', 50)
 		return 1
 	else if(landing.get_fluid_depth() >= FLUID_DEEP)
 		visible_message(SPAN_NOTICE("\The [src] falls into the water!"), SPAN_NOTICE("What a splash!"))
-		playsound(src,  'sound/effects/watersplash.ogg', 30, TRUE)
+		playsound(src,  'sounds/effects/watersplash.ogg', 30, TRUE)
 		return 1
 	else
 		handle_fall_effect(landing)
@@ -281,7 +290,7 @@
 			return FALSE
 
 		visible_message(SPAN_NOTICE("[src] starts climbing onto \the [A]!"), SPAN_NOTICE("You start climbing onto \the [A]!"))
-		if(do_after(src, 50, A))
+		if(do_after(src, 7 SECONDS, A, bonus_percentage = 25))
 			visible_message(SPAN_NOTICE("[src] climbs onto \the [A]!"), SPAN_NOTICE("You climb onto \the [A]!"))
 			src.Move(T)
 		else
@@ -317,7 +326,7 @@
 	. = ..()
 	owner = user
 	follow()
-	GLOB.moved_event.register(owner, src, /atom/movable/z_observer/proc/follow)
+	RegisterSignal(owner, COMSIG_MOVED, TYPE_PROC_REF(/atom/movable/z_observer, follow))
 
 /atom/movable/z_observer/proc/follow()
 
@@ -341,7 +350,7 @@
 	qdel(src)
 
 /atom/movable/z_observer/Destroy()
-	GLOB.moved_event.unregister(owner, src, /atom/movable/z_observer/proc/follow)
+	UnregisterSignal(owner, COMSIG_MOVED)
 	owner = null
 	. = ..()
 

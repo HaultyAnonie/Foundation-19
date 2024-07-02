@@ -1,29 +1,11 @@
-/obj/item/clothing/accessory/armorplate/get_fibers()
-	return null	//plates do not shed
-
-/obj/item/clothing/accessory/armorplate/medium
-	name = "medium armor plate"
-	desc = "A plasteel-reinforced synthetic armor plate, providing good protection. Attaches to a plate carrier."
-	icon_state = "armor_medium"
-	armor = list(melee = 40, bullet = 50, laser = 40, energy = 25, bomb = 30, bio = 0, rad = 0)
-
-/obj/item/clothing/accessory/armor_tag/scp
-	name = "\improper SCP tag"
-	desc = "An armor tag with the word SCP printed in white lettering on it."
-	icon_state = "presstag"
-
-/obj/item/clothing/suit/armor/pcarrier/scp
-	name = "plate carrier"
-
 /obj/item/clothing/suit/armor/pcarrier/scp/medium
-	starting_accessories = list(/obj/item/clothing/accessory/armorplate/medium, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor_tag/scp)
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/medium, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor/tag/scp)
 
 /obj/item/clothing/suit/armor/pcarrier/scp/tactical
-	starting_accessories = list(/obj/item/clothing/accessory/armorplate/tactical, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor_tag/scp, /obj/item/clothing/accessory/armguards, /obj/item/clothing/accessory/legguards)
-
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/tactical, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor/tag/scp, /obj/item/clothing/accessory/armguards, /obj/item/clothing/accessory/legguards)
 
 /obj/item/clothing/suit/armor/pcarrier/green/scp/mtf_epsilon
-	starting_accessories = list(/obj/item/clothing/accessory/storage/pouches/green)
+	starting_accessories = list(/obj/item/clothing/accessory/armorplate/tactical/mtf, /obj/item/clothing/accessory/storage/pouches, /obj/item/clothing/accessory/armor/tag/scp, /obj/item/clothing/accessory/armguards, /obj/item/clothing/accessory/legguards, /obj/item/clothing/accessory/storage/pouches/green)
 
 /obj/item/clothing/suit/armor/vest/scp
 	w_class = ITEM_SIZE_HUGE
@@ -41,56 +23,75 @@
 
 /obj/item/clothing/suit/armor/vest/scp/medarmor
 	name = "armored vest"
-	desc = "A synthetic armor vest."
+	desc = "A heavy armored vest. Worn by facility security, it has some durathread plating in it to make it durable against melee, sadly not much else though."
 	icon_state = "guard-armor"
-	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	armor = list(melee = 40, bullet = 50, laser = 40, energy = 25, bomb = 30, bio = 15, rad = 10)
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO
+	cold_protection = UPPER_TORSO | LOWER_TORSO
+	armor = list(melee = 60, bullet = 35, laser = 35, energy = 25, bomb = 30, bio = 15, rad = 10)
 	acid_resistance = 1.5
 
-/obj/item/clothing/suit/armor/vest/scp/russcom
-	name = "Commander armor vest"
-	desc = "A synthetic armor vest. This one is for Commander."
-	icon_state = "heavy-guard-armor"
-	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	armor = list(melee = 45, bullet = 65, laser = 40, energy = 40, bomb = 40, bio = 15, rad = 10)
+/obj/item/clothing/suit/armor/vest/scp/medarmor/medic
+	name = "medical armored vest"
+	desc = "A light armored vest, with a medical pauldron. Worn by facility security in the Combat Medic division. This one's armor padding has been lessened to cope with faster response."
+	icon_state = "combatmedic"
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO | ARMS
+	cold_protection = UPPER_TORSO | LOWER_TORSO | ARMS
+	armor = list(melee = 35, bullet = 40, laser = 40, energy = 45, bomb = 15, bio = 45, rad = 35)
+	acid_resistance = 1.5
+
+/obj/item/clothing/suit/armor/vest/scp/medarmor/recontain
+	name = "response armored vest"
+	desc = "A heavy armored vest, with added kneepads. It has a Recontainment Unit insignia on the chest. Worn by facility security in the Riot Control Unit division. Universally defensive."
+	icon_state = "reconguard"
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS
+	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS
+	armor = list(melee = 35, bullet = 50, laser = 45, energy = 25, bomb = 30, bio = 10, rad = 5)
+	acid_resistance = 1.5
+
+/obj/item/clothing/suit/armor/vest/scp/medarmor/riot
+	name = "riot armored vest"
+	desc = "A heavy armored vest, with added arm armor, and kneepads for full body coverage. Worn by facility security in the Riot Control Unit division, it has some durathread plating in it to make it durable against melee, sadly not much else though. It looks extremely durable from impacts, but in return is fragile towards bullets."
+	icon_state = "riotguard"
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO | ARMS | LEGS
+	cold_protection = UPPER_TORSO | LOWER_TORSO | ARMS | LEGS
+	armor = list(melee = 70, bullet = 15, laser = 25, energy = 25, bomb = 50, bio = 15, rad = 10)
+	acid_resistance = 1.5
+
+/obj/item/clothing/suit/armor/vest/scp/medarmor/cadet
+	name = "foundation security trainee rig"
+	desc = "A lightly armored rig. Worn by facility security in training, it's nimble plating, and defensive properties make it faster to manuever in than a normal ol' vest."
+	icon_state = "cadetarmor"
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO
+	cold_protection = UPPER_TORSO | LOWER_TORSO
+	armor = list(melee = 35, bullet = 20, laser = 15, energy = 15, bomb = 15, bio = 15, rad = 10)
+	acid_resistance = 1.5
+	flags_inv = 0
+
+/obj/item/clothing/suit/armor/vest/scp/isd
+	name = "Internal Security trenchcoat"
+	desc = "A durable coat used by the Internal Security Department, there isn't much to note about it except for the golden SCP logo on the shoulder, and wrist designs."
+	icon_state = "isd_trenchcoat"
+	body_parts_covered = UPPER_TORSO | LOWER_TORSO | ARMS
+	cold_protection = UPPER_TORSO | LOWER_TORSO | ARMS
+	armor = list(melee = 40, bullet = 60, laser = 30, energy = 25, bomb = 30, bio = 15, rad = 10)
 	acid_resistance = 1.5
 
 /obj/item/clothing/suit/armor/vest/scp/lczcomm
-	name = "Heavy-plated armor vest"
-	desc = "A synthetic armor vest. This one is for Commander."
-	icon_state = "donate_sec"
+	name = "Heavy-plated armored vest"
+	desc = "A heavy armored vest, with added arm armor, and kneepads for full body coverage. Worn by the facility's LCZ Lieutenant, it has some durathread plating in it to make it durable against melee, and slightly in some other damage types."
+	icon_state = "heavy-guard-armor"
 	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
 	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	armor = list(melee = 45, bullet = 65, laser = 40, energy = 40, bomb = 40, bio = 15, rad = 10)
-	acid_resistance = 1.5
-
-/obj/item/clothing/suit/armor/vest/scp/commandervest
-	name = "armored vest"
-	desc = "A synthetic armor vest. This one is for Commander."
-	icon_state = "don_sec"
-	body_parts_covered = UPPER_TORSO | LOWER_TORSO
-	cold_protection = UPPER_TORSO | LOWER_TORSO
-	armor = list(melee = 45, bullet = 65, laser = 40, energy = 25, bomb = 30, bio = 15, rad = 10)
-	acid_resistance = 1.5
-
-/obj/item/clothing/suit/armor/vest/scp/combatexo
-	name = "Combat exosuit"
-	desc = "Another Synthetic armor vest."
-	icon_state = "donor_sec"
-	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	armor = list(melee = 40, bullet = 80, laser = 40, energy = 25, bomb = 30, bio = 15, rad = 10)
+	armor = list(melee = 65, bullet = 45, laser = 30, energy = 40, bomb = 40, bio = 15, rad = 10)
 	acid_resistance = 1.5
 
 /obj/item/clothing/suit/armor/vest/scp/medarmor/chaos
-	name = "armored vest"
-	desc = "A synthetic armor vest."
-	icon_state = "chaos-armor"
+	name = "Chaos Insurgency armored vest"
+	desc = "A heavy tan russian type ballistic vest, mainly protecting against bullets, and not much else. It's usually used by russian military forces, but is used by the Chaos Insurgency."
+	icon_state = "ci_vest"
 	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
 	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS | ARMS
-	armor = list(melee = 40, bullet = 85, laser = 40, energy = 25, bomb = 30, bio = 15, rad = 10)
+	armor = list(melee = 40, bullet = 65, laser = 40, energy = 25, bomb = 30, bio = 15, rad = 10)
 	acid_resistance = 1.5
 
 /obj/item/clothing/suit/armor/vest/scp/medarmor/eta
@@ -118,7 +119,7 @@
 	icon_state = "alpha-armor"
 	body_parts_covered = UPPER_TORSO | LOWER_TORSO | LEGS
 	cold_protection = UPPER_TORSO | LOWER_TORSO | LEGS
-	armor = list(melee = 90, bullet = 90, laser = 90, energy = 95, bomb = 90, bio = 90, rad = 0)
+	armor = list(melee = 90, bullet = 90, laser = 90, energy = 95, bomb = 90, bio = 15, rad = 0)
 	acid_resistance = 2
 
 /obj/item/clothing/head/hcz_hazmat
@@ -128,11 +129,11 @@
 	desc = "A helmet that protects the head and face from biological comtaminants, heavy acids, high temperatures, and bullets."
 	permeability_coefficient = 0
 	armor = list(
-		melee = 40,
+		melee = ARMOR_MELEE_RESISTANT,
 		bullet = ARMOR_BALLISTIC_PISTOL,
 		laser = ARMOR_LASER_HANDGUNS,
 		energy = ARMOR_ENERGY_RESISTANT,
-		bomb = 50,
+		bomb = ARMOR_BOMB_RESISTANT,
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SHIELDED
 		)
@@ -160,11 +161,11 @@
 	item_flags = ITEM_FLAG_THICKMATERIAL|ITEM_FLAG_PHORONGUARD|ITEM_FLAG_AIRTIGHT
 	allowed = list(/obj/item/tank/emergency,/obj/item/gun/energy,/obj/item/device/radio,/obj/item/reagent_containers/spray/pepper,/obj/item/gun/projectile,/obj/item/ammo_magazine,/obj/item/ammo_casing,/obj/item/melee/baton,/obj/item/handcuffs,/obj/item/gun/magnetic,/obj/item/clothing/head/helmet,/obj/item/device/flashlight,/obj/item/clothing/head/hcz_hazmat,/obj/item/clothing/mask/gas)
 	armor = list(
-		melee = 40,
+		melee = ARMOR_MELEE_RESISTANT,
 		bullet = ARMOR_BALLISTIC_PISTOL,
 		laser = ARMOR_LASER_HANDGUNS,
 		energy = ARMOR_ENERGY_RESISTANT,
-		bomb = 50,
+		bomb = ARMOR_BOMB_RESISTANT,
 		bio = ARMOR_BIO_SHIELDED,
 		rad = ARMOR_RAD_SHIELDED
 		)

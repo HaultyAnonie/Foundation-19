@@ -5,15 +5,11 @@
 	desc = "An inactive, hacked supply beacon stamped with the Nyx Rapid Fabrication logo. Good for one (1) ballistic supply pod shipment."
 	icon_state = "beacon"
 	var/deploy_path = /obj/machinery/power/supply_beacon
-	var/deploy_time = 30
-
-/obj/item/supply_beacon/supermatter
-	name = "inactive supermatter supply beacon"
-	deploy_path = /obj/machinery/power/supply_beacon/supermatter
+	var/deploy_time = 4 SECONDS
 
 /obj/item/supply_beacon/attack_self(mob/user)
 	user.visible_message(SPAN_NOTICE("\The [user] begins setting up \the [src]."))
-	if(!do_after(user, deploy_time, src))
+	if(!do_after(user, deploy_time, src, bonus_percentage = 25))
 		return
 	if(!user.unEquip(src))
 		return
@@ -40,10 +36,6 @@
 	..()
 	if(!drop_type) drop_type = pick(supply_drop_random_loot_types())
 
-/obj/machinery/power/supply_beacon/supermatter
-	name = "supermatter supply beacon"
-	drop_type = "supermatter"
-
 /obj/machinery/power/supply_beacon/attackby(obj/item/W, mob/user)
 	if(!use_power && isWrench(W))
 		if(!anchored && !connect_to_network())
@@ -51,7 +43,7 @@
 			return
 		anchored = !anchored
 		user.visible_message(SPAN_NOTICE("\The [user] [anchored ? "secures" : "unsecures"] \the [src]."))
-		playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
 		return
 	return ..()
 

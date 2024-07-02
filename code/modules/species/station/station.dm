@@ -171,38 +171,16 @@
 
 	available_cultural_info = list(
 		TAG_CULTURE = list(
-			CULTURE_SKRELL_QERR,
-			CULTURE_SKRELL_MALISH,
-			CULTURE_SKRELL_KANIN,
-			CULTURE_SKRELL_TALUM,
-			CULTURE_SKRELL_RASKINTA
+			CULTURE_OTHER
 		),
 		TAG_HOMEWORLD = list(
-			HOME_SYSTEM_QERRBALAK,
-			HOME_SYSTEM_TALAMIRA,
-			HOME_SYSTEM_ROASORA,
-			HOME_SYSTEM_MITORQI,
-			HOME_SYSTEM_SKRELLSPACE
+			HOME_SYSTEM_OTHER
 		),
 		TAG_FACTION = list(
-			FACTION_EXPEDITIONARY,
-			FACTION_CORPORATE,
-			FACTION_NANOTRASEN,
-			FACTION_PCRC,
-			FACTION_HEPHAESTUS,
-			FACTION_DAIS,
-			FACTION_SKRELL_QERRVOAL,
-			FACTION_SKRELL_QALAOA,
-			FACTION_SKRELL_YIITALANA,
-			FACTION_SKRELL_KRRIGLI,
-			FACTION_SKRELL_QONPRRI,
 			FACTION_OTHER
 		),
 		TAG_RELIGION = list(
-			RELIGION_OTHER,
-			RELIGION_ATHEISM,
-			RELIGION_DEISM,
-			RELIGION_AGNOSTICISM
+			RELIGION_OTHER
 		)
 	)
 
@@ -333,7 +311,7 @@
 
 	body_temperature = T0C + 15		//make the plant people have a bit lower body temperature, why not
 
-	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_IS_PLANT | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_SLIP
+	species_flags = SPECIES_FLAG_NO_SCAN | SPECIES_FLAG_IS_PLANT | SPECIES_FLAG_NO_PAIN | SPECIES_FLAG_NO_SLIP | SPECIES_FLAG_NO_DISEASE
 	appearance_flags = 0
 	spawn_flags = SPECIES_CAN_JOIN | SPECIES_IS_WHITELISTED | SPECIES_NO_FBP_CONSTRUCTION | SPECIES_NO_FBP_CHARGEN
 
@@ -344,8 +322,8 @@
 	genders = list(PLURAL)
 
 	available_cultural_info = list(
-		TAG_CULTURE =   list(CULTURE_DIONA),
-		TAG_HOMEWORLD = list(HOME_SYSTEM_DIONAEA),
+		TAG_CULTURE =   list(CULTURE_OTHER),
+		TAG_HOMEWORLD = list(HOME_SYSTEM_OTHER),
 		TAG_FACTION =   list(FACTION_OTHER),
 		TAG_RELIGION =  list(RELIGION_OTHER)
 	)
@@ -356,7 +334,7 @@
 	var/mob/living/carbon/alien/diona/nymph = new (target)
 	var/datum/ghosttrap/trap = get_ghost_trap("living plant")
 	trap.request_player(nymph, "A diona nymph has split from its gestalt.", 30 SECONDS)
-	addtimer(CALLBACK(nymph, /mob/living/carbon/alien/diona/proc/check_spawn_death), 30 SECONDS)
+	addtimer(CALLBACK(nymph, TYPE_PROC_REF(/mob/living/carbon/alien/diona, check_spawn_death)), 30 SECONDS)
 
 /mob/living/carbon/alien/diona/proc/check_spawn_death()
 	if (QDELETED(src))
@@ -399,7 +377,7 @@
 /datum/species/diona/handle_post_spawn(mob/living/carbon/human/H)
 	H.gender = NEUTER
 	. = ..()
-	addtimer(CALLBACK(src, .proc/fill_with_nymphs, H), 0)
+	addtimer(CALLBACK(src, PROC_REF(fill_with_nymphs), H), 0)
 
 /datum/species/diona/proc/fill_with_nymphs(mob/living/carbon/human/H)
 

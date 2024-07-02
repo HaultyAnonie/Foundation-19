@@ -30,7 +30,7 @@
 		holding = null
 
 	update_icon()
-	GLOB.destroyed_event.unregister(I, src, /obj/structure/bed/roller/ironingboard/proc/remove_item)
+	UnregisterSignal(I, COMSIG_PARENT_QDELETING)
 
 /obj/structure/bed/roller/ironingboard/examine(mob/user)
 	. = ..()
@@ -66,7 +66,7 @@
 
 		if(user.unEquip(I, src))
 			cloth = I
-			GLOB.destroyed_event.register(I, src, /obj/structure/bed/roller/ironingboard/proc/remove_item)
+			RegisterSignal(I, COMSIG_PARENT_QDELETING, TYPE_PROC_REF(/obj/structure/bed/roller/ironingboard, remove_item))
 			update_icon()
 		return
 	else if(istype(I,/obj/item/ironingiron))
@@ -79,7 +79,7 @@
 			var/parsed = parse_zone(zone)
 
 			visible_message(SPAN_DANGER("[user] begins ironing [src.buckled_mob]'s [parsed]!"), SPAN_DANGER("You begin ironing [buckled_mob]'s [parsed]!"))
-			if(!do_after(user, 40, src))
+			if(!do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 				return
 			visible_message(SPAN_DANGER("[user] irons [src.buckled_mob]'s [parsed]!"), SPAN_DANGER("You iron [buckled_mob]'s [parsed]!"))
 
@@ -91,14 +91,14 @@
 		if(!cloth)
 			if(!holding && !R.enabled && user.unEquip(I, src))
 				holding = R
-				GLOB.destroyed_event.register(I, src, /obj/structure/bed/roller/ironingboard/proc/remove_item)
+				RegisterSignal(I, COMSIG_PARENT_QDELETING, TYPE_PROC_REF(/obj/structure/bed/roller/ironingboard, remove_item))
 				update_icon()
 				return
 			to_chat(user, SPAN_NOTICE("There isn't anything on the ironing board."))
 			return
 
 		visible_message("[user] begins ironing [cloth].")
-		if(!do_after(user, 40, src))
+		if(!do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 			return
 
 		visible_message("[user] finishes ironing [cloth].")

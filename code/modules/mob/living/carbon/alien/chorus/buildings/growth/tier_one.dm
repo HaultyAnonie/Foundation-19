@@ -14,7 +14,7 @@
 
 /obj/structure/chorus/nutrient_syphon/activate()
 	owner.add_to_resource(/datum/chorus_resource/growth_nutrients, 1)
-	playsound(src, 'sound/machines/pump.ogg', 50, 1)
+	playsound(src, 'sounds/machines/pump.ogg', 50, 1)
 	flick("growth_syphon_exert", src)
 
 /datum/chorus_building/set_to_turf/growth/bitter
@@ -44,10 +44,10 @@
 
 /obj/structure/chorus/biter/Initialize(maploading, o)
 	. = ..()
-	GLOB.entered_event.register(get_turf(src), src, .proc/bite_victim)
+	RegisterSignal(get_turf(src), COMSIG_ENTERED, PROC_REF(bite_victim))
 
 /obj/structure/chorus/biter/Destroy()
-	GLOB.entered_event.unregister(get_turf(src), src)
+	UnregisterSignal(get_turf(src), COMSIG_ENTERED)
 	. = ..()
 
 /obj/structure/chorus/biter/proc/bite_victim(atom/a, mob/living/L)
@@ -60,7 +60,7 @@
 			FONT_LARGE(SPAN_DANGER("You stumble over a hole and teeth bite down into your legs!")),
 			SPAN_WARNING("You hear a meaty thump, then a crunch.")
 		)
-		playsound(loc, 'sound/weapons/bladeslice.ogg', 100, FALSE, frequency = 0.5)
+		playsound(loc, 'sounds/weapons/bladeslice.ogg', 100, FALSE, frequency = 0.5)
 		show_sound_effect(loc, soundicon = SFX_ICON_JAGGED)
 		if(istype(L, /mob/living/carbon/human))
 			var/target_foot = pick(list(BP_L_FOOT, BP_R_FOOT))

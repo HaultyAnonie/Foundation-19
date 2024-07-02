@@ -2,15 +2,7 @@
 	name = "box"
 	desc = "A sleek, sturdy box."
 	icon_state = "box_of_doom"
-
-/obj/item/storage/box/syndie_kit/open(mob/user)
-	. = ..()
-	icon_state = "box_of_doomopen"
-
-/obj/item/storage/box/syndie_kit/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
+	open_icon = "box_of_doomopen"
 
 //For uplink kits that provide bulkier items
 /obj/item/storage/backpack/satchel/syndie_kit
@@ -104,7 +96,7 @@
 /obj/item/storage/backpack/satchel/syndie_kit/revolver
 	startswith = list(
 		/obj/item/gun/projectile/revolver,
-		/obj/item/ammo_magazine/speedloader/magnum
+		/obj/item/ammo_magazine/speedloader
 	)
 
 /obj/item/storage/box/syndie_kit/toxin

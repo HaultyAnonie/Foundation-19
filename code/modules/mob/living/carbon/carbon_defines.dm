@@ -39,3 +39,9 @@
 	var/stasis_value
 
 	var/player_triggered_sleeping = 0
+	var/handcuffs_breakout_modifier = 1.0
+
+	/// Assoc list of addiction values, key is the type of withdrawal (as singleton type), and the value is the amount of addiction points (as number)
+	var/list/addiction_points
+	/// Assoc list of key active addictions and value amount of cycles that it has been active.
+	var/list/active_addictions

@@ -19,7 +19,7 @@
 	var/ammo_type = null		//the type of ammo that the gun comes preloaded with
 	var/list/loaded = list()	//stored ammo
 	var/starts_loaded = 1		//whether the gun starts loaded or not, can be overridden for guns crafted in-game
-	var/load_sound = 'sound/weapons/guns/interaction/bullet_insert.ogg'
+	var/load_sound = 'sounds/weapons/guns/interaction/bullet_insert.ogg'
 
 	//For MAGAZINE guns
 	var/magazine_type = null	//the type of magazine that the gun comes preloaded with
@@ -27,8 +27,8 @@
 	var/allowed_magazines		//magazine types that may be loaded. Can be a list or single path
 	var/auto_eject = 0			//if the magazine should automatically eject itself when empty.
 	var/auto_eject_sound = null
-	var/mag_insert_sound = 'sound/weapons/guns/interaction/pistol_magin.ogg'
-	var/mag_remove_sound = 'sound/weapons/guns/interaction/pistol_magout.ogg'
+	var/mag_insert_sound = 'sounds/weapons/guns/interaction/pistol_magin.ogg'
+	var/mag_remove_sound = 'sounds/weapons/guns/interaction/pistol_magout.ogg'
 	var/can_special_reload = TRUE //Whether or not we can tactical/speed reload
 
 	var/is_jammed = 0           //Whether this gun is jammed
@@ -72,13 +72,13 @@
 			if(prob(user.skill_fail_chance(SKILL_WEAPONS, 100, SKILL_MASTER)))
 				return null
 			else
-				to_chat(user, SPAN_NOTICE("You reflexively clear the jam on \the [src]."))
+				balloon_alert(user, "jam cleared")
 				is_jammed = 0
-				playsound(src.loc, 'sound/weapons/flipblade.ogg', 50, 1)
+				playsound(src.loc, 'sounds/weapons/flipblade.ogg', 50, 1)
 	if(is_jammed)
 		return null
 	//get the next casing
-	if(loaded.len)
+	if(LAZYLEN(loaded))
 		chambered = loaded[1] //load next casing.
 		if(handle_casings != HOLD_CASINGS)
 			loaded -= chambered
@@ -130,10 +130,10 @@
 	if(handle_casings != HOLD_CASINGS)
 		chambered = null
 
-#define EXP_TAC_RELOAD 1 SECOND
-#define PROF_TAC_RELOAD 0.5 SECONDS
-#define EXP_SPD_RELOAD 0.5 SECONDS
-#define PROF_SPD_RELOAD 0.25 SECONDS
+#define EXP_TAC_RELOAD (1 SECOND)
+#define PROF_TAC_RELOAD (0.5 SECONDS)
+#define EXP_SPD_RELOAD (0.5 SECONDS)
+#define PROF_SPD_RELOAD (0.25 SECONDS)
 
 
 
@@ -149,19 +149,16 @@
 		switch(AM.mag_type)
 			if(MAGAZINE)
 				if((ispath(allowed_magazines) && !istype(A, allowed_magazines)) || (islist(allowed_magazines) && !is_type_in_list(A, allowed_magazines)))
-					to_chat(user, SPAN_WARNING("\The [A] won't fit into [src]."))
+					balloon_alert(user, "won't fit!")
 					return
 				if(ammo_magazine)
-					if(user.a_intent == I_HELP || user.a_intent == I_DISARM || !user.skill_check(SKILL_WEAPONS, SKILL_EXPERIENCED))
-						to_chat(user, SPAN_WARNING("[src] already has a magazine loaded."))//already a magazine here
+					if(!can_special_reload || user.a_intent == I_HELP || user.a_intent == I_DISARM || !user.skill_check(SKILL_WEAPONS, SKILL_EXPERIENCED))
+						balloon_alert(user, "already has a magazine!") //already a magazine here
 						return
 					else
 						if(user.a_intent == I_GRAB) //Tactical reloading
-							if(!can_special_reload)
-								to_chat(user, SPAN_WARNING("You can't tactically reload this gun!"))
-								return
 							//Experienced gets a 1 second delay, master gets a 0.5 second delay
-							if(!do_after(user, user.get_skill_value(SKILL_WEAPONS) == SKILL_MASTER ? PROF_TAC_RELOAD : EXP_TAC_RELOAD, src))
+							if(!do_after(user, user.get_skill_value(SKILL_WEAPONS) == SKILL_MASTER ? PROF_TAC_RELOAD : EXP_TAC_RELOAD, src, bonus_percentage = 25))
 								return
 							if(!user.unEquip(AM, src))
 								return
@@ -170,11 +167,8 @@
 							user.visible_message(SPAN_WARNING("\The [user] reloads \the [src] with \the [AM]!"),\
 												SPAN_WARNING("You tactically reload \the [src] with \the [AM]!"))
 						else //Speed reloading
-							if(!can_special_reload)
-								to_chat(user, SPAN_WARNING("You can't speed reload with this gun!"))
-								return
 							//Experienced gets a 0.5 second delay, master gets a 0.25 second delay
-							if(!do_after(user, user.get_skill_value(SKILL_WEAPONS) == SKILL_MASTER ? PROF_SPD_RELOAD : EXP_SPD_RELOAD, src))
+							if(!do_after(user, user.get_skill_value(SKILL_WEAPONS) == SKILL_MASTER ? PROF_SPD_RELOAD : EXP_SPD_RELOAD, src, bonus_percentage = 25))
 								return
 							if(!user.unEquip(AM, src))
 								return
@@ -196,7 +190,7 @@
 				show_sound_effect(loc, user, SFX_ICON_SMALL)
 			if(SPEEDLOADER)
 				if(loaded.len >= max_shells)
-					to_chat(user, SPAN_WARNING("[src] is full!"))
+					balloon_alert(user, "full!")
 					return
 				var/count = 0
 				for(var/obj/item/ammo_casing/C in AM.stored_ammo)
@@ -209,7 +203,7 @@
 						count++
 				if(count)
 					user.visible_message("[user] reloads [src].", SPAN_NOTICE("You load [count] round\s into [src]."))
-					playsound(src.loc, 'sound/weapons/empty.ogg', 50, 1)
+					playsound(src.loc, 'sounds/weapons/empty.ogg', 50, 1)
 		AM.update_icon()
 	else if(istype(A, /obj/item/ammo_casing))
 		. = TRUE
@@ -217,7 +211,7 @@
 		if(!(load_method & SINGLE_CASING) || caliber != C.caliber)
 			return //incompatible
 		if(loaded.len >= max_shells)
-			to_chat(user, SPAN_WARNING("[src] is full."))
+			balloon_alert(user, "full!")
 			return
 		if(!user.unEquip(C, src))
 			return
@@ -236,10 +230,10 @@
 /obj/item/gun/projectile/proc/unload_ammo(mob/user, allow_dump=1)
 	if(is_jammed)
 		user.visible_message("\The [user] begins to unjam [src].", "You clear the jam and unload [src]")
-		if(!do_after(user, 4, src))
+		if(!do_after(user, 0.6 SECONDS, src, bonus_percentage = 100))
 			return
 		is_jammed = 0
-		playsound(src.loc, 'sound/weapons/flipblade.ogg', 50, 1)
+		playsound(src.loc, 'sounds/weapons/flipblade.ogg', 50, 1)
 	if(ammo_magazine)
 		user.put_in_hands(ammo_magazine)
 		user.visible_message("[user] removes [ammo_magazine] from [src].", SPAN_NOTICE("You remove [ammo_magazine] from [src]."))
@@ -262,11 +256,11 @@
 				user.visible_message("[user] unloads [src].", SPAN_NOTICE("You unload [count] round\s from [src]."))
 		else if(load_method & SINGLE_CASING)
 			var/obj/item/ammo_casing/C = loaded[loaded.len]
-			loaded.len--
+			loaded -= C
 			user.put_in_hands(C)
 			user.visible_message("[user] removes \a [C] from [src].", SPAN_NOTICE("You remove \a [C] from [src]."))
 	else
-		to_chat(user, SPAN_WARNING("[src] is empty."))
+		balloon_alert(user, "empty!")
 	update_icon()
 
 /obj/item/gun/projectile/attackby(obj/item/A as obj, mob/user as mob)
@@ -318,14 +312,57 @@
 		bullets += 1
 	return bullets
 
-/* Unneeded -- so far.
-//in case the weapon has firemodes and can't unload using attack_hand()
-/obj/item/gun/projectile/verb/unload_gun()
-	set name = "Unload Ammo"
-	set category = "Object"
-	set src in usr
+GLOBAL_LIST_INIT(banned_914_projectile_guns, list(
+	/obj/item/gun/projectile/automatic/scp/svd,
+	))
 
-	if(usr.stat || usr.restrained()) return
-
-	unload_ammo(usr)
-*/
+// 1:1 - Returns random gun with same caliber and same weight, if it can find one
+// Fine or Very Fine - Returns random gun that either has higher damage with default projectiles, higher ammo capacity, higher penetration
+/obj/item/gun/projectile/Conversion914(mode = MODE_ONE_TO_ONE, mob/user = usr)
+	switch(mode)
+		if(MODE_ONE_TO_ONE)
+			var/list/potential_return = list()
+			for(var/thing in (subtypesof(/obj/item/gun/projectile) - GLOB.banned_914_projectile_guns))
+				var/obj/item/gun/projectile/G = thing
+				if(initial(G.caliber) != caliber)
+					continue
+				if(initial(G.w_class) != w_class)
+					continue
+				potential_return += G
+			if(!LAZYLEN(potential_return))
+				return src
+			return pick(potential_return)
+		if(MODE_FINE, MODE_VERY_FINE)
+			var/mult_mod = (mode == MODE_VERY_FINE ? 2 : 1)
+			if(prob(mult_mod ** 2))
+				explosion(get_turf(src), -1, prob(35), 3, 7, TRUE)
+				return null
+			var/list/potential_return = list()
+			for(var/thing in (subtypesof(/obj/item/gun/projectile) - GLOB.banned_914_projectile_guns))
+				var/obj/item/gun/projectile/G = thing
+				if(!isnull(magazine_type) && !isnull(initial(G.magazine_type)))
+					// Higher capacity magazine
+					var/obj/item/ammo_magazine/M = initial(G.magazine_type)
+					var/obj/item/ammo_magazine/our_mag = magazine_type
+					if(initial(M.max_ammo) > initial(our_mag.max_ammo) * 1.2 * mult_mod && \
+						initial(M.max_ammo) < initial(our_mag.max_ammo) * 2.4 * mult_mod)
+						potential_return += G
+					// Stronger bullets
+					var/obj/item/ammo_casing/C = initial(M.ammo_type)
+					var/obj/item/ammo_casing/our_case = initial(our_mag.ammo_type)
+					var/obj/item/projectile/P = initial(C.projectile_type)
+					var/obj/item/projectile/our_proj = initial(our_case.projectile_type)
+					if(initial(P.damage) > initial(our_proj.damage) * 1.2 * mult_mod && \
+						initial(P.damage) < initial(our_proj.damage) * 2.4 * mult_mod)
+						potential_return += G
+					// Higher penetration
+					if(initial(P.penetration_modifier) > initial(our_proj.penetration_modifier) * 1.2 * mult_mod && \
+						initial(P.penetration_modifier) < initial(our_proj.penetration_modifier) * 2.4 * mult_mod)
+						potential_return += G
+					if(initial(P.penetrating) > initial(our_proj.penetrating) * 1.5 * mult_mod && \
+						initial(P.penetrating) < initial(our_proj.penetrating) * 3 * mult_mod)
+						potential_return += G
+			if(!LAZYLEN(potential_return))
+				return src
+			return pick(potential_return)
+	return ..()

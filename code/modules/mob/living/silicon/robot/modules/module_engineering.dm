@@ -8,8 +8,7 @@
 		NETWORK_ENGINEERING
 	)
 	subsystems = list(
-		/datum/tgui_module/power_monitor/robot,
-		/datum/tgui_module/supermatter_monitor/robot
+		/datum/tgui_module/power_monitor/robot
 	)
 	supported_upgrades = list(
 		/obj/item/borg/upgrade/rcd
@@ -119,4 +118,6 @@
 /obj/item/robot_module/engineering/respawn_consumable(mob/living/silicon/robot/R, amount)
 	var/obj/item/device/lightreplacer/LR = locate() in equipment
 	LR.Charge(R, amount)
+	var/obj/item/reagent_containers/spray/cleaner/drone/SC = locate() in equipment
+	SC.reagents.add_reagent(/datum/reagent/hydroxylsan, 8 * amount)
 	..()

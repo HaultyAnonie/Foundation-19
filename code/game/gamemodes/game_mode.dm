@@ -35,9 +35,6 @@ var/global/list/additional_antag_types = list()
 	var/event_delay_mod_moderate             // Modifies the timing of random events.
 	var/event_delay_mod_major                // As above.
 
-	var/waittime_l = 60 SECONDS				 // Lower bound on time before start of shift report
-	var/waittime_h = 180 SECONDS		     // Upper bounds on time before start of shift report
-
 	//Format: list(start_animation = duration, hit_animation, miss_animation). null means animation is skipped.
 	var/cinematic_icon_states = list(
 		"intro_nuke" = 35,
@@ -188,11 +185,9 @@ var/global/list/additional_antag_types = list()
 
 	refresh_event_modifiers()
 
-	addtimer(CALLBACK(null, /proc/display_roundstart_logout_report), ROUNDSTART_LOGOUT_REPORT_TIME)
-
-	var/welcome_delay = rand(waittime_l, waittime_h)
-	addtimer(CALLBACK(GLOB.using_map, /datum/map/proc/send_welcome), welcome_delay)
-	addtimer(CALLBACK(src, .proc/announce_ert_disabled), welcome_delay + 10 SECONDS)
+	addtimer(CALLBACK(null, GLOBAL_PROC_REF(display_roundstart_logout_report)), ROUNDSTART_LOGOUT_REPORT_TIME)
+  
+	addtimer(CALLBACK(src, PROC_REF(announce_ert_disabled)), rand(70 SECONDS, 190 SECONDS))
 
 	//Assign all antag types for this game mode. Any players spawned as antags earlier should have been removed from the pending list, so no need to worry about those.
 	for(var/datum/antagonist/antag in antag_templates)
@@ -239,7 +234,6 @@ var/global/list/additional_antag_types = list()
 		"wormholes to another dimension",
 		"a telescience mishap",
 		"radiation flares",
-		"supermatter dust",
 		"leaks into a negative reality",
 		"antiparticle clouds",
 		"residual bluespace energy",
@@ -258,7 +252,7 @@ var/global/list/additional_antag_types = list()
 		"classified security operations",
 		"a gargantuan glowing goat"
 		)
-	command_announcement.Announce("The presence of [pick(reasons)] in the region is tying up all available local emergency resources; emergency response teams cannot be called at this time, and post-evacuation recovery efforts will be substantially delayed.","Emergency Transmission")
+	command_announcement.Announce("The presence of [pick(reasons)] in the region is tying up all available local emergency resources; mobile task forces cannot be called at this time, and post-evacuation recovery efforts will be substantially delayed.","Emergency Transmission")
 
 /datum/game_mode/proc/check_finished()
 	if(evacuation_controller.round_over() || station_was_nuked)
@@ -309,6 +303,7 @@ var/global/list/additional_antag_types = list()
 
 	send2mainirc("A round of [src.name] has ended - [data["surviving_total"]] survivor\s, [data["ghosts"]] ghost\s.")
 	SSwebhooks.send(WEBHOOK_ROUNDEND, data)
+	SSticker.send_news_report()
 
 	return 0
 
@@ -417,7 +412,7 @@ var/global/list/additional_antag_types = list()
 
 	else
 		sleep(50)
-	sound_to(world, sound('sound/effects/explosionfar.ogg'))
+	sound_to(world, sound('sounds/effects/explosionfar.ogg'))
 
 //////////////////////////
 //Reports player logouts//

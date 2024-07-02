@@ -100,7 +100,7 @@
 		else if(prob(5)) //earthquake spell
 			G.visible_message(SPAN_CLASS("cultannounce","\The [G]' eyes begin to glow ominously as dust and debris in the area is kicked up in a light breeze."))
 			set_busy(TRUE)
-			if(do_after(G, 6 SECONDS))
+			if(do_after(G, 7 SECONDS, bonus_percentage = 25))
 				var/health_holder = G.health
 				G.visible_message(SPAN_MFAUNA("\The [G] raises its fore-hooves and stomps them into the ground with incredible force!"))
 				explosion(get_step(G,pick(GLOB.cardinal)), -1, 2, 2, 3, 6)
@@ -173,7 +173,7 @@
 
 /mob/living/simple_animal/hostile/retaliate/goat/king/phase2/Initialize()
 	. = ..()
-	boss_theme = GLOB.sound_player.PlayLoopingSound(src, sound_id, 'sound/music/Visager-Battle.ogg', volume = 10, range = 7, falloff = 4, prefer_mute = TRUE)
+	boss_theme = GLOB.sound_player.PlayLoopingSound(src, sound_id, 'sounds/music/Visager-Battle.ogg', volume = 10, range = 7, falloff = 4, prefer_mute = TRUE)
 	update_icon()
 
 /mob/living/simple_animal/hostile/retaliate/goat/guard
@@ -210,7 +210,7 @@
 	health = 750
 	new /obj/item/grenade/flashbang/instant(src.loc)
 	QDEL_NULL(boss_theme)
-	boss_theme = GLOB.sound_player.PlayLoopingSound(src, sound_id, 'sound/music/Visager-Miniboss_Fight.ogg', volume = 10, range = 8, falloff = 4, prefer_mute = TRUE)
+	boss_theme = GLOB.sound_player.PlayLoopingSound(src, sound_id, 'sounds/music/Visager-Miniboss_Fight.ogg', volume = 10, range = 8, falloff = 4, prefer_mute = TRUE)
 	stun_chance = 10
 	update_icon()
 	visible_message(SPAN_CLASS("cultannounce","\The [src]' wounds close with a flash, and when he emerges, he's even larger than before!"))

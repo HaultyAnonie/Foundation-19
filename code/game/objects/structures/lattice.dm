@@ -17,7 +17,7 @@
 /obj/structure/lattice/Initialize(mapload, new_material)
 	. = ..()
 	DELETE_IF_DUPLICATE_OF(/obj/structure/lattice)
-	if(!(istype(src.loc, /turf/space) || istype(src.loc, /turf/simulated/open)))
+	if(!(isspaceturf(loc) || istype(src.loc, /turf/simulated/open)))
 		return INITIALIZE_HINT_QDEL
 	if(!new_material)
 		new_material = init_material
@@ -75,7 +75,7 @@
 		var/obj/item/stack/material/rods/R = C
 		if(R.use(2))
 			src.alpha = 0
-			playsound(src, 'sound/weapons/Genhit.ogg', 50, 1)
+			playsound(src, 'sounds/weapons/Genhit.ogg', 50, 1)
 			new /obj/structure/catwalk(src.loc)
 			qdel(src)
 			return
@@ -89,7 +89,7 @@
 		if(locate(/obj/structure/lattice, T) || locate(/obj/structure/catwalk, T))
 			dir_sum += direction
 		else
-			if(!(istype(get_step(src, direction), /turf/space)) && !(istype(get_step(src, direction), /turf/simulated/open)))
+			if(!(isspaceturf(get_step(src, direction))) && !(istype(get_step(src, direction), /turf/simulated/open)))
 				dir_sum += direction
 
 	icon_state = "lattice[dir_sum]"

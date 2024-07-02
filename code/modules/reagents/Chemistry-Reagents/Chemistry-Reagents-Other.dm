@@ -50,7 +50,7 @@
 	color_weight = 20
 
 /datum/reagent/paint/touch_turf(turf/T)
-	if(istype(T) && !istype(T, /turf/space))
+	if(istype(T) && !isspaceturf(T))
 		T.color = color
 
 /datum/reagent/paint/touch_obj(obj/O)
@@ -145,7 +145,7 @@
 
 /datum/reagent/uranium/touch_turf(turf/T)
 	if(volume >= 3)
-		if(!istype(T, /turf/space))
+		if(!isspaceturf(T))
 			var/obj/effect/decal/cleanable/greenglow/glow = locate(/obj/effect/decal/cleanable/greenglow, T)
 			if(!glow)
 				new /obj/effect/decal/cleanable/greenglow(T)
@@ -229,6 +229,7 @@
 	reagent_state = LIQUID
 	color = "#673910"
 	touch_met = 50
+	accelerant_quality = 20
 
 /datum/reagent/napalm/touch_turf(turf/T)
 	new /obj/effect/decal/cleanable/liquid_fuel(T, volume)
@@ -242,58 +243,58 @@
 	name = "Napalm B"
 	taste_description = "burnt plastic and metal"
 
-/datum/reagent/space_cleaner
-	name = "Space cleaner"
-	description = "A compound used to clean things. Now with 50% more sodium hypochlorite!"
+/datum/reagent/hydroxylsan
+	name = "Hydroxylsan"
+	description = "A compound used to clean things. The name \"Hydroxylsan\" is derived from \"hydroxyl,\" which is a chemical group consisting of H2O and NH3 elements (NH4OH), often found in cleaning agents and sanitizers, and \"san\" representing \"sanitization\" or \"sanitize.\" holding quaternary ammonium compounds!"
 	taste_description = "sourness"
 	reagent_state = LIQUID
 	color = "#a5f0ee"
 	touch_met = 50
 	value = 0.7
 
-/datum/reagent/space_cleaner/touch_obj(obj/O)
-	O.clean_blood()
+/datum/reagent/hydroxylsan/touch_obj(obj/O)
+	O.clean()
 
-/datum/reagent/space_cleaner/touch_turf(turf/T)
+/datum/reagent/hydroxylsan/touch_turf(turf/T)
 	if(volume >= 1)
 		if(istype(T, /turf/simulated))
 			var/turf/simulated/S = T
 			S.dirt = 0
 			if(S.wet > 1)
 				S.unwet_floor(FALSE)
-		T.clean_blood()
+		T.clean()
 
 
 		for(var/mob/living/carbon/slime/M in T)
 			M.adjustToxLoss(rand(5, 10))
 
-/datum/reagent/space_cleaner/affect_touch(mob/living/carbon/M, alien, removed)
+/datum/reagent/hydroxylsan/affect_touch(mob/living/carbon/M, alien, removed)
 	if(M.r_hand)
-		M.r_hand.clean_blood()
+		M.r_hand.clean()
 	if(M.l_hand)
-		M.l_hand.clean_blood()
+		M.l_hand.clean()
 	if(M.wear_mask)
-		if(M.wear_mask.clean_blood())
+		if(M.wear_mask.clean())
 			M.update_inv_wear_mask(0)
 	if(ishuman(M))
 		var/mob/living/carbon/human/H = M
 		if(H.head)
-			if(H.head.clean_blood())
+			if(H.head.clean())
 				H.update_inv_head(0)
 		if(H.wear_suit)
-			if(H.wear_suit.clean_blood())
+			if(H.wear_suit.clean())
 				H.update_inv_wear_suit(0)
 		else if(H.w_uniform)
-			if(H.w_uniform.clean_blood())
+			if(H.w_uniform.clean())
 				H.update_inv_w_uniform(0)
 		if(H.shoes)
-			if(H.shoes.clean_blood())
+			if(H.shoes.clean())
 				H.update_inv_shoes(0)
 		else
-			H.clean_blood(1)
+			H.clean(1)
 			return
 	M.update_icons()
-	M.clean_blood()
+	M.clean()
 
 /datum/reagent/medicine/sterilizine
 	name = "Sterilizine"
@@ -346,7 +347,7 @@
 	color = "#000000"
 
 /datum/reagent/oil/touch_turf(turf/simulated/T)
-	if(!istype(T, /turf/space))
+	if(!isspaceturf(T))
 		new /obj/effect/decal/cleanable/blood/oil/streak(T)
 
 /datum/reagent/glycerol
@@ -386,8 +387,8 @@
 	var/datum/gas_mixture/environment = T.return_air()
 	var/min_temperature = 0 // Room temperature + some variance. An actual diminishing return would be better, but this is *like* that. In a way. . This has the potential for weird behavior, but I says fuck it. Water grenades for everyone.
 
-	var/hotspot = (locate(/obj/fire) in T)
-	if(hotspot && !istype(T, /turf/space))
+	var/hotspot = (locate(/obj/hotspot) in T)
+	if(hotspot && !isspaceturf(T))
 		var/datum/gas_mixture/lowertemp = T.remove_air(T:air:total_moles)
 		lowertemp.temperature = max(min(lowertemp.temperature-2000, lowertemp.temperature / 2), 0)
 		lowertemp.react()
@@ -656,6 +657,27 @@
 		M.emote(pick("giggle", "laugh"))
 	M.add_chemical_effect(CE_PULSE, -1)
 
+/datum/reagent/vaccine
+	//data must contain virus type
+	name = "Vaccine"
+	color = "#c81040" // rgb: 200, 16, 64
+	taste_description = "slime"
+
+/datum/reagent/vaccine/affect_blood(mob/living/carbon/M, alien, removed)
+	. = ..()
+	if(!islist(data))
+		return
+
+	for(var/thing in M.diseases)
+		var/datum/disease/infection = thing
+		if(infection.GetDiseaseID() in data)
+			infection.Cure()
+	LAZYOR(M.disease_resistances, data)
+
+/datum/reagent/vaccine/mix_data(list/newdata, newamount)
+	if(istype(newdata))
+		src.data |= newdata.Copy()
+
 /* Abominable Infestation reagents */
 
 // Grauel - Basically a healing chem that can implant a larva into its user.
@@ -686,6 +708,13 @@
 	if(!prob(max(10, dosage*0.5)))
 		return
 
+	var/obj/item/organ/internal/larva_producer/I = M.internal_organs_by_name[BP_LARVA]
+	if(istype(I))
+		I.larva_cooldown_time -= 2
+		return
+	if(alien == IS_ABOMINATION)
+		return
+
 	var/list/valid_organs = list()
 	for(var/obj/item/organ/external/O in M.organs)
 		if(istype(O, /obj/item/organ/external/stump))
@@ -711,8 +740,96 @@
 /datum/reagent/laich/affect_blood(mob/living/carbon/M, alien, removed)
 	if(alien == IS_DIONA)
 		return
+
+	var/obj/item/organ/internal/larva_producer/I = M.internal_organs_by_name[BP_LARVA]
+	if(istype(I))
+		I.larva_cooldown_time -= 5
+		return
+	if(alien == IS_ABOMINATION)
+		return
+
 	if(prob(20))
 		M.adjustOxyLoss(8)
 	if(ishuman(M) && prob(2))
 		var/mob/living/carbon/human/H = M
 		H.vomit(2, 2, rand(2 SECONDS, 4 SECONDS))
+
+// Gottheit - VERY addictive drug that essentially makes you a god. Take it once and there's no coming back.
+/datum/reagent/gottheit
+	name = "Gottheit"
+	description = "An impossibly powerful medicine, which is just as impossibly addictive."
+	taste_description = "pleasantly burning acid"
+	taste_mult = 5
+	reagent_state = LIQUID
+	color = COLOR_YELLOW
+	value = 50
+	metabolism = 0.1
+	addiction_types = list(/datum/addiction/gottheit = 600) // Near instant addiction
+
+/datum/reagent/gottheit/affect_blood(mob/living/carbon/human/M, alien, removed)
+	if(alien == IS_DIONA)
+		return
+
+	// Heal all conventional damage types
+	M.adjustCloneLoss(-40 * removed)
+	M.adjustOxyLoss(-40 * removed)
+	M.heal_organ_damage(80 * removed, 80 * removed)
+	M.adjustToxLoss(-80 * removed)
+
+	// Restore blood
+	M.regenerate_blood(8 * removed)
+
+	// Some useful chem effects, including painkilling
+	M.add_chemical_effect(CE_PAINKILLER, 400)
+	M.add_chemical_effect(CE_SPEEDBOOST, 1)
+
+	// Reduce bad effects
+	M.drowsyness = max(M.drowsyness - 50, 0)
+	M.adjust_hallucination(-50)
+	M.AdjustParalysis(-10)
+	M.AdjustStunned(-10)
+	M.AdjustWeakened(-10)
+
+	// Super low doses won't do cool stuff
+	var/dosage = M.chem_doses[type]
+	if(dosage < 2)
+		return
+
+	// Heal organs
+	if(ishuman(M))
+		var/mob/living/carbon/human/H = M
+		for(var/obj/item/organ/internal/I in H.internal_organs)
+			if((I.status & ORGAN_DEAD) && prob(25))
+				I.revive()
+			if(!BP_IS_ROBOTIC(I))
+				I.heal_damage(20 * removed)
+		for(var/obj/item/organ/external/E in H.organs)
+			if(E.status & ORGAN_ARTERY_CUT)
+				E.status &= ~ORGAN_ARTERY_CUT
+			if(E.status & ORGAN_TENDON_CUT)
+				E.status &= ~ORGAN_TENDON_CUT
+			if(E.status & ORGAN_BLEEDING)
+				E.status &= ~ORGAN_BLEEDING
+			if(E.status & ORGAN_BROKEN)
+				E.status &= ~ORGAN_BROKEN
+			if(E.status & ORGAN_DEAD)
+				E.revive()
+
+	// Remove all diseases
+	for(var/datum/disease/D in M.diseases)
+		qdel(D)
+
+/datum/reagent/concentrated_mana
+	name = "Concentrated Mana"
+	description = "A mysterious liquid used by magic-fluent people to restore their internal mana reserves. \
+		Can also be used in certain tools that utilize magic phenomenon."
+	taste_description = "cool air"
+	reagent_state = LIQUID
+	color = COLOR_MANA
+
+/datum/reagent/concentrated_mana/affect_blood(mob/living/carbon/human/H, alien, removed)
+	if(!ishuman(H))
+		return
+	if(!H.mind || !H.mind?.mana)
+		return
+	H.mind.mana.AddMana(2)

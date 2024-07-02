@@ -6,15 +6,13 @@
 	dead_icon = "heart-off"
 	var/pulse = PULSE_NORM
 	var/heartbeat = 0
-	var/beat_sound = 'sound/effects/singlebeat.ogg'
+	var/beat_sound = 'sounds/effects/singlebeat.ogg'
 	var/tmp/next_blood_squirt = 0
 	damage_reduction = 0.7
 	relative_size = 5
 	max_damage = 45
 	var/open
 	var/list/external_pump
-	scp106_vulnerable = FALSE
-	var/scp3349_induced = FALSE		// whether or not you're currently undergoing the effects of 3349
 
 /obj/item/organ/internal/heart/open
 	open = 1
@@ -102,7 +100,7 @@
 			pulse++
 
 	// So does SCP-3349
-	if(pulse != PULSE_NORM && scp3349_induced)
+	if(pulse != PULSE_NORM && ((SCP ? SCP.designation : "") == "3349-1"))
 		if(pulse > PULSE_NORM)
 			pulse--
 		else
@@ -117,9 +115,9 @@
 		if(owner.chem_effects[CE_PULSE] > 2)
 			heartbeat++
 
-		if(heartbeat >= (scp3349_induced ? (rate * 2) : rate))	// scp3349 heartbeat is long so we play it half as often to prevent overlap
+		if(heartbeat >= (((SCP ? SCP.designation : "") == "3349-1") ? (rate * 2) : rate))	// scp3349 heartbeat is long so we play it half as often to prevent overlap
 			heartbeat = 0
-			sound_to(owner, sound((scp3349_induced ? 'sound/effects/heartbeatpurr.ogg' : beat_sound),0,0,0,50))
+			sound_to(owner, sound((((SCP ? SCP.designation : "") == "3349-1") ? 'sounds/effects/heartbeatpurr.ogg' : beat_sound),0,0,0,50))
 		else
 			heartbeat++
 
@@ -235,7 +233,7 @@
 		if(PULSE_THREADY)
 			. += "extremely fast and faint "
 
-	if(scp3349_induced)
+	if(SCP?.designation == "3349-1")
 		. += "cat purr"
 	else
 		. += "pulse"

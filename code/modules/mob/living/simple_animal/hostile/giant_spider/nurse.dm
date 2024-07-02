@@ -15,7 +15,7 @@
 	movement_cooldown = 3	// A bit faster so that they can inject the eggs easier.
 
 	poison_per_bite = 5
-	poison_type = "stoxin"
+	poison_type = /datum/reagent/vecuronium_bromide
 
 	natural_weapon = /obj/item/natural_weapon/bite/spider/nurse
 
@@ -97,7 +97,7 @@
 	// Get our AI to stay still.
 	set_AI_busy(TRUE)
 
-	if(!do_after(src, 5 SECONDS, AM))
+	if(!do_after(src, 6 SECONDS, AM, bonus_percentage = 25))
 		set_AI_busy(FALSE)
 		return FALSE
 
@@ -156,7 +156,7 @@
 	// Get our AI to stay still.
 	set_AI_busy(TRUE)
 
-	if(!do_after(src, 5 SECONDS, T))
+	if(!do_after(src, 6 SECONDS, T, bonus_percentage = 25))
 		set_AI_busy(FALSE)
 		return FALSE
 
@@ -186,7 +186,7 @@
 	// Stop players from spamming eggs.
 	laying_eggs = TRUE
 
-	if(!do_after(src, 5 SECONDS, T))
+	if(!do_after(src, 6 SECONDS, T, bonus_percentage = 25))
 		set_AI_busy(FALSE)
 		return FALSE
 

@@ -19,7 +19,7 @@
 	var/material/reinf_material
 	var/last_state
 	var/construction_stage
-	var/hitsound = 'sound/weapons/Genhit.ogg'
+	var/hitsound = 'sounds/weapons/Genhit.ogg'
 	var/list/wall_connections = list("0", "0", "0", "0")
 	var/list/other_connections = list("0", "0", "0", "0")
 	var/floor_type = /turf/simulated/floor/plating //turf it leaves after destruction
@@ -43,7 +43,7 @@
 	hitsound = material.hitsound
 
 /turf/simulated/wall/Initialize()
-	set_extension(src, /datum/extension/penetration/proc_call, .proc/CheckPenetration)
+	set_extension(src, /datum/extension/penetration/proc_call, PROC_REF(CheckPenetration))
 	START_PROCESSING(SSturf, src) //Used for radiation.
 	. = ..()
 
@@ -195,7 +195,7 @@
 
 /turf/simulated/wall/proc/dismantle_wall(devastated, explode, no_product)
 
-	playsound(src, 'sound/items/Welder.ogg', 100, 1)
+	playsound(src, 'sounds/items/Welder.ogg', 100, 1)
 	if(!no_product)
 		if(reinf_material)
 			reinf_material.place_dismantled_girder(src, reinf_material)

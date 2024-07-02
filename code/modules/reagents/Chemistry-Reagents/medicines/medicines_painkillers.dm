@@ -14,6 +14,11 @@
 	/// Certain medicines may "ramp up" to maximum strength, which is defined by this value.
 	var/target_painkiller_strength = 10
 
+/datum/reagent/medicine/painkiller/New()
+	if(is_opiate)
+		addiction_types = list(/datum/addiction/opiate = max(0.5, 0.15 * target_painkiller_strength))
+	return ..()
+
 /datum/reagent/medicine/painkiller/affect_blood(mob/living/carbon/M, alien, removed)
 	calculate_strength(M, alien, removed)
 	M.add_chemical_effect(CE_PAINKILLER, current_painkiller_strength)
@@ -143,3 +148,43 @@
 	..()
 	M.druggy = max(M.druggy, 2)
 	M.add_chemical_effect(CE_PAINKILLER, 10)
+
+// Painkillers used by painkilling symptom
+/datum/reagent/medicine/painkiller/tramadol/disease
+	name = "biological painkiller"
+	description = "A product of a virus, which acts as painkiller."
+	target_painkiller_strength = 50
+	is_opiate = FALSE
+
+/datum/reagent/medicine/painkiller/tramadol/disease/two
+	target_painkiller_strength = 100
+
+/datum/reagent/medicine/painkiller/tramadol/disease/three
+	target_painkiller_strength = 150
+
+// Powerful painkiller made out of grauel with potential side-effects
+/datum/reagent/medicine/painkiller/sinlor
+	name = "sinlor"
+	description = "A powerful painkiller manufactured from infestation by-products."
+	taste_description = "sickness"
+	color = COLOR_RED
+	// Keep it the same as effective_dose
+	overdose = 10
+	target_painkiller_strength = 400
+	var/effective_dose = 10
+
+/datum/reagent/medicine/painkiller/sinlor/overdose(mob/living/carbon/M, alien)
+	M.druggy = max(M.druggy, 10)
+	M.reagents.add_reagent(/datum/reagent/grauel, metabolism * 2)
+
+/datum/reagent/medicine/painkiller/sinlor/calculate_strength(mob/living/carbon/M, alien, removed)
+	if(alien == IS_ABOMINATION)
+		current_painkiller_strength = target_painkiller_strength
+		return
+
+	var/effectiveness = 1
+	if(M.chem_doses[type] < effective_dose)
+		effectiveness = M.chem_doses[type] / effective_dose
+	else if(volume < effective_dose)
+		effectiveness = volume / effective_dose
+	current_painkiller_strength = (target_painkiller_strength * effectiveness)

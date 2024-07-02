@@ -81,13 +81,13 @@ var/list/mob_hat_cache = list()
 	remove_verb(src, /mob/living/silicon/robot/verb/Namepick)
 	update_icon()
 
-	GLOB.moved_event.register(src, src, /mob/living/silicon/robot/drone/proc/on_moved)
+	RegisterSignal(src, COMSIG_MOVED, TYPE_PROC_REF(/mob/living/silicon/robot/drone, on_moved))
 
 /mob/living/silicon/robot/drone/Destroy()
 	if(hat)
 		hat.dropInto(loc)
 		hat = null
-	GLOB.moved_event.unregister(src, src, /mob/living/silicon/robot/drone/proc/on_moved)
+	UnregisterSignal(src, COMSIG_MOVED)
 	. = ..()
 
 /mob/living/silicon/robot/drone/proc/on_moved(atom/movable/am, turf/old_loc, turf/new_loc)
@@ -145,7 +145,7 @@ var/list/mob_hat_cache = list()
 	if(!module) module = new module_type(src)
 
 	flavor_text = "It's a tiny little repair drone. The casing is stamped with an corporate logo and the subscript: '[GLOB.using_map.company_name] Recursive Repair Systems: Fixing Tomorrow's Problem, Today!'"
-	playsound(src.loc, 'sound/machines/twobeep.ogg', 50, 0)
+	playsound(src.loc, 'sounds/machines/twobeep.ogg', 50, 0)
 
 //Redefining some robot procs...
 /mob/living/silicon/robot/drone/fully_replace_character_name(pickedName as text)

@@ -63,7 +63,7 @@
 	var/reload_max = 1									// How many shots the mob gets before it has to reload, will not be used if needs_reload is FALSE
 	var/reload_count = 0								// A counter to keep track of how many shots the mob has fired so far. Reloads when it hits reload_max.
 	var/reload_time = 4 SECONDS							// How long it takes for a mob to reload. This is to buy a player a bit of time to run or fight.
-	var/reload_sound = 'sound/weapons/flipblade.ogg'	// What sound gets played when the mob successfully reloads. Defaults to the same sound as reloading guns. Can be null.
+	var/reload_sound = 'sounds/weapons/flipblade.ogg'	// What sound gets played when the mob successfully reloads. Defaults to the same sound as reloading guns. Can be null.
 
 	//Hostility settings
 	var/taser_kill = 1				// Is the mob weak to tasers
@@ -206,6 +206,17 @@
 	if(LAZYLEN(death_sounds))
 		playsound(src, pick(death_sounds), 50, TRUE)
 
+// Reset icon on revival
+/mob/living/simple_animal/rejuvenate()
+	var/was_dead = stat == DEAD
+	. = ..()
+	if(was_dead && stat != DEAD)
+		icon_state = icon_living
+		switch_from_dead_to_living_mob_list()
+		set_stat(CONSCIOUS)
+		set_density(initial(density))
+		bleed_ticks = 0
+
 /mob/living/simple_animal/proc/drop_loot()
 	if(!LAZYLEN(loot_list))
 		return
@@ -260,7 +271,7 @@
 			meat.SetName("[src.name] [meat.name]")
 			if(can_bleed)
 				var/obj/effect/decal/cleanable/blood/splatter/splat = new(get_turf(src))
-				splat.basecolor = bleed_colour
+				splat.basecolor = GetBloodColor()
 				splat.update_icon()
 			qdel(src)
 
@@ -277,21 +288,36 @@
 				var/hit_dir = get_dir(P.starting, src)
 				var/obj/effect/decal/cleanable/blood/B = blood_splatter(get_step(src, hit_dir), src, 1, hit_dir)
 				B.icon_state = pick("dir_splatter_1","dir_splatter_2")
-				B.basecolor = bleed_colour
+				B.basecolor = GetBloodColor()
 				var/scale = min(1, round(mob_size / MOB_MEDIUM, 0.1))
 				var/matrix/M = new()
 				B.transform = M.Scale(scale)
 				B.update_icon()
 
 /mob/living/simple_animal/handle_fire()
-	return
+	. = ..()
+
+	var/burn_temperature = fire_burn_temperature()
+	var/thermal_protection = get_heat_protection(burn_temperature)
+
+	if (thermal_protection < 1 && bodytemperature < burn_temperature)
+		bodytemperature += round(BODYTEMP_HEATING_MAX*(1-thermal_protection), 1)
+
+	burn_temperature -= maxbodytemp
+
+	if(burn_temperature < 1)
+		return
+
+	// At minimum level of fire stacks and default(350) max body temp it will deal ~5 damage per tick
+	// At "absolute maximum" of around 100.000 burn_temperature it will deal ~80 damage per tick
+	var/burn_damage = round(sqrt(burn_temperature) * 0.25)
+	adjustBruteLoss(burn_damage)
 
 /mob/living/simple_animal/update_fire()
-	return
-/mob/living/simple_animal/IgniteMob()
-	return
-/mob/living/simple_animal/ExtinguishMob()
-	return
+	. = ..()
+	overlays -= image("icon"='icons/mob/OnFire.dmi', "icon_state"="Generic_mob_burning")
+	if(on_fire)
+		overlays += image("icon"='icons/mob/OnFire.dmi', "icon_state"="Generic_mob_burning")
 
 /mob/living/simple_animal/is_burnable()
 	return heat_damage_per_tick
@@ -315,7 +341,7 @@
 	adjustBruteLoss(1)
 
 	var/obj/effect/decal/cleanable/blood/drip/drip = new(get_turf(src))
-	drip.basecolor = bleed_colour
+	drip.basecolor = GetBloodColor()
 	drip.update_icon()
 
 /mob/living/simple_animal/get_digestion_product()
@@ -367,10 +393,39 @@
 /mob/living/simple_animal/proc/pry_door(mob/user, delay, obj/machinery/door/pesky_door)
 	visible_message(SPAN_WARNING("\The [user] begins [pry_desc] at \the [pesky_door]!"))
 	set_AI_busy(TRUE)
-	if(do_after(user, delay, pesky_door))
+	if(do_after(user, delay, pesky_door, bonus_percentage = 25))
 		pesky_door.open(1)
 		ai_holder.prying = FALSE
 		set_AI_busy(FALSE)
 	else
 		visible_message(SPAN_NOTICE("\The [user] is interrupted."))
 		set_AI_busy(FALSE)
+
+// Rough - Gibs
+// Coarse - Spawns a random(50% - 80%) amount of its buchering results
+/mob/living/simple_animal/Conversion914(mode = MODE_ONE_TO_ONE, mob/user = usr)
+	switch(mode)
+		if(MODE_ROUGH)
+			gib()
+			return null
+		if(MODE_COARSE)
+			death()
+			ghostize()
+			var/turf/T = get_turf(src)
+			var/list/return_items = list()
+			if(meat_type && meat_amount)
+				for(var/i = 1 to rand(round(meat_amount * 0.5), round(meat_amount * 0.8)))
+					return_items += new meat_type(T)
+			if(bone_material && bone_amount)
+				var/bone_count = rand(round(bone_amount * 0.5), round(bone_amount * 0.8))
+				var/material/M = SSmaterials.get_material_by_name(bone_material)
+				return_items += new M.stack_type(T, bone_count, bone_material)
+			if(skin_material && skin_amount)
+				var/skin_count = rand(round(skin_amount * 0.5), round(skin_amount * 0.8))
+				var/material/M = SSmaterials.get_material_by_name(skin_material)
+				return_items += new M.stack_type(T, skin_count, skin_material)
+			return return_items
+	return ..()
+
+/mob/living/simple_animal/GetBloodColor()
+	return bleed_colour

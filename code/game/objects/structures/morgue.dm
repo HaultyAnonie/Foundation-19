@@ -65,11 +65,11 @@
 		for(var/atom/movable/A as mob|obj in src.connected.loc)
 			if (!( A.anchored ))
 				A.forceMove(src)
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
 		qdel(src.connected)
 		src.connected = null
 	else
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
 		src.connected = new /obj/structure/m_tray( src.loc )
 		step(src.connected, src.dir)
 		var/turf/T = get_step(src, src.dir)
@@ -158,6 +158,11 @@
 		return
 	return
 
+/obj/structure/m_tray/attack_robot(mob/user)
+	if(Adjacent(user))
+		return attack_hand(user)
+	else return ..()
+
 /obj/structure/m_tray/MouseDrop_T(atom/movable/O as mob|obj, mob/user as mob)
 	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || list_find(user.contents, src) || list_find(user.contents, O)))
 		return
@@ -238,11 +243,11 @@
 		for(var/atom/movable/A as mob|obj in src.connected.loc)
 			if (!( A.anchored ))
 				A.forceMove(src)
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
 		qdel(src.connected)
 		src.connected = null
 	else if(src.locked == 0)
-		playsound(src.loc, 'sound/items/Deconstruct.ogg', 50, 1)
+		playsound(src.loc, 'sounds/items/Deconstruct.ogg', 50, 1)
 		src.connected = new /obj/structure/c_tray(src.loc)
 		step(src.connected, dir)
 		var/turf/T = get_step(src, dir)
@@ -257,6 +262,11 @@
 			src.connected = null
 	src.add_fingerprint(user)
 	update()
+
+/obj/structure/crematorium/attack_robot(mob/user)
+	if(Adjacent(user))
+		return attack_hand(user)
+	else return ..()
 
 /obj/structure/crematorium/attackby(P as obj, mob/user as mob)
 	if(istype(P, /obj/item/pen))
@@ -326,28 +336,28 @@
 						var/desperation = rand(1,5)
 						switch(desperation) //This is messy. A better solution would probably be to make more sounds, but...
 							if(1)
-								playsound(src.loc, 'sound/weapons/genhit.ogg', 45, 1)
+								playsound(src.loc, 'sounds/weapons/genhit.ogg', 45, 1)
 								shake_animation(2)
-								playsound(src.loc, 'sound/weapons/genhit.ogg', 45, 1)
+								playsound(src.loc, 'sounds/weapons/genhit.ogg', 45, 1)
 							if(2)
-								playsound(src.loc, 'sound/effects/grillehit.ogg', 45, 1)
+								playsound(src.loc, 'sounds/effects/grillehit.ogg', 45, 1)
 								shake_animation(3)
-								playsound(src.loc, 'sound/effects/grillehit.ogg', 45, 1)
+								playsound(src.loc, 'sounds/effects/grillehit.ogg', 45, 1)
 							if(3)
-								playsound(src, 'sound/effects/bang.ogg', 45, 1)
+								playsound(src, 'sounds/effects/bang.ogg', 45, 1)
 								if(prob(50))
-									playsound(src, 'sound/effects/bang.ogg', 45, 1)
+									playsound(src, 'sounds/effects/bang.ogg', 45, 1)
 									shake_animation()
 								else
 									shake_animation(5)
 							if(4)
-								playsound(src, 'sound/effects/clang.ogg', 45, 1)
+								playsound(src, 'sounds/effects/clang.ogg', 45, 1)
 								shake_animation(5)
 							if(5)
-								playsound(src, 'sound/weapons/smash.ogg', 50, 1)
+								playsound(src, 'sounds/weapons/smash.ogg', 50, 1)
 								show_sound_effect(src.loc, user)
 								if(prob(50))
-									playsound(src, 'sound/weapons/smash.ogg', 50, 1)
+									playsound(src, 'sounds/weapons/smash.ogg', 50, 1)
 									shake_animation(9)
 								else
 									shake_animation()
@@ -356,9 +366,9 @@
 			if(M.stat == DEAD)
 				if(round_is_spooky())
 					if(prob(50))
-						playsound(src, 'sound/effects/ghost.ogg', 10, 5)
+						playsound(src, 'sounds/effects/ghost.ogg', 10, 5)
 					else
-						playsound(src, 'sound/effects/ghost2.ogg', 10, 5)
+						playsound(src, 'sounds/effects/ghost2.ogg', 10, 5)
 
 				admin_attack_log(M, A, "Cremated their victim.", "Was cremated.", "cremated alive")
 				M.audible_message("[M]'s screams cease, as does any movement within the [src]. All that remains is a dull, empty silence.")
@@ -375,7 +385,7 @@
 		cremating = initial(cremating)
 		locked = initial(locked)
 		update()
-		playsound(src.loc, 'sound/effects/spray.ogg', 50, 1)
+		playsound(src.loc, 'sounds/effects/spray.ogg', 50, 1)
 	return
 
 /*
@@ -410,6 +420,11 @@
 		qdel(src)
 		return
 	return
+
+/obj/structure/c_tray/attack_robot(mob/user)
+	if(Adjacent(user))
+		return attack_hand(user)
+	else return ..()
 
 /obj/structure/c_tray/MouseDrop_T(atom/movable/O as mob|obj, mob/user as mob)
 	if ((!( istype(O, /atom/movable) ) || O.anchored || get_dist(user, src) > 1 || get_dist(user, O) > 1 || list_find(user.contents, src) || list_find(user.contents, O)))

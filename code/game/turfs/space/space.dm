@@ -1,3 +1,4 @@
+// TODO: delete this entirely
 /turf/space
 	plane = SPACE_PLANE
 	icon = 'icons/turf/space.dmi'
@@ -12,6 +13,8 @@
 	turf_flags = TURF_DISALLOW_BLOB
 
 	z_eventually_space = TRUE
+
+	pathing_pass_method = TURF_PATHING_PASS_PROC
 
 /turf/space/proc/build_dust_cache()
 	LAZYINITLIST(dust_cache)
@@ -35,7 +38,7 @@
 		return
 	var/turf/below = GetBelow(src)
 
-	if(istype(below, /turf/space))
+	if(isspaceturf(below))
 		return
 	var/area/A = below.loc
 
@@ -83,7 +86,7 @@
 		var/obj/item/stack/material/rods/R = C
 		if (R.use(1))
 			to_chat(user, SPAN_NOTICE("Constructing support lattice ..."))
-			playsound(src, 'sound/weapons/Genhit.ogg', 50, 1)
+			playsound(src, 'sounds/weapons/Genhit.ogg', 50, 1)
 			ReplaceWithLattice(R.material.name)
 		return
 
@@ -94,7 +97,7 @@
 			if (!S.use(1))
 				return
 			qdel(L)
-			playsound(src, 'sound/weapons/Genhit.ogg', 50, 1)
+			playsound(src, 'sounds/weapons/Genhit.ogg', 50, 1)
 			ChangeTurf(/turf/simulated/floor/airless, keep_air = TRUE)
 			return
 		else
@@ -120,3 +123,10 @@
 /turf/space/bluespace
 	name = "bluespace"
 	icon_state = "bluespace"
+
+/*
+/turf/open/openspace/CanPathingPass(obj/item/card/id/ID, to_dir, atom/movable/caller, no_id = FALSE)
+	if(caller && !caller.can_z_move(DOWN, src, null , ZMOVE_FALL_FLAGS)) //If we can't fall here (flying/lattice), it's fine to path through
+		return TRUE
+	return FALSE
+*/

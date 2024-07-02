@@ -4,6 +4,12 @@
 	GLOB.living_mob_list_ -= src
 	GLOB.player_list -= src
 	unset_machine()
+	if(length(progressbars))
+		crash_with("[src] destroyed with elements in its progressbars list")
+		progressbars = null
+	if(length(progressbars_recipient))
+		crash_with("[src] destroyed with elements in its progressbars_recipient list")
+		progressbars_recipient = null
 	QDEL_NULL(hud_used)
 	if(istype(skillset))
 		QDEL_NULL(skillset)
@@ -55,6 +61,7 @@
 	START_PROCESSING(SSmobs, src)
 	if(!mob_panel)
 		mob_panel = new(src)
+	initialize_actionspeed()
 
 /mob/proc/show_message(msg, type, alt, alt_type)//Message, type of message (1 or 2), alternative message, alt message type (1 or 2)
 	if(!client)	return
@@ -376,6 +383,9 @@
 			else
 				client.perspective = EYE_PERSPECTIVE
 				client.eye = loc
+
+		for(var/atom/B in view(world.view, A))
+			SEND_SIGNAL(B, COMSIG_ATOM_VIEW_RESET, src, A)
 	return
 
 
@@ -423,6 +433,7 @@
 		if(source_turf && source_turf.z == target_turf?.z)
 			distance = get_dist(source_turf, target_turf)
 
+	SEND_SIGNAL(A, COMSIG_ATOM_EXAMINED, src)
 	if(!A.examine(src, distance))
 		crash_with("Improper /examine() override: [log_info_line(A)]")
 
@@ -430,22 +441,25 @@
 	set name = "Point To"
 	set category = "Object"
 
-	if(!src || !isturf(src.loc) || !(can_see(A)))
-		return 0
+	// Ghosts can point to anything
+	if(isliving(src) && (!isturf(src.loc) || !(A in view(src.loc))))
+		return FALSE
+
 	if(istype(A, /obj/effect/decal/point))
-		return 0
+		return FALSE
 
-	var/tile = get_turf(A)
-	if (!tile)
-		return 0
+	var/turf/T = get_turf(A)
+	if(!istype(T))
+		return FALSE
 
-	var/obj/P = new /obj/effect/decal/point(tile)
+	var/turf/mob_tile = get_turf(src)
+	var/obj/P = new /obj/effect/decal/point(mob_tile)
 	P.plane = MOB_PLANE
 	P.set_invisibility(invisibility)
-	P.pixel_x = A.pixel_x
-	P.pixel_y = A.pixel_y
+	animate(P, pixel_x = (T.x - mob_tile.x) * world.icon_size + A.pixel_x, pixel_y = (T.y - mob_tile.y) * world.icon_size + A.pixel_y, time = 3, easing = EASE_OUT)
 	face_atom(A)
-	return 1
+	setClickCooldown(DEFAULT_QUICK_COOLDOWN)
+	return TRUE
 
 //Gets the mob grab conga line.
 /mob/proc/ret_grab(list/L)
@@ -667,7 +681,7 @@
 			visible_message(SPAN_WARNING("\The [src] grips \the [H]'s [grabtype]."), SPAN_NOTICE("You grip \the [H]'s [grabtype]."), exclude_mobs = list(H))
 			if(!H.stat)
 				to_chat(H, SPAN_WARNING("\The [src] grips your [grabtype]."))
-		playsound(src.loc, 'sound/weapons/thudswoosh.ogg', 15) //Quieter than hugging/grabbing but we still want some audio feedback
+		playsound(src.loc, 'sounds/weapons/thudswoosh.ogg', 15) //Quieter than hugging/grabbing but we still want some audio feedback
 
 		if(H.pull_damage())
 			to_chat(src, SPAN_DANGER("Pulling \the [H] in their current condition would probably be a bad idea."))
@@ -744,7 +758,7 @@
 
 	// update SCP-106's vis_contents icon
 	if(isscp106(src))
-		var/mob/living/carbon/human/scp_106/H = src
+		var/mob/living/carbon/human/scp106/H = src
 		// H.fix_icons()
 		H.update_vision_cone()
 
@@ -1015,24 +1029,33 @@
 	set category = "IC"
 	set src = usr
 
-	set_face_dir()
+	face_current_direction()
 
+/mob/proc/face_current_direction()
 	if(!facing_dir)
-		to_chat(usr, "You are now not facing anything.")
+		set_face_dir(dir)
 	else
-		to_chat(usr, "You are now facing [dir2text(facing_dir)].")
+		set_face_dir(null)
 
+/// Sets a mobs facing_dir to newdir, and gives an alert
 /mob/proc/set_face_dir(newdir)
-	if(!isnull(facing_dir) && newdir == facing_dir)
-		facing_dir = null
-	else if(newdir)
-		set_dir(newdir)
-		facing_dir = newdir
-	else if(facing_dir)
-		facing_dir = null
+	if(newdir)
+		if(!facing_dir || facing_dir != newdir)
+			facing_dir = newdir
+			set_dir(newdir)
+
+			balloon_alert(src, "facing [dir2text(facing_dir)]")
 	else
-		set_dir(dir)
-		facing_dir = dir
+		facing_dir = null
+
+		balloon_alert(src, "not facing")
+
+	if(hud_used)
+		if(isnull(facing_dir))
+			hud_used.facedir_button?.icon_state = "facedir"
+		else
+			hud_used.facedir_button?.icon_state = "facedir1"
+			hud_used.facedir_button?.dir = facing_dir
 
 /mob/set_dir()
 	if(facing_dir)
@@ -1054,22 +1077,7 @@
 		return
 	. = stat
 	stat = new_stat
-
-/mob/verb/northfaceperm()
-	set hidden = 1
-	set_face_dir(client.client_dir(NORTH))
-
-/mob/verb/southfaceperm()
-	set hidden = 1
-	set_face_dir(client.client_dir(SOUTH))
-
-/mob/verb/eastfaceperm()
-	set hidden = 1
-	set_face_dir(client.client_dir(EAST))
-
-/mob/verb/westfaceperm()
-	set hidden = 1
-	set_face_dir(client.client_dir(WEST))
+	SEND_SIGNAL(src, COMSIG_SET_STAT, new_stat)
 
 #define SHIFT_MAX 8
 

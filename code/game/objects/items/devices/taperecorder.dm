@@ -143,7 +143,7 @@
 
 	if(usr.incapacitated())
 		return
-	playsound(src, 'sound/machines/click.ogg', 10, 1)
+	playsound(src, 'sounds/machines/click.ogg', 10, 1)
 	if(!mytape)
 		to_chat(usr, SPAN_NOTICE("There's no tape!"))
 		return
@@ -196,7 +196,7 @@
 
 	if(usr.incapacitated())
 		return
-	playsound(src, 'sound/machines/click.ogg', 10, 1)
+	playsound(src, 'sounds/machines/click.ogg', 10, 1)
 	if(recording)
 		stop_recording()
 		return
@@ -255,7 +255,7 @@
 	playing = 1
 	update_icon()
 	to_chat(user, SPAN_NOTICE("Audio playback started."))
-	playsound(src, 'sound/machines/click.ogg', 10, 1)
+	playsound(src, 'sounds/machines/click.ogg', 10, 1)
 	for(var/i=1 , i < mytape?.max_capacity , i++)
 		if(!mytape || !playing)
 			break
@@ -273,7 +273,7 @@
 			sleep(10)
 			T = get_turf(src)
 			T.audible_message("<font color=Maroon><B>Tape Recorder</B>: End of recording.</font>")
-			playsound(src, 'sound/machines/click.ogg', 10, 1)
+			playsound(src, 'sounds/machines/click.ogg', 10, 1)
 			break
 		else
 			playsleepseconds = mytape.timestamp[i+1] - mytape.timestamp[i]
@@ -423,7 +423,7 @@
 			to_chat(user, SPAN_NOTICE("There is no tape left inside."))
 			return
 		to_chat(user, SPAN_NOTICE("You start winding the tape back in..."))
-		if(do_after(user, 120, src))
+		if(do_after(user, 15 SECONDS, src, bonus_percentage = 25))
 			to_chat(user, SPAN_NOTICE("You wound the tape back in."))
 			fix()
 		return

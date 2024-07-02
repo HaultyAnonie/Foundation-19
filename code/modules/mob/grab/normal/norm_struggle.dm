@@ -15,7 +15,7 @@
 	breakability = 3
 
 	grab_slowdown = 10
-	upgrade_cooldown = 20
+	upgrade_cooldown = 2 SECONDS
 
 	can_downgrade_on_resist = 0
 
@@ -49,12 +49,12 @@
 	else
 		affecting.visible_message(SPAN_WARNING("[affecting] struggles against [assailant]!"))
 		G.done_struggle = FALSE
-		addtimer(CALLBACK(G, .proc/handle_resist), 1 SECOND)
+		addtimer(CALLBACK(G, PROC_REF(handle_resist)), 1 SECOND)
 		resolve_struggle(G)
 
 /datum/grab/normal/struggle/proc/resolve_struggle(obj/item/grab/G)
 	set waitfor = FALSE
-	if(do_after(G.assailant, upgrade_cooldown, G, do_flags = DO_DEFAULT | DO_USER_CAN_MOVE))
+	if(do_after(G.assailant, upgrade_cooldown, G, do_flags = DO_DEFAULT | DO_USER_CAN_MOVE, bonus_percentage = 25))
 		G.done_struggle = TRUE
 		G.upgrade(TRUE)
 	else

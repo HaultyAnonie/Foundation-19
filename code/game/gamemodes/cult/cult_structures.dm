@@ -5,13 +5,13 @@
 
 /obj/structure/cult/talisman
 	name = "Altar"
-	desc = "A bloodstained altar dedicated to Nar-Sie."
+	desc = "A bloodstained altar dedicated to the Scarlet King."
 	icon_state = "talismanaltar"
 
 
 /obj/structure/cult/forge
 	name = "Daemon forge"
-	desc = "A forge used in crafting the unholy weapons used by the armies of Nar-Sie."
+	desc = "A forge used in crafting the unholy weapons used by the Children of the Scarlet King."
 	icon_state = "forge"
 
 /obj/structure/cult/pylon
@@ -25,7 +25,7 @@
 	light_color = "#3e0000"
 	health_max = 20
 	health_min_damage = 4
-	damage_hitsound = 'sound/effects/Glasshit.ogg'
+	damage_hitsound = 'sounds/effects/Glasshit.ogg'
 
 /obj/structure/cult/pylon/attackby(obj/item/W, mob/user)
 	if(istype(W, /obj/item/natural_weapon/cult_builder))
@@ -38,7 +38,18 @@
 			)
 			restore_health(5)
 		return
-	..()
+	return ..()
+
+/obj/structure/cult/pylon/handle_death_change(new_death_state)
+	. = ..()
+	if(new_death_state)
+		Shatter()
+
+/obj/structure/cult/pylon/proc/Shatter(display_message = TRUE)
+	playsound(src, "shatter", 70, 1)
+	if(display_message)
+		visible_message("<span class='warning'>\The [src] shatters!</span>")
+	qdel(src)
 
 /obj/structure/cult/tome
 	name = "Desk"
@@ -85,7 +96,7 @@
 
 /obj/effect/gateway/active/New()
 	..()
-	addtimer(CALLBACK(src, .proc/create_and_delete), rand(30,60) SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(create_and_delete)), rand(30,60) SECONDS)
 
 
 /obj/effect/gateway/active/proc/create_and_delete()
@@ -131,4 +142,3 @@
 			new_mob.key = M.key
 
 		to_chat(new_mob, "<B>Your form morphs into that of a corgi.</B>")//Because we don't have cluwnes
-

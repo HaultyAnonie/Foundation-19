@@ -24,13 +24,13 @@
 					return TRUE
 	return FALSE
 
-/proc/get_area(O)
-	var/turf/loc = get_turf(O)
-	if(loc)
-		var/area/res = loc.loc
-		.= res
+/// Returns the name of the area the atom is in
+/proc/get_area_name(atom/checked_atom)
+	var/area/checked_area = isarea(checked_atom) ? checked_atom : get_area(checked_atom)
+	return checked_area?.name
 
-/proc/get_area_name(N) //get area by its name
+/// Returns the area with the name given
+/proc/get_area_by_name(N)
 	for(var/area/A in world)
 		if(A.name == N)
 			return A
@@ -606,3 +606,12 @@
 			continue
 
 		bot += list(list("name" = robot.name, "rank" = "[robot.modtype] [robot.braintype]"), "active" = "Active")
+
+/// Removes an image from a client's `.images`. Useful as a callback.
+/proc/remove_image_from_client(image/image_to_remove, client/remove_from)
+	remove_from?.images -= image_to_remove
+
+/// Like remove_image_from_client, but will remove the image from a list of clients
+/proc/remove_image_from_clients(image/image_to_remove, list/hide_from)
+	for(var/client/remove_from in hide_from)
+		remove_from.images -= image_to_remove

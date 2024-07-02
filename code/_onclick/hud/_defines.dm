@@ -53,7 +53,8 @@
 #define ui_drop_throw "EAST-1:28,SOUTH+1:7"
 #define ui_pull_resist "EAST-2:26,SOUTH+1:7"
 #define ui_acti "EAST-2:26,SOUTH:5"
-#define ui_rest_act "EAST-4:24,SOUTH:5"
+#define ui_rest_act "EAST-4:24,SOUTH+1:5"
+#define ui_facedir "EAST-4:24,SOUTH:5"
 #define ui_movi "EAST-3:24,SOUTH:5"
 #define ui_zonesel "EAST-1:28,SOUTH:5"
 #define ui_acti_alt "EAST-1:28,SOUTH:5" //alternative intent switcher for when the interface is hidden (F12)
@@ -132,6 +133,7 @@
 #define ui_ghost_orbit "SOUTH:6,CENTER-1"
 #define ui_ghost_reenter_corpse "SOUTH:6,CENTER"
 #define ui_ghost_teleport "SOUTH:6,CENTER+1"
+#define ui_ghost_become_scp "SOUTH:6,CENTER+2"
 
 //pai
 #define ui_pai_software "NORTH,WEST:6"
@@ -167,6 +169,7 @@
 #define ui_ai_power_override "LEFT:6,TOP:0"
 #define ui_ai_shutdown "LEFT+1:6,TOP:0"
 #define ui_ai_holo_mov "LEFT:6, TOP-1:0"
+#define ui_ai_area_apc "LEFT+1:6, TOP-1:0"
 
 // AI: Crew
 #define ui_ai_crew_mon "RIGHT-1:30,TOP:0"

@@ -5,7 +5,7 @@
 	icon_state = "sleeper_0"
 	density = TRUE
 	anchored = TRUE
-	clicksound = 'sound/machines/buttonbeep.ogg'
+	clicksound = 'sounds/machines/buttonbeep.ogg'
 	clickvol = 30
 	base_type = /obj/machinery/sleeper
 	construct_state = /decl/machine_construction/default/panel_closed
@@ -241,7 +241,7 @@
 	else
 		visible_message("\The [user] starts putting [M] into \the [src].")
 
-	if(do_after(user, 20, src))
+	if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25))
 		if(occupant)
 			to_chat(user, SPAN_WARNING("\The [src] is already occupied."))
 			return

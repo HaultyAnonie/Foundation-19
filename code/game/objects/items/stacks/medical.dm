@@ -72,7 +72,7 @@
 	icon_state = "brutepack"
 	origin_tech = list(TECH_BIO = 1)
 	animal_heal = 5
-	apply_sounds = list('sound/effects/rip1.ogg','sound/effects/rip2.ogg')
+	apply_sounds = list('sounds/effects/rip1.ogg','sounds/effects/rip2.ogg')
 	amount = 10
 
 /obj/item/stack/medical/bruise_pack/attack(mob/living/carbon/M, mob/user)
@@ -95,7 +95,7 @@
 					continue
 				if(used == amount)
 					break
-				if(!do_after(user, W.damage / 5, M))
+				if(!do_after(user, W.damage / 5, M, bonus_percentage = 25))
 					break
 
 				if (W.current_stage <= W.max_bleeding_stage)
@@ -131,7 +131,7 @@
 	heal_burn = 1
 	origin_tech = list(TECH_BIO = 1)
 	animal_heal = 4
-	apply_sounds = list('sound/effects/ointment.ogg')
+	apply_sounds = list('sounds/effects/ointment.ogg')
 
 /obj/item/stack/medical/ointment/attack(mob/living/carbon/M, mob/user)
 	if(..())
@@ -148,7 +148,7 @@
 			user.visible_message(SPAN_NOTICE("\The [user] starts salving wounds on [M]'s [affecting.name]."), \
 					             SPAN_NOTICE("You start salving the wounds on [M]'s [affecting.name].") )
 			playsound(src, pick(apply_sounds), 25)
-			if(!do_after(user, 1 SECOND, M))
+			if(!do_after(user, 1 SECOND, M, bonus_percentage = 25))
 				return 1
 			user.visible_message(SPAN_NOTICE("[user] salved wounds on [M]'s [affecting.name]."), \
 			                         SPAN_NOTICE("You salved wounds on [M]'s [affecting.name].") )
@@ -164,7 +164,7 @@
 	heal_brute = 0
 	origin_tech = list(TECH_BIO = 1)
 	animal_heal = 12
-	apply_sounds = list('sound/effects/rip1.ogg','sound/effects/rip2.ogg','sound/effects/tape.ogg')
+	apply_sounds = list('sounds/effects/rip1.ogg','sounds/effects/rip2.ogg','sounds/effects/tape.ogg')
 	amount = 10
 
 /obj/item/stack/medical/advanced/bruise_pack/attack(mob/living/carbon/M, mob/user)
@@ -186,7 +186,7 @@
 					continue
 				if(used == amount)
 					break
-				if(!do_after(user, W.damage / 5, M))
+				if(!do_after(user, W.damage / 5, M, bonus_percentage = 25))
 					break
 				if (W.current_stage <= W.max_bleeding_stage)
 					user.visible_message(SPAN_NOTICE("\The [user] cleans \a [W.desc] on [M]'s [affecting.name] and seals the edges with bioglue."), \
@@ -221,7 +221,7 @@
 	heal_burn = 5
 	origin_tech = list(TECH_BIO = 1)
 	animal_heal = 7
-	apply_sounds = list('sound/effects/ointment.ogg')
+	apply_sounds = list('sounds/effects/ointment.ogg')
 
 
 /obj/item/stack/medical/advanced/ointment/attack(mob/living/carbon/M, mob/user)
@@ -239,7 +239,7 @@
 			user.visible_message(SPAN_NOTICE("\The [user] starts salving wounds on [M]'s [affecting.name]."), \
 					             SPAN_NOTICE("You start salving the wounds on [M]'s [affecting.name].") )
 			playsound(src, pick(apply_sounds), 25)
-			if(!do_after(user, 1 SECOND, M))
+			if(!do_after(user, 1 SECOND, M, bonus_percentage = 25))
 				return 1
 			user.visible_message( 	SPAN_NOTICE("[user] covers wounds on [M]'s [affecting.name] with regenerative membrane."), \
 									SPAN_NOTICE("You cover wounds on [M]'s [affecting.name] with regenerative membrane.") )
@@ -353,7 +353,7 @@
 			SPAN_NOTICE("\The [user] starts patching fractures on \the [M]'s [affecting.name]."), \
 			SPAN_NOTICE("You start patching fractures on \the [M]'s [affecting.name].") )
 		playsound(src, pick(apply_sounds), 25)
-		if(!do_after(user, 1 SECOND, M))
+		if(!do_after(user, 1 SECOND, M, bonus_percentage = 25))
 			to_chat(user, SPAN_NOTICE("You must stand still to patch fractures."))
 			return 1
 		user.visible_message( \

@@ -21,10 +21,10 @@ SUBSYSTEM_DEF(fluids)
 	var/list/fluid_images = list()
 
 	var/list/gurgles = list(
-		'sound/effects/gurgle1.ogg',
-		'sound/effects/gurgle2.ogg',
-		'sound/effects/gurgle3.ogg',
-		'sound/effects/gurgle4.ogg'
+		'sounds/effects/gurgle1.ogg',
+		'sounds/effects/gurgle2.ogg',
+		'sounds/effects/gurgle3.ogg',
+		'sounds/effects/gurgle4.ogg'
 		)
 
 /datum/controller/subsystem/fluids/stat_entry(msg)
@@ -156,7 +156,7 @@ SUBSYSTEM_DEF(fluids)
 						SET_FLUID_DEPTH(other, F.equalize_avg_depth)
 						other.temperature = F.equalize_avg_temp
 			F.equalizing_fluids.Cut()
-			if(istype(F.loc, /turf/space))
+			if(isspaceturf(F.loc))
 				LOSE_FLUID(F, max((FLUID_EVAPORATION_POINT-1),F.fluid_amount * 0.5))
 
 		if (MC_TICK_CHECK)
@@ -174,7 +174,7 @@ SUBSYSTEM_DEF(fluids)
 
 			if(F.flow_amount >= 10)
 				if(prob(1))
-					playsound(F.loc, 'sound/effects/slosh.ogg', 25, 1)
+					playsound(F.loc, 'sounds/effects/slosh.ogg', 25, 1)
 					show_sound_effect(F.loc, soundicon = SFX_ICON_SMALL)
 				for(var/atom/movable/AM in F.loc.contents)
 					if(isnull(pushing_atoms[AM]) && AM.is_fluid_pushable(F.flow_amount))

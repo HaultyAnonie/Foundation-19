@@ -77,7 +77,7 @@ GLOBAL_VAR(href_logfile)
 	to_file(diary, "[log_end]\n[log_end]\nStarting up. (ID: [game_id]) [time2text(world.timeofday, "hh:mm.ss")][log_end]\n---------------------[log_end]")
 
 	if(config && config.log_runtime)
-		var/runtime_log = file("data/logs/runtime/[date_string]_[time2text(world.timeofday, "hh:mm")]_[game_id].log")
+		var/runtime_log = file("data/logs/runtime/[date_string]_[time2text(world.timeofday, "hh-mm")]_[game_id].log")
 		to_file(runtime_log, "Game [game_id] starting up at [time2text(world.timeofday, "hh:mm.ss")]")
 		log = runtime_log // Note that, as you can see, this is misnamed: this simply moves world.log into the runtime log file.
 
@@ -129,7 +129,7 @@ GLOBAL_VAR(href_logfile)
 GLOBAL_LIST_EMPTY(world_topic_throttle)
 GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 #define SET_THROTTLE(TIME, REASON) throttle[1] = base_throttle + (TIME); throttle[2] = (REASON);
-#define THROTTLE_MAX_BURST 15 SECONDS
+#define THROTTLE_MAX_BURST (15 SECONDS)
 
 /world/Topic(T, addr, master, key)
 	TGS_TOPIC
@@ -148,6 +148,32 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 	var/base_throttle = max(throttle[1], world.timeofday)
 	SET_THROTTLE(3 SECONDS, null)
+
+	/* Cross-Comms stuff */
+	if(findtext(T, "Comms_Console") && GLOB.cross_comms_allowed)
+		var/list/input = params2list(T)
+		// Reject comms messages from other servers that are not on our configured network,
+		// if this has been configured. (See CROSS_COMMS_NETWORK in comms.txt)
+		var/configured_network = config.cross_comms_network
+		if(configured_network && configured_network != input["network"])
+			return
+		// Check comms key
+		if(config.comms_key != input["key"])
+			return
+		post_comm_message("Incoming message from [input["message_sender"]]", input["message"])
+		command_announcement.Announce(input["message"], "Incoming message from [input["message_sender"]]")
+		var/sender_ckey = input["message_sender_ckey"] ? input["message_sender_ckey"] : "Unknown"
+		log_and_message_admins("Comms_Console message received from [input["source"]]; Sender ckey: [sender_ckey].")
+
+	else if(findtext(T, "News_Report") && GLOB.cross_comms_allowed)
+		var/list/input = params2list(T)
+		var/configured_network = config.cross_comms_network
+		if(configured_network && configured_network != input["network"])
+			return
+		if(config.comms_key != input["key"])
+			return
+		post_comm_message("Breaking Update From [input["message_sender"]]", input["message"])
+		command_announcement.Announce(input["message"], "Breaking Update From [input["message_sender"]]")
 
 	/* * * * * * * *
 	* Public Topic Calls
@@ -416,7 +442,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 		C.received_irc_pm = world.time
 		C.irc_admin = input["sender"]
 
-		sound_to(C, 'sound/effects/adminhelp.ogg')
+		sound_to(C, 'sounds/effects/adminhelp.ogg')
 		to_chat(C, message)
 
 		for(var/client/A in GLOB.admins)
@@ -464,7 +490,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 
 /world/Reboot(reason)
 	/*spawn(0)
-		sound_to(world, sound(pick('sound/AI/newroundsexy.ogg','sound/misc/apcdestroyed.ogg','sound/misc/bangindonk.ogg')))// random end sounds!! - LastyBatsy
+		sound_to(world, sound(pick('sounds/AI/newroundsexy.ogg','sounds/misc/apcdestroyed.ogg','sounds/misc/bangindonk.ogg')))// random end sounds!! - LastyBatsy
 
 		*/
 	TgsReboot()
@@ -486,7 +512,7 @@ GLOBAL_VAR_INIT(world_topic_last, world.timeofday)
 /world/Del()
 	var/debug_server = world.GetConfig("env", "AUXTOOLS_DEBUG_DLL")
 	if (debug_server)
-		call(debug_server, "auxtools_shutdown")()
+		LIBCALL("debug_server.dll", "auxtools_shutdown")() //! FIXME515 hacky solution till auxtools and sdmm come out with support ~Tsuru
 	callHook("shutdown")
 	return ..()
 
@@ -680,3 +706,50 @@ var/failed_old_db_connections = 0
 		return 1
 
 #undef FAILED_DB_CONNECTION_CUTOFF
+
+/**
+ * Sends a message to a set of cross-communications-enabled servers using world topic calls
+ *
+ * Arguments:
+ * * source - Who sent this message
+ * * msg - The message body
+ * * type - The type of message, becomes the topic command under the hood
+ * * target_servers - A collection of servers to send the message to, defined in config
+ * * additional_data - An (optional) associated list of extra parameters and data to send with this world topic call
+ */
+/proc/send2otherserver(source, msg, type = "Comms_Console", target_servers, list/additional_data = list())
+	if(!config.comms_key)
+		to_chat(usr, SPAN_WARNING("Lacking comms key. Message was not sent."))
+		return
+
+	var/our_id = config.cross_comms_name
+	additional_data["message_sender"] = source
+	additional_data["message"] = msg
+	additional_data["source"] = "([our_id])"
+	if(!additional_data["message_sender_ckey"])
+		var/sender_ckey = usr ? usr.ckey : "server itself"
+		additional_data["message_sender_ckey"] = sender_ckey
+	additional_data += type
+
+	var/list/servers = config.cross_servers
+	for(var/I in servers)
+		if(I == our_id) //No sending to ourselves
+			continue
+		if(target_servers && !(I in target_servers))
+			continue
+		world.send_cross_comms(I, additional_data)
+
+/// Sends a message to a given cross comms server by name (by name for security).
+/world/proc/send_cross_comms(server_name, list/message, auth = TRUE)
+	set waitfor = FALSE
+	if (auth)
+		var/comms_key = config.comms_key
+		if(!comms_key)
+			to_chat(usr, SPAN_WARNING("Lacking comms key. Message was not sent."))
+			return
+		message["key"] = comms_key
+	var/list/servers = config.cross_servers
+	var/server_url = servers[server_name]
+	if (!server_url)
+		CRASH("Invalid cross comms config: [server_name]")
+	world.Export("[server_url]?[list2params(message)]")

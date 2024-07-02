@@ -40,7 +40,6 @@ var/list/airlock_overlays = list()
 	var/aiHacking = 0
 	var/obj/machinery/door/airlock/closeOther = null
 	var/closeOtherId = null
-	var/lockdownbyai = 0
 	autoclose = 1
 	var/assembly_type = /obj/structure/door_assembly
 	var/mineral = null
@@ -51,16 +50,16 @@ var/list/airlock_overlays = list()
 	var/hasShocked = 0 //Prevents multiple shocks from happening
 	var/secured_wires = 0
 
-	var/open_sound_powered = 'sound/machines/airlock_open.ogg'
-	var/open_sound_unpowered = 'sound/machines/airlock_open_force.ogg'
-	var/open_failure_access_denied = 'sound/machines/deniedboop.ogg'
+	var/open_sound_powered = 'sounds/machines/airlock_open.ogg'
+	var/open_sound_unpowered = 'sounds/machines/airlock_open_force.ogg'
+	var/open_failure_access_denied = 'sounds/machines/deniedboop.ogg'
 
-	var/close_sound_powered = 'sound/machines/airlock_close.ogg'
-	var/close_sound_unpowered = 'sound/machines/airlock_close_force.ogg'
-	var/close_failure_blocked = 'sound/machines/triple_beep.ogg'
+	var/close_sound_powered = 'sounds/machines/airlock_close.ogg'
+	var/close_sound_unpowered = 'sounds/machines/airlock_close_force.ogg'
+	var/close_failure_blocked = 'sounds/machines/triple_beep.ogg'
 
-	var/bolts_rising = 'sound/machines/bolts_up.ogg'
-	var/bolts_dropping = 'sound/machines/bolts_down.ogg'
+	var/bolts_rising = 'sounds/machines/bolts_up.ogg'
+	var/bolts_dropping = 'sounds/machines/bolts_down.ogg'
 
 	var/door_crush_damage = DOOR_CRUSH_DAMAGE
 	var/obj/item/airlock_brace/brace = null
@@ -169,7 +168,7 @@ var/list/airlock_overlays = list()
 /obj/machinery/door/airlock/glass
 	name = "Glass Airlock"
 	icon_state = "preview_glass"
-	hitsound = 'sound/effects/Glasshit.ogg'
+	hitsound = 'sounds/effects/Glasshit.ogg'
 	maxhealth = 300
 	explosion_resistance = 5
 	opacity = 0
@@ -254,9 +253,9 @@ var/list/airlock_overlays = list()
 /obj/machinery/door/airlock/external/escapepod/attackby(obj/item/C, mob/user)
 	if(p_open && !arePowerSystemsOn())
 		if(isWrench(C))
-			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+			playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
 			user.visible_message(SPAN_WARNING("[user.name] starts frantically pumping the bolt override mechanism!"), SPAN_WARNING("You start frantically pumping the bolt override mechanism!"))
-			if(do_after(user, 160))
+			if(do_after(user, 20 SECONDS, bonus_percentage = 35))
 				visible_message("\The [src] bolts [locked ? "disengage" : "engage"]!")
 				locked = !locked
 				return
@@ -418,7 +417,7 @@ var/list/airlock_overlays = list()
 /obj/machinery/door/airlock/phoron/proc/PhoronBurn(temperature)
 	for(var/turf/simulated/floor/target_tile in range(2,loc))
 		target_tile.assume_gas(GAS_PHORON, 35, 400+T0C)
-		addtimer(CALLBACK(target_tile, /turf/proc/hotspot_expose, 400), 0)
+		addtimer(CALLBACK(target_tile, TYPE_PROC_REF(/turf, hotspot_expose), 400), 0)
 	for(var/turf/simulated/wall/W in range(3,src))
 		W.burn((temperature/4))//Added so that you can't set off a massive chain reaction with a small flame
 	for(var/obj/machinery/door/airlock/phoron/D in range(3,src))
@@ -446,7 +445,7 @@ About the new airlock wires panel:
 			if(!src.justzap)
 				if(src.shock(user, 100))
 					src.justzap = TRUE
-					addtimer(CALLBACK(src, .proc/set_justzap, FALSE), 1 SECOND)
+					addtimer(CALLBACK(src, PROC_REF(set_justzap), FALSE), 1 SECOND)
 					return
 			else
 				return
@@ -570,7 +569,7 @@ About the new airlock wires panel:
 	if(feedback && message)
 		to_chat(usr, message)
 	if(.)
-		playsound(src, 'sound/effects/sparks3.ogg', 30, 0, -6)
+		playsound(src, 'sounds/effects/sparks3.ogg', 30, 0, -6)
 
 /obj/machinery/door/airlock/proc/set_idscan(activate, feedback = 0)
 	var/message = ""
@@ -952,7 +951,7 @@ About the new airlock wires panel:
 
 //returns 1 on success, 0 on failure
 /obj/machinery/door/airlock/proc/cut_bolts(obj/item/item, mob/user)
-	var/cut_delay = (15 SECONDS)
+	var/cut_delay = 18 SECONDS
 	var/cut_verb
 	var/cut_sound
 
@@ -961,13 +960,13 @@ About the new airlock wires panel:
 		if(!WT.remove_fuel(0,user))
 			return 0
 		cut_verb = "cutting"
-		cut_sound = 'sound/items/Welder.ogg'
+		cut_sound = 'sounds/items/Welder.ogg'
 	else if(istype(item,/obj/item/gun/energy/plasmacutter)) //They could probably just shoot them out, but who cares!
 		var/obj/item/gun/energy/plasmacutter/cutter = item
 		if(!cutter.slice(user))
 			return 0
 		cut_verb = "cutting"
-		cut_sound = 'sound/items/Welder.ogg'
+		cut_sound = 'sounds/items/Welder.ogg'
 		cut_delay *= 0.66
 	else if(istype(item,/obj/item/melee/energy/blade) || istype(item,/obj/item/melee/energy/sword))
 		cut_verb = "slicing"
@@ -975,7 +974,7 @@ About the new airlock wires panel:
 		cut_delay *= 0.66
 	else if(istype(item,/obj/item/circular_saw))
 		cut_verb = "sawing"
-		cut_sound = 'sound/weapons/circsawhit.ogg'
+		cut_sound = 'sounds/weapons/circsawhit.ogg'
 		cut_delay *= 1.5
 
 	else if(istype(item,/obj/item/material/twohanded/fireaxe))
@@ -989,7 +988,7 @@ About the new airlock wires panel:
 			SPAN_DANGER("\The [user] smashes the bolt cover open!"),
 			SPAN_WARNING("You smash the bolt cover open!")
 			)
-		playsound(src, 'sound/weapons/smash.ogg', 100, 1)
+		playsound(src, 'sounds/weapons/smash.ogg', 100, 1)
 		show_sound_effect(src.loc, user)
 		src.lock_cut_state = BOLTS_EXPOSED
 		return 0
@@ -1006,7 +1005,7 @@ About the new airlock wires panel:
 
 		playsound(src, cut_sound, 100, 1)
 		show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
-		if (do_after(user, cut_delay, src))
+		if (do_after(user, cut_delay, src, bonus_percentage = 25))
 			user.visible_message(
 				SPAN_NOTICE("\The [user] removes the bolt cover from [src]"),
 				SPAN_NOTICE("You remove the cover and expose the door bolts.")
@@ -1021,7 +1020,7 @@ About the new airlock wires panel:
 			)
 		playsound(src, cut_sound, 100, 1)
 		show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
-		if (do_after(user, cut_delay, src))
+		if (do_after(user, cut_delay, src, bonus_percentage = 25))
 			user.visible_message(
 				SPAN_NOTICE("\The [user] severs the door bolts, unlocking [src]."),
 				SPAN_NOTICE("You sever the door bolts, unlocking the door.")
@@ -1044,7 +1043,7 @@ About the new airlock wires panel:
 		if(!length(A.req_access) && (alert("\the [A]'s 'Access Not Set' light is flashing. Install it anyway?", "Access not set", "Yes", "No") == "No"))
 			return
 
-		if(do_after(user, 50, src) && density && A && user.unEquip(A, src))
+		if(do_after(user, 7 SECONDS, src, bonus_percentage = 25) && density && A && user.unEquip(A, src))
 			to_chat(user, SPAN_NOTICE("You successfully install \the [A]."))
 			brace = A
 			brace.airlock = src
@@ -1068,13 +1067,13 @@ About the new airlock wires panel:
 		if(!W.remove_fuel(0,user))
 			to_chat(user, SPAN_NOTICE("Your [W.name] doesn't have enough fuel."))
 			return
-		playsound(src, 'sound/items/Welder.ogg', 50, 1)
+		playsound(src, 'sounds/items/Welder.ogg', 50, 1)
 		show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
 		user.visible_message(SPAN_WARNING("\The [user] begins welding \the [src] [welded ? "open" : "closed"]!"),
 							SPAN_NOTICE("You begin welding \the [src] [welded ? "open" : "closed"]."))
-		if(do_after(user, (rand(3,5)) SECONDS, src))
+		if(do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 			if(density && !(operating > 0) && !repairing)
-				playsound(src, 'sound/items/Welder2.ogg', 50, 1)
+				playsound(src, 'sounds/items/Welder2.ogg', 50, 1)
 				show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
 				welded = !welded
 				update_icon()
@@ -1089,12 +1088,12 @@ About the new airlock wires panel:
 			else
 				src.p_open = 0
 				user.visible_message(SPAN_NOTICE("[user.name] closes the maintenance panel on \the [src]."), SPAN_NOTICE("You close the maintenance panel on \the [src]."))
-				playsound(src.loc, "sound/items/Screwdriver.ogg", 20)
+				playsound(src.loc, "sounds/items/Screwdriver.ogg", 20)
 				show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
 		else
 			src.p_open = 1
 			user.visible_message(SPAN_NOTICE("[user.name] opens the maintenance panel on \the [src]."), SPAN_NOTICE("You open the maintenance panel on \the [src]."))
-			playsound(src.loc, "sound/items/Screwdriver.ogg", 20)
+			playsound(src.loc, "sounds/items/Screwdriver.ogg", 20)
 			show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
 		src.update_icon()
 	else if(isWirecutter(C))
@@ -1108,10 +1107,10 @@ About the new airlock wires panel:
 		cable.plugin(src, user)
 	else if(!repairing && isCrowbar(C))
 		if(src.p_open && (operating < 0 || (!operating && welded && !src.arePowerSystemsOn() && density && !src.locked)) && !brace)
-			playsound(src.loc, 'sound/items/Crowbar.ogg', 100, 1)
+			playsound(src.loc, 'sounds/items/Crowbar.ogg', 100, 1)
 			show_sound_effect(get_turf(src), soundicon = SFX_ICON_SMALL)
 			user.visible_message("[user] removes the electronics from the airlock assembly.", "You start to remove electronics from the airlock assembly.")
-			if(do_after(user,40,src))
+			if(do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 				to_chat(user, SPAN_NOTICE("You've removed the airlock electronics!"))
 				deconstruct(user)
 				return
@@ -1131,7 +1130,7 @@ About the new airlock wires panel:
 	else if (istype(C, /obj/item/material/twohanded/fireaxe) && !(stat & BROKEN) && user.a_intent == I_HURT)
 		var/obj/item/material/twohanded/fireaxe/F = C
 		if (F.wielded)
-			playsound(src, 'sound/weapons/smash.ogg', 100, 1)
+			playsound(src, 'sounds/weapons/smash.ogg', 100, 1)
 			show_sound_effect(get_turf(src))
 			health -= F.force_wielded * 2
 			if(health <= 0)
@@ -1490,12 +1489,16 @@ About the new airlock wires panel:
 		window_color = GLASS_COLOR
 	update_icon()
 
+/obj/machinery/door/airlock/CanPathingPass(obj/item/card/id/ID, to_dir, atom/movable/caller, no_id = FALSE)
+	//Airlock is passable if it is open (!density), bot has access, and is not bolted shut or powered off)
+	return !density || (check_access(ID) && !locked && arePowerSystemsOn() && !no_id)
+
 // Public access
 
 /decl/public_access/public_method/airlock_toggle_bolts
 	name = "toggle bolts"
 	desc = "Toggles whether the airlock is bolted or not, if possible."
-	call_proc = /obj/machinery/door/airlock/proc/toggle_lock
+	call_proc = TYPE_PROC_REF(/obj/machinery/door/airlock, toggle_lock)
 
 /decl/stock_part_preset/radio/receiver/airlock
 	frequency = AIRLOCK_FREQ

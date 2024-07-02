@@ -23,9 +23,13 @@
 	)
 	stock_part_presets = list(/decl/stock_part_preset/radio/receiver/flasher = 1)
 
+/obj/machinery/flasher/examine(mob/user)
+	. = ..()
+	if(disable)
+		to_chat(user, SPAN_WARNING("[src] wires have been cut!"))
 
 /obj/machinery/flasher/on_update_icon()
-	if ( !(stat & (BROKEN|NOPOWER)) )
+	if ( !disable && !(stat & (BROKEN|NOPOWER)) )
 		icon_state = "[base_state]1"
 //		src.sd_SetLuminosity(2)
 	else
@@ -41,6 +45,9 @@
 			user.visible_message(SPAN_WARNING("[user] has disconnected the [src]'s flashbulb!"), SPAN_WARNING("You disconnect the [src]'s flashbulb!"))
 		if (!src.disable)
 			user.visible_message(SPAN_WARNING("[user] has connected the [src]'s flashbulb!"), SPAN_WARNING("You connect the [src]'s flashbulb!"))
+		playsound(W, 'sounds/items/Wirecutter.ogg', 20, 1)
+		show_sound_effect(W.loc, soundicon = SFX_ICON_SMALL)
+		update_icon()
 	else
 		..()
 
@@ -58,7 +65,7 @@
 	if ((src.disable) || (src.last_flash && world.time < src.last_flash + 150))
 		return
 
-	playsound(src.loc, 'sound/weapons/flash.ogg', 100, 1)
+	playsound(src.loc, 'sounds/weapons/flash.ogg', 100, 1)
 	show_sound_effect(src.loc)
 	flick("[base_state]_flash", src)
 	src.last_flash = world.time
@@ -144,7 +151,7 @@
 /decl/public_access/public_method/flasher_flash
 	name = "flash"
 	desc = "Performs a flash, if possible."
-	call_proc = /obj/machinery/flasher/proc/flash
+	call_proc = TYPE_PROC_REF(/obj/machinery/flasher, flash)
 
 /decl/stock_part_preset/radio/receiver/flasher
 	frequency = BUTTON_FREQ

@@ -31,9 +31,6 @@ var/list/organ_cache = list()
 	// Bioprinter stats
 	var/can_be_printed = TRUE
 	var/print_cost
-	// SCP-13
-	var/scp106_affected = FALSE
-	var/scp106_vulnerable = TRUE
 
 
 /obj/item/organ/Destroy()
@@ -101,6 +98,11 @@ var/list/organ_cache = list()
 	if(owner && vital)
 		owner.death()
 
+/obj/item/organ/proc/revive()
+	damage = 0
+	status &= ~ORGAN_DEAD
+	START_PROCESSING(SSobj, src)
+
 /obj/item/organ/Process()
 
 	if(loc != owner)
@@ -161,7 +163,7 @@ var/list/organ_cache = list()
 /obj/item/organ/proc/handle_germ_effects()
 	//** Handle the effects of infections
 	var/virus_immunity = owner.virus_immunity() //reduces the amount of times we need to call this proc
-	var/antibiotics = owner.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
+	var/antibiotics = owner.reagents.get_reagent_amount(/datum/reagent/medicine/penicillin)
 
 	if (germ_level > 0 && germ_level < INFECTION_LEVEL_ONE/2 && prob(virus_immunity*0.3))
 		germ_level--
@@ -274,7 +276,7 @@ var/list/organ_cache = list()
 
 	if(!istype(owner))
 		return
-	GLOB.dismembered_event.raise_event(owner, src)
+	SEND_SIGNAL(owner, COMSIG_ORGAN_DISMEMBERED, src)
 
 	action_button_name = null
 

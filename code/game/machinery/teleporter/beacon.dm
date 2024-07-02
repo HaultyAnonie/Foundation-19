@@ -44,7 +44,7 @@
 	if (!panel_open)
 		if (isWrench(I))
 			var/turf/T = get_turf(src)
-			if (is_space_turf(T) || istype(T, /turf/simulated/open))
+			if (isspaceturf(T) || istype(T, /turf/simulated/open))
 				to_chat(user, SPAN_WARNING("You cannot anchor \the [src] to \the [T]. It requires solid plating."))
 				return FALSE
 			if (!T.is_plating())
@@ -55,9 +55,9 @@
 				SPAN_NOTICE("\The [user] starts to [anchored ? "disconnect" : "connect"] \the [src] [anchored ? "from" : "to"] \the [T]."),
 				SPAN_NOTICE("You start to [anchored ? "disconnect" : "connect"] \the [src] [anchored ? "from" : "to"] \the [T].")
 			)
-			playsound(loc, 'sound/items/Ratchet.ogg', 75, TRUE)
+			playsound(loc, 'sounds/items/Ratchet.ogg', 75, TRUE)
 
-			if (!do_after(user, 3 SECONDS, src, DO_DEFAULT | DO_BOTH_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+			if (!do_after(user, 4 SECONDS, src, DO_DEFAULT | DO_TARGET_UNIQUE_ACT, bonus_percentage = 25))
 				return TRUE
 
 			anchored = !anchored
@@ -67,7 +67,7 @@
 				SPAN_NOTICE("\The [user] [anchored ? "connects" : "disconnects"] \the [src] [anchored ? "to" : "from"] \the [T] with \the [I]."),
 				SPAN_NOTICE("You [anchored ? "connect" : "disconnect"] \the [src] [anchored ? "to" : "from"] \the [T] with \the [I].")
 			)
-			playsound(loc, 'sound/items/Deconstruct.ogg', 75, TRUE)
+			playsound(loc, 'sounds/items/Deconstruct.ogg', 75, TRUE)
 			update_icon()
 			update_use_power(anchored ? POWER_USE_IDLE : POWER_USE_OFF)
 			if (!anchored)
@@ -110,7 +110,7 @@
 		stat |= EMPED
 		disconnect_computers()
 		var/emp_time = rand(15 SECONDS, 30 SECONDS) / severity
-		addtimer(CALLBACK(src, .proc/emp_act_end), emp_time, TIMER_UNIQUE | TIMER_OVERRIDE)
+		addtimer(CALLBACK(src, PROC_REF(emp_act_end)), emp_time, TIMER_UNIQUE | TIMER_OVERRIDE)
 
 
 /obj/machinery/tele_beacon/proc/emp_act_end()
@@ -202,7 +202,7 @@
 	if(wires.is_cut(WIRE_TELEBEACON_SIGNALLER))
 		return
 	audible_message(SPAN_NOTICE("\The [src] beeps as a new teleporter links to it."))
-	playsound(loc, 'sound/machines/twobeep.ogg', 75, TRUE)
+	playsound(loc, 'sounds/machines/twobeep.ogg', 75, TRUE)
 
 
 /// Disconnects a single hub from the beacon.

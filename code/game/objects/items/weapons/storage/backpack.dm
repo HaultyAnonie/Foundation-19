@@ -21,7 +21,7 @@
 	slot_flags = SLOT_BACK
 	max_w_class = ITEM_SIZE_LARGE
 	max_storage_space = DEFAULT_BACKPACK_STORAGE
-	open_sound = 'sound/effects/storage/unzip.ogg'
+	open_sound = 'sounds/effects/storage/unzip.ogg'
 
 /obj/item/storage/backpack/equipped()
 	if(!has_extension(src, /datum/extension/appearance))
@@ -87,7 +87,7 @@
 	spawn_gifts()
 
 /obj/item/storage/backpack/santabag/proc/spawn_gifts()
-	addtimer(CALLBACK(src, .proc/spawn_gifts), 30 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(spawn_gifts)), 30 SECONDS)
 
 	var/mob/M = get(loc, /mob)
 	if(!istype(M))
@@ -202,15 +202,7 @@
 	item_state_slots = null
 	w_class = ITEM_SIZE_HUGE
 	max_storage_space = DEFAULT_BACKPACK_STORAGE + 10
-
-/obj/item/storage/backpack/dufflebag/open(mob/user)
-	. = ..()
-	icon_state = "duffleopen"
-
-/obj/item/storage/backpack/dufflebag/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/Initialize()
 	. = ..()
@@ -221,83 +213,53 @@
 	desc = "A large dufflebag for holding extra tactical supplies."
 	icon_state = "duffle_syndie"
 	item_state_slots = list(slot_l_hand_str = "duffle_syndie", slot_r_hand_str = "duffle_syndie")
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/syndie/Initialize()
 	. = ..()
 	slowdown_per_slot[slot_back] = 0
-
-
-/obj/item/storage/backpack/dufflebag/syndie/open(mob/user)
-	. = ..()
-	icon_state = "duffle_syndieopen"
-
-/obj/item/storage/backpack/dufflebag/syndie/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
 
 /obj/item/storage/backpack/dufflebag/syndie/med
 	name = "medical dufflebag"
 	desc = "A large dufflebag for holding extra tactical medical supplies."
 	icon_state = "duffle_syndiemed"
 	item_state_slots = list(slot_l_hand_str = "duffle_syndiemed", slot_r_hand_str = "duffle_syndiemed")
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/syndie/ammo
 	name = "ammunition dufflebag"
 	desc = "A large dufflebag for holding extra weapons ammunition and supplies."
 	icon_state = "duffle_syndieammo"
 	item_state_slots = list(slot_l_hand_str = "duffle_syndieammo", slot_r_hand_str = "duffle_syndieammo")
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/com
 	name = "command dufflebag"
 	desc = "A large dufflebag for holding extra goods for senior command."
 	icon_state = "duffle_captain"
 	item_state_slots = list(slot_l_hand_str = "duffle_captain", slot_r_hand_str = "duffle_captain")
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/med
 	name = "medical dufflebag"
 	desc = "A large dufflebag for holding extra medical supplies."
 	icon_state = "duffle_med"
 	item_state_slots = list(slot_l_hand_str = "duffle_med", slot_r_hand_str = "duffle_med")
-
-/obj/item/storage/backpack/dufflebag/med/open(mob/user)
-	. = ..()
-	icon_state = "duffle_medopen"
-
-/obj/item/storage/backpack/dufflebag/med/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/sec
 	name = "security dufflebag"
 	desc = "A large dufflebag for holding extra security supplies and ammunition."
 	icon_state = "duffle_sec"
 	item_state_slots = list(slot_l_hand_str = "duffle_sec", slot_r_hand_str = "duffle_sec")
-
-/obj/item/storage/backpack/dufflebag/sec/open(mob/user)
-	. = ..()
-	icon_state = "duffle_secopen"
-
-/obj/item/storage/backpack/dufflebag/sec/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/eng
 	name = "industrial dufflebag"
 	desc = "A large dufflebag for holding extra tools and supplies."
 	icon_state = "duffle_eng"
 	item_state_slots = list(slot_l_hand_str = "duffle_eng", slot_r_hand_str = "duffle_eng")
-
-/obj/item/storage/backpack/dufflebag/eng/open(mob/user)
-	. = ..()
-	icon_state = "duffle_engopen"
-
-/obj/item/storage/backpack/dufflebag/eng/close(mob/user)
-	. = ..()
-	icon_state = initial(icon_state)
-	playsound(src, use_sound, 30)
+	open_icon = null
 
 /obj/item/storage/backpack/dufflebag/firefighter
 	name = "firefighter's dufflebag"
@@ -312,6 +274,7 @@
 		/obj/item/clothing/head/hardhat/firefighter,
 		/obj/item/extinguisher
 	)
+	open_icon = null
 /*
  * Satchel Types
  */
@@ -474,8 +437,8 @@
 
 //ERT backpacks.
 /obj/item/storage/backpack/ert
-	name = "emergency response team backpack"
-	desc = "A spacious backpack with lots of pockets, used by members of the Emergency Response Team."
+	name = "mobile task force backpack"
+	desc = "A spacious backpack with lots of pockets, used by members of an MTF squad."
 	icon_state = "ert_commander"
 	item_state_slots = list(
 		slot_l_hand_str = "securitypack",
@@ -484,25 +447,25 @@
 
 //Commander
 /obj/item/storage/backpack/ert/commander
-	name = "emergency response team commander backpack"
-	desc = "A spacious backpack with lots of pockets, worn by the commander of an Emergency Response Team."
+	name = "mobile task force commander backpack"
+	desc = "A spacious backpack with lots of pockets, worn by the commander of an MTF squad."
 
 //Security
 /obj/item/storage/backpack/ert/security
-	name = "emergency response team security backpack"
-	desc = "A spacious backpack with lots of pockets, worn by security members of an Emergency Response Team."
+	name = "mobile task force security backpack"
+	desc = "A spacious backpack with lots of pockets, worn by security members of an MTF squad."
 	icon_state = "ert_security"
 
 //Engineering
 /obj/item/storage/backpack/ert/engineer
-	name = "emergency response team engineer backpack"
-	desc = "A spacious backpack with lots of pockets, worn by engineering members of an Emergency Response Team."
+	name = "mobile task force engineer backpack"
+	desc = "A spacious backpack with lots of pockets, worn by engineering members of an MTF squad."
 	icon_state = "ert_engineering"
 
 //Medical
 /obj/item/storage/backpack/ert/medical
-	name = "emergency response team corpsman backpack"
-	desc = "A spacious backpack with lots of pockets, worn by the corpsmen of an Emergency Response Team."
+	name = "mobile task force corpsman backpack"
+	desc = "A spacious backpack with lots of pockets, worn by the corpsmen of an MTF squad."
 	icon_state = "ert_medical"
 
 /*
@@ -559,3 +522,7 @@
 	desc = "A small, tactical backpack worn over one shoulder. This one is in EXO colors."
 	icon_state = "courierbagsec_exo"
 
+/obj/item/storage/backpack/rucksack/ci
+	name = "military rucksack"
+	desc = "A heavy rucksack that can carry more than the conventional rucksacks, usually used by the russian military forces, but this one is used by the Chaos Insurgency."
+	icon_state = "ci_rucksack"

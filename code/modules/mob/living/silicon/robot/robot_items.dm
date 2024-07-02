@@ -27,7 +27,7 @@
 			if(confirm == "Yes" && !QDELETED(loaded_item)) //This is pretty copypasta-y
 				to_chat(user, "You activate the analyzer's microlaser, analyzing \the [loaded_item] and breaking it down.")
 				flick("portable_analyzer_scan", src)
-				playsound(src.loc, 'sound/items/Welder2.ogg', 50, 1)
+				playsound(src.loc, 'sounds/items/Welder2.ogg', 50, 1)
 				for(var/T in loaded_item.origin_tech)
 					files.UpdateTech(T, loaded_item.origin_tech[T])
 					to_chat(user, "\The [loaded_item] had level [loaded_item.origin_tech[T]] in [CallTechName(T)].")
@@ -62,10 +62,10 @@
 			files.RefreshResearch()
 		if(success)
 			to_chat(user, "You connect to the research server, push your data upstream to it, then pull the resulting merged data from the master branch.")
-			playsound(src.loc, 'sound/machines/twobeep.ogg', 50, 1)
+			playsound(src.loc, 'sounds/machines/twobeep.ogg', 50, 1)
 		else
 			to_chat(user, "Reserch server ping response timed out.  Unable to connect.  Please contact the system administrator.")
-			playsound(src.loc, 'sound/machines/buzz-two.ogg', 50, 1)
+			playsound(src.loc, 'sounds/machines/buzz-two.ogg', 50, 1)
 	if(response == "Eject")
 		if(loaded_item)
 			loaded_item.dropInto(loc)
@@ -103,7 +103,7 @@
 	icon_state = "partylight-off"
 	item_state = "partylight-off"
 	var/activated = 0
-	var/strobe_effect = null
+	var/obj/effect/party_light/strobe_effect = null
 
 /obj/item/party_light/attack_self()
 	if (activated)
@@ -124,11 +124,10 @@
 
 	// Create the party light effect and place it on the turf of who/whatever has it.
 	var/turf/T = get_turf(src)
-	var/obj/effect/party_light/L = new(T)
-	strobe_effect = L
+	strobe_effect = new(T)
 
 	// Make the light effect follow this party light object.
-	GLOB.moved_event.register(src, L, /atom/movable/proc/move_to_turf_or_null)
+	strobe_effect.RegisterSignal(src, COMSIG_MOVED, TYPE_PROC_REF(/atom/movable, move_to_turf_or_null))
 
 	update_icon()
 
@@ -136,7 +135,7 @@
 	activated = 0
 
 	// Cause the party light effect to stop following this object, and then delete it.
-	GLOB.moved_event.unregister(src, strobe_effect, /atom/movable/proc/move_to_turf_or_null)
+	strobe_effect.UnregisterSignal(src, COMSIG_MOVED)
 	QDEL_NULL(strobe_effect)
 
 	update_icon()
@@ -214,7 +213,7 @@
 	var/choice = input("Would you like to change colour or mode?") as null|anything in list("Colour","Mode")
 	if(!choice) return
 
-	playsound(src.loc, 'sound/effects/pop.ogg', 50, 0)
+	playsound(src.loc, 'sounds/effects/pop.ogg', 50, 0)
 
 	switch(choice)
 
@@ -337,9 +336,9 @@
 		return
 
 	if (istype(target, /obj/structure/inflatable))
-		if (!do_after(user, 0.5 SECONDS, target))
+		if (!do_after(user, 0.5 SECONDS, target, bonus_percentage = 100))
 			return
-		playsound(loc, 'sound/machines/hiss.ogg', 75, 1)
+		playsound(loc, 'sounds/machines/hiss.ogg', 75, 1)
 		var/obj/item/inflatable/I
 		if (istype(target, /obj/structure/inflatable/door))
 			if (stored_doors < max_doors)
@@ -391,7 +390,7 @@
 		if (obstruction)
 			to_chat(user, SPAN_WARNING("\The [english_list(obstruction)] is blocking that spot."))
 			return
-		if (!do_after(user, 0.5 SECONDS))
+		if (!do_after(user, 0.5 SECONDS, bonus_percentage = 100))
 			return
 		obstruction = T.get_obstruction()
 		if (obstruction)
@@ -409,11 +408,11 @@
 			SPAN_NOTICE("You inflate \an [placed]."),
 			range = 5
 		)
-		playsound(loc, 'sound/items/zip.ogg', 75, 1)
+		playsound(loc, 'sounds/items/zip.ogg', 75, 1)
 
 /obj/item/reagent_containers/spray/cleaner/drone
-	name = "space cleaner"
-	desc = "BLAM!-brand non-foaming space cleaner!"
+	name = "cleaner"
+	desc = "BLAM!-brand non-foaming Hydroxylsan!"
 	volume = 150
 
 /obj/item/robot_rack

@@ -33,7 +33,8 @@ var/list/ai_verbs_default = list(
 	/mob/living/silicon/ai/proc/ai_power_override,
 	/mob/living/silicon/ai/proc/ai_shutdown,
 	/mob/living/silicon/ai/proc/ai_reset_radio_keys,
-	/mob/living/silicon/ai/proc/eye_puppet_toggle
+	/mob/living/silicon/ai/proc/eye_puppet_toggle,
+	/mob/living/silicon/ai/proc/access_area_apc,
 )
 
 //Not sure why this is necessary...
@@ -159,6 +160,7 @@ var/list/ai_verbs_default = list(
 	add_language(LANGUAGE_HUMAN_ARABIC, 1)
 	add_language(LANGUAGE_HUMAN_CHINESE, 1)
 	add_language(LANGUAGE_HUMAN_SPANISH, 1)
+	add_language(LANGUAGE_HUMAN_FRENCH, 1)
 	add_language(LANGUAGE_HUMAN_INDIAN, 1)
 	add_language(LANGUAGE_HUMAN_RUSSIAN, 1)
 	add_language(LANGUAGE_UNATHI_SINTA, 1)
@@ -542,7 +544,7 @@ var/list/ai_verbs_default = list(
 		var/personnel_list[] = list()
 
 		for(var/datum/computer_file/report/crew_record/t in GLOB.all_crew_records)//Look in data core locked.
-			personnel_list["[t.get_name()]: [t.get_rank()]"] = t.uncropped_photo_front//Pull names, rank, and image.
+			personnel_list["[t.get_name()]: [t.get_class()]"] = t.uncropped_photo_front//Pull names, rank, and image.
 
 		if(personnel_list.len)
 			input = input("Select a crew member:") as null|anything in personnel_list
@@ -625,7 +627,7 @@ var/list/ai_verbs_default = list(
 	else if(isWrench(W))
 		if(anchored)
 			user.visible_message(SPAN_NOTICE("\The [user] starts to unbolt \the [src] from the plating..."))
-			if(!do_after(user,40, src))
+			if(!do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 				user.visible_message(SPAN_NOTICE("\The [user] decides not to unbolt \the [src]."))
 				return
 			user.visible_message(SPAN_NOTICE("\The [user] finishes unfastening \the [src]!"))
@@ -633,7 +635,7 @@ var/list/ai_verbs_default = list(
 			return
 		else
 			user.visible_message(SPAN_NOTICE("\The [user] starts to bolt \the [src] to the plating..."))
-			if(!do_after(user,40,src))
+			if(!do_after(user, 4 SECONDS, src, bonus_percentage = 25))
 				user.visible_message(SPAN_NOTICE("\The [user] decides not to bolt \the [src]."))
 				return
 			user.visible_message(SPAN_NOTICE("\The [user] finishes fastening down \the [src]!"))

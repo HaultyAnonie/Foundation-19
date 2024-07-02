@@ -44,7 +44,7 @@
 			return
 		installed_gun = gun
 		to_chat(user, SPAN_NOTICE("You slide \the [gun] into the firing mechanism."))
-		playsound(src, 'sound/items/Crowbar.ogg', 50, 1)
+		playsound(src, 'sounds/items/Crowbar.ogg', 50, 1)
 		if(installed_gun.fire_delay)
 			cooldown_per_use = installed_gun.fire_delay * 10
 		if(cooldown_per_use < 30)
@@ -64,7 +64,7 @@
 		installed_gun.dropInto(loc)
 		to_chat(user, SPAN_NOTICE("You slide \the [installed_gun] out of the firing mechanism."))
 		size = initial(size)
-		playsound(src, 'sound/items/Crowbar.ogg', 50, 1)
+		playsound(src, 'sounds/items/Crowbar.ogg', 50, 1)
 		installed_gun = null
 		set_pin_data(IC_OUTPUT, 1, weakref(null))
 		push_data()
@@ -207,7 +207,7 @@
 			dt = Clamp(detonation_time.data, 1, 12)*10
 		else
 			dt = 15
-		addtimer(CALLBACK(attached_grenade, /obj/item/grenade.proc/activate), dt)
+		addtimer(CALLBACK(attached_grenade, TYPE_PROC_REF(/obj/item/grenade, activate)), dt)
 		var/atom/holder = loc
 		log_and_message_staff("activated a grenade assembly. Last touches: Assembly: [holder.fingerprintslast] Circuit: [fingerprintslast] Grenade: [attached_grenade.fingerprintslast]")
 
@@ -420,9 +420,9 @@
 					set_pin_data(IC_OUTPUT, 1, TRUE)
 					pulling = to_pull
 					acting_object.visible_message("\The [acting_object] starts pulling \the [to_pull] around.")
-					GLOB.moved_event.register(to_pull, src, .proc/check_pull) //Whenever the target moves, make sure we can still pull it!
-					GLOB.destroyed_event.register(to_pull, src, .proc/stop_pulling) //Stop pulling if it gets destroyed
-					GLOB.moved_event.register(acting_object, src, .proc/pull) //Make sure we actually pull it.
+					RegisterSignal(to_pull, COMSIG_MOVED, PROC_REF(check_pull))	//Whenever the target moves, make sure we can still pull it!
+					RegisterSignal(to_pull, COMSIG_PARENT_QDELETING, PROC_REF(stop_pulling))
+					RegisterSignal(acting_object, COMSIG_MOVED, PROC_REF(pull))	//Make sure we actually pull it.
 			push_data()
 		if(3)
 			if(pulling)
@@ -456,10 +456,10 @@
 
 /obj/item/integrated_circuit/manipulation/claw/proc/stop_pulling()
 	var/atom/movable/AM = get_object()
-	GLOB.moved_event.unregister(pulling, src)
-	GLOB.moved_event.unregister(AM, src)
+	UnregisterSignal(pulling, COMSIG_MOVED)
+	UnregisterSignal(AM, COMSIG_MOVED)
 	AM.visible_message("\The [AM] stops pulling \the [pulling]")
-	GLOB.destroyed_event.unregister(pulling, src)
+	UnregisterSignal(pulling, COMSIG_PARENT_QDELETING)
 	pulling = null
 	set_pin_data(IC_OUTPUT, 1, FALSE)
 	activate_pin(3)
@@ -564,7 +564,7 @@
 
 	var/turf/depart = get_turf(src)
 	if (!depart || !isPlayerLevel(depart.z))
-		playsound(src, 'sound/effects/sparks2.ogg', 50, 1)
+		playsound(src, 'sounds/effects/sparks2.ogg', 50, 1)
 		return
 
 	var/turf/arrive
@@ -573,7 +573,7 @@
 	else
 		arrive = get_random_turf_in_range(src, 10)
 	if (!arrive || !isPlayerLevel(arrive.z))
-		playsound(src, 'sound/effects/sparks2.ogg', 50, 1)
+		playsound(src, 'sounds/effects/sparks2.ogg', 50, 1)
 		return
 
 	var/step_dir = get_pin_data(IC_INPUT, 2)
@@ -583,7 +583,7 @@
 	depart = get_step(depart, step_dir) || depart
 
 	new /obj/effect/portal(depart, arrive, 30 SECONDS, 33)
-	playsound(src, 'sound/effects/sparks2.ogg', 50, 1)
+	playsound(src, 'sounds/effects/sparks2.ogg', 50, 1)
 
 
 /obj/item/integrated_circuit/manipulation/ai

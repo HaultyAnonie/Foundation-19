@@ -15,7 +15,7 @@
 	var/elastic
 	var/dispenser = 0
 	var/breakouttime = 1200 //Deciseconds = 120s = 2 minutes
-	var/cuff_sound = 'sound/weapons/handcuffs.ogg'
+	var/cuff_sound = 'sounds/weapons/handcuffs.ogg'
 	var/cuff_type = "handcuffs"
 
 /obj/item/handcuffs/get_icon_state(mob/user_mob, slot)
@@ -78,7 +78,7 @@
 
 	user.visible_message(SPAN_DANGER("\The [user] is attempting to put [cuff_type] on \the [H]!"))
 
-	if(!do_after(user,30, target))
+	if(!do_after(user, 4 SECONDS, target, do_flags = DO_DEFAULT | DO_SHOW_TARGET, bonus_percentage = 25))
 		return 0
 
 	if(!target.has_danger_grab(user)) // victim may have resisted out of the grab in the meantime
@@ -129,7 +129,7 @@ var/last_chew = 0
 	desc = "Looks like some cables tied together. Could be used to tie something up."
 	icon_state = "cuff_white"
 	breakouttime = 300 //Deciseconds = 30s
-	cuff_sound = 'sound/weapons/cablecuff.ogg'
+	cuff_sound = 'sounds/weapons/cablecuff.ogg'
 	cuff_type = "cable restraints"
 	elastic = 1
 	health_max = 75
@@ -170,3 +170,15 @@ var/last_chew = 0
 	breakouttime = 200
 	cuff_type = "duct tape"
 	health_max = 50
+
+/obj/item/handcuffs/shadowshackle
+	name = "shadow shackles"
+	desc = "A shadowy force meant to hold your hands together."
+	breakouttime = 100
+	cuff_sound = 'sounds/weapons/cablecuff.ogg'
+	cuff_type = "shadow restraints"
+	health_max = 0
+
+/obj/item/handcuffs/shadowshackle/dropped(mob/user)
+	. = ..()
+	qdel(src)

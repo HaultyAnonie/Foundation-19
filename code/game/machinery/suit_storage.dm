@@ -103,9 +103,9 @@
 
 /obj/machinery/suit_storage_unit/attackby(obj/item/I, mob/user)
 	if(isScrewdriver(I))
-		if(do_after(user, 50, src))
+		if(do_after(user, 7 SECONDS, src, bonus_percentage = 25))
 			panelopen = !panelopen
-			playsound(loc, 'sound/items/Screwdriver.ogg', 100, 1)
+			playsound(loc, 'sounds/items/Screwdriver.ogg', 100, 1)
 			to_chat(user, SPAN_NOTICE("You [panelopen ? "open" : "close"] the unit's maintenance panel."))
 			SSnano.update_uis(src)
 			update_icon()
@@ -113,7 +113,7 @@
 	if(isCrowbar(I))
 		if(inoperable() && !islocked && !isopen)
 			to_chat(user, SPAN_NOTICE("You begin prying the unit open."))
-			if(do_after(user, 50, src))
+			if(do_after(user, 7 SECONDS, src, bonus_percentage = 25))
 				isopen = TRUE
 				to_chat(user, SPAN_NOTICE("You pry the unit open."))
 				SSnano.update_uis(src)
@@ -135,7 +135,7 @@
 			to_chat(user, SPAN_NOTICE("The unit's storage area is too cluttered."))
 			return
 		visible_message(SPAN_WARNING("[user] starts putting [G.affecting.name] into the Suit Storage Unit."))
-		if(do_after(user, 20, src) && G?.affecting)
+		if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25) && G?.affecting)
 			var/mob/M = G.affecting
 			if(M.client)
 				M.client.perspective = EYE_PERSPECTIVE
@@ -283,7 +283,7 @@
 		eject_occupant(user)
 		return  // eject_occupant opens the door, so we need to return
 	isopen = !isopen
-	playsound(src, 'sound/machines/suitstorage_cycledoor.ogg', 50, 0)
+	playsound(src, 'sounds/machines/suitstorage_cycledoor.ogg', 50, 0)
 
 /obj/machinery/suit_storage_unit/proc/toggle_lock(mob/user)
 	if(!is_powered())
@@ -298,7 +298,7 @@
 	if(isopen)
 		return
 	islocked = !islocked
-	playsound(src, 'sound/machines/suitstorage_lockdoor.ogg', 50, 0)
+	playsound(src, 'sounds/machines/suitstorage_lockdoor.ogg', 50, 0)
 
 /obj/machinery/suit_storage_unit/proc/start_UV(mob/user)
 	if(isUV || isopen)
@@ -320,11 +320,11 @@
 	update_icon()
 	SSnano.update_uis(src)
 
-	var/datum/callback/uvburn = CALLBACK(src, .proc/uv_burn)
+	var/datum/callback/uvburn = CALLBACK(src, PROC_REF(uv_burn))
 	addtimer(uvburn, 5 SECONDS)
 	addtimer(uvburn, 10 SECONDS)
 	addtimer(uvburn, 15 SECONDS)
-	addtimer(CALLBACK(src, .proc/uv_finish), 20 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(uv_finish)), 20 SECONDS)
 
 /obj/machinery/suit_storage_unit/proc/uv_burn()
 	if(occupant)
@@ -360,15 +360,15 @@
 		eject_occupant(occupant) // Mixing up these two lines causes bug. DO NOT DO IT.
 	else
 		if(helmet )
-			helmet.clean_blood()
+			helmet.clean()
 		if(suit)
-			suit.clean_blood()
+			suit.clean()
 		if(boots)
-			boots.clean_blood()
+			boots.clean()
 		if(tank)
-			tank.clean_blood()
+			tank.clean()
 		if(mask)
-			mask.clean_blood()
+			mask.clean()
 	update_use_power(POWER_USE_IDLE)
 	update_icon()
 	SSnano.update_uis(src)
@@ -415,7 +415,7 @@
 		to_chat(usr, SPAN_WARNING("It's too cluttered inside for you to fit in!"))
 		return
 	visible_message(SPAN_NOTICE("\The [usr] starts squeezing into the suit storage unit!"))
-	if(do_after(usr, 10, src))
+	if(do_after(usr, 1 SECOND, src, bonus_percentage = 75))
 		usr.reset_view(src)
 		usr.stop_pulling()
 		usr.forceMove(src)

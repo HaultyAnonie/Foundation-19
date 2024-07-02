@@ -56,7 +56,7 @@
 				SPAN_WARNING("You whack \the [I] against \the [src]. Nothing happens."),
 				SPAN_WARNING("You hear a soft impact!")
 			)
-			playsound(src, 'sound/weapons/tablehit1.ogg', 50, TRUE)
+			playsound(src, 'sounds/weapons/tablehit1.ogg', 50, TRUE)
 			show_sound_effect(src.loc, user)
 			return
 		user.visible_message(
@@ -64,7 +64,7 @@
 			SPAN_DANGER("You slam \the [I] against \the [src]!"),
 			SPAN_WARNING("You hear a violent impact!")
 		)
-		playsound(src, 'sound/weapons/smash.ogg', 50, TRUE)
+		playsound(src, 'sounds/weapons/smash.ogg', 50, TRUE)
 		show_sound_effect(src.loc, user)
 		if (I.damtype == BRUTE)
 			modify_health(-I.force * 0.75)
@@ -80,7 +80,7 @@
 			"You start to repair \the [src]'s plating with \the [I].",
 			"You hear creaking metal."
 		)
-		if (do_after(user, 15 SECONDS, src, do_flags = DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+		if (do_after(user, 18 SECONDS, src, bonus_percentage = 25))
 			to_chat(user, SPAN_NOTICE("There - Good as new."))
 			modify_health(initial(health) - health)
 		return TRUE
@@ -97,7 +97,7 @@
 			"You start to repair \the [src]'s locking clamps with \the [I].",
 			"You hear a hissing flame."
 		)
-		if (do_after(user, 15 SECONDS, src, do_flags = DO_DEFAULT | DO_USER_UNIQUE_ACT | DO_PUBLIC_PROGRESS))
+		if (do_after(user, 18 SECONDS, src, bonus_percentage = 25))
 			to_chat(user, SPAN_NOTICE("There - Good as new."))
 			emagged = FALSE
 			if (locked)

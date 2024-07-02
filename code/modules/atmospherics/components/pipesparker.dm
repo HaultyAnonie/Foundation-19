@@ -30,7 +30,7 @@
 /decl/public_access/public_method/pipe_sparker_spark
 	name = "pipespark"
 	desc = "Ignites gas in a pipeline."
-	call_proc = /obj/machinery/atmospherics/pipe/cap/sparker/proc/ignite
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/pipe/cap/sparker, ignite)
 
 /decl/stock_part_preset/radio/receiver/sparker/pipe
 	frequency = BUTTON_FREQ
@@ -51,7 +51,7 @@
 	return FALSE
 
 /obj/machinery/atmospherics/pipe/cap/sparker/proc/ignite()
-	playsound(loc, 'sound/machines/click.ogg', 10, 1)
+	playsound(loc, 'sounds/machines/click.ogg', 10, 1)
 	if (cant_ignite())
 		return
 

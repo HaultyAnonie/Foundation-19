@@ -8,8 +8,6 @@
 	var/list/obj/structure/fuel_port/fuel_ports //the fuel ports of the shuttle (but usually just one)
 
 	category = /datum/shuttle/autodock/overmap
-	var/skill_needed = SKILL_BASIC
-	var/operator_skill = SKILL_MIN
 
 /datum/shuttle/autodock/overmap/New(_name, obj/effect/shuttle_landmark/start_waypoint)
 	..(_name, start_waypoint)
@@ -45,16 +43,8 @@
 	return ..() && can_go()
 
 /datum/shuttle/autodock/overmap/get_travel_time()
-	var/distance_mod = get_dist(waypoint_sector(current_location),waypoint_sector(next_location))
-	var/skill_mod = 0.2*(skill_needed - operator_skill)
-	return move_time * (1 + distance_mod + skill_mod)
-
-/datum/shuttle/autodock/overmap/process_launch()
-	if(prob(10*max(0, skill_needed - operator_skill)))
-		var/places = get_possible_destinations()
-		var/place = pick(places)
-		set_destination(places[place])
-	..()
+	var/distance_mod = get_dist(waypoint_sector(current_location), waypoint_sector(next_location))
+	return move_time * (1 + distance_mod)
 
 /datum/shuttle/autodock/overmap/proc/set_destination(obj/effect/shuttle_landmark/A)
 	if(A != current_location)
@@ -147,11 +137,11 @@
 	if(isCrowbar(W))
 		if(opened)
 			to_chat(user, "<spawn class='notice'>You tightly shut \the [src] door.")
-			playsound(src.loc, 'sound/effects/locker_close.ogg', 25, 0, -3)
+			playsound(src.loc, 'sounds/effects/locker_close.ogg', 25, 0, -3)
 			opened = 0
 		else
 			to_chat(user, "<spawn class='notice'>You open up \the [src] door.")
-			playsound(src.loc, 'sound/effects/locker_open.ogg', 15, 1, -3)
+			playsound(src.loc, 'sounds/effects/locker_open.ogg', 15, 1, -3)
 			opened = 1
 	else if(istype(W,/obj/item/tank))
 		if(!opened)

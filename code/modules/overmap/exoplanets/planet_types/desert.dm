@@ -59,7 +59,7 @@
 		new/obj/effect/quicksand(T)
 
 /area/exoplanet/desert
-	ambience = list('sound/effects/wind/desert0.ogg','sound/effects/wind/desert1.ogg','sound/effects/wind/desert2.ogg','sound/effects/wind/desert3.ogg','sound/effects/wind/desert4.ogg','sound/effects/wind/desert5.ogg')
+	ambience = list('sounds/effects/wind/desert0.ogg','sounds/effects/wind/desert1.ogg','sounds/effects/wind/desert2.ogg','sounds/effects/wind/desert3.ogg','sounds/effects/wind/desert4.ogg','sounds/effects/wind/desert5.ogg')
 	base_turf = /turf/simulated/floor/exoplanet/desert
 
 /obj/effect/quicksand
@@ -84,7 +84,7 @@
 		if(busy)
 			to_chat(user, SPAN_NOTICE("\The [buckled_mob] is already getting out, be patient."))
 			return
-		var/delay = 60
+		var/delay = 8 SECONDS
 		if(user == buckled_mob)
 			delay *=2
 			user.visible_message(
@@ -99,7 +99,7 @@
 				SPAN_NOTICE("You hear water sloshing.")
 				)
 		busy = TRUE
-		if(do_after(user, delay, src))
+		if(do_after(user, delay, src, bonus_percentage = 25))
 			busy = FALSE
 			if(user == buckled_mob)
 				if(prob(80))

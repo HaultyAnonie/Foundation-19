@@ -1,3 +1,5 @@
+// Medium damage, Low health, Medium mobility.
+// Recommended strategy is to rush it, as its melee damage is subpar and has no armor penetration.
 /mob/living/simple_animal/hostile/infestation/spitter
 	name = "spitter"
 	desc = "A weird wriggling creature. Some sort of corrosive substance is dripping from its maw."
@@ -14,7 +16,7 @@
 
 	ranged = TRUE
 	projectiletype = /obj/item/projectile/energy/acid_spit
-	projectilesound = 'sound/weapons/alien_spit.ogg'
+	projectilesound = 'sounds/weapons/alien_spit.ogg'
 	fire_desc = "spits acid"
 
 	health = 150
@@ -29,22 +31,22 @@
 
 	ai_holder_type = /datum/ai_holder/simple_animal/infestation/spitter
 	say_list_type = /datum/say_list/infestation_spitter
-	death_sounds = list('sound/simple_mob/abominable_infestation/spitter/death.ogg')
+	death_sounds = list('sounds/simple_mob/abominable_infestation/spitter/death.ogg')
 
 /obj/item/natural_weapon/bite/abomination_spitter
-	hitsound = 'sound/simple_mob/abominable_infestation/spitter/attack.ogg'
+	hitsound = 'sounds/simple_mob/abominable_infestation/spitter/attack.ogg'
 
 /datum/say_list/infestation_spitter
 	emote_hear = list("gurgles")
 	emote_see = list("looks around", "wriggles around")
 
 	emote_hear_sounds = list(
-		'sound/simple_mob/abominable_infestation/spitter/ambient_1.ogg',
-		'sound/simple_mob/abominable_infestation/spitter/ambient_2.ogg',
+		'sounds/simple_mob/abominable_infestation/spitter/ambient_1.ogg',
+		'sounds/simple_mob/abominable_infestation/spitter/ambient_2.ogg',
 		)
 	emote_see_sounds = list(
-		'sound/simple_mob/abominable_infestation/spitter/ambient_1.ogg',
-		'sound/simple_mob/abominable_infestation/spitter/ambient_2.ogg',
+		'sounds/simple_mob/abominable_infestation/spitter/ambient_1.ogg',
+		'sounds/simple_mob/abominable_infestation/spitter/ambient_2.ogg',
 		)
 
 /datum/ai_holder/simple_animal/infestation/spitter

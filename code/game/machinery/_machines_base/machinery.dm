@@ -354,7 +354,7 @@ Class Procs:
 		text = "\The [src] pings."
 
 	state(text, "blue")
-	playsound(src.loc, 'sound/machines/ping.ogg', 50, 0)
+	playsound(src.loc, 'sounds/machines/ping.ogg', 50, 0)
 	show_sound_effect(src.loc, soundicon = SFX_ICON_SMALL)
 
 /obj/machinery/proc/shock(mob/user, prb)
@@ -378,7 +378,7 @@ Class Procs:
 	return 0
 
 /obj/machinery/proc/dismantle()
-	playsound(loc, 'sound/items/Crowbar.ogg', 50, 1)
+	playsound(loc, 'sounds/items/Crowbar.ogg', 50, 1)
 	var/obj/item/stock_parts/circuitboard/circuit = get_component_of_type(/obj/item/stock_parts/circuitboard)
 	if(circuit)
 		circuit.deconstruct(src)
@@ -462,3 +462,21 @@ Class Procs:
 	var/obj/item/stock_parts/power/battery/battery = get_component_of_type(/obj/item/stock_parts/power/battery)
 	if(battery)
 		return battery.get_cell()
+
+// Coarse - Dismantles the machine
+// Fine - Randomly upgrades components of the machine via same proc
+/obj/machinery/Conversion914(mode = MODE_ONE_TO_ONE, mob/user = usr)
+	switch(mode)
+		if(MODE_COARSE)
+			dismantle()
+			return null
+		if(MODE_FINE)
+			for(var/obj/item/stock_parts/S in component_parts)
+				if(istype(S, /obj/item/stock_parts/circuitboard))
+					continue
+				if(prob(20))
+					continue
+				S.Conversion914(mode, user)
+			playsound(src, 'sounds/items/rped.ogg', 50, TRUE)
+			return src
+	return ..()

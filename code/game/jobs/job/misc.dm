@@ -10,8 +10,7 @@
 	access = list()
 	minimal_access = list()
 	outfit_type = /decl/hierarchy/outfit/job/civ/classd
-	allowed_branches = list(/datum/mil_branch/civilian)
-	allowed_ranks = list(/datum/mil_rank/civ/classd)
+	class = CLASS_D
 	hud_icon = "huddclass"
 	var/static/list/used_numbers = list()
 
@@ -40,19 +39,13 @@
 	total_positions = 100
 	spawn_positions = 100
 	minimal_player_age = 10
-	//supervisors = "the Archivist and administrative staff"
-	//duties = "<big><b>You are a low level pen pusher of the SCP Foundation. Your direct supervisor is the Archivist but you may also answer to the O5 and Ethics Committee Representative. Write reports, assist researchers and generally be a pain in the ass to everyone around you.</big></b>"
+	//supervisors = "administrative staff"
 	economic_power = 2
 	minimal_player_age = 5
 	ideal_character_age = 30
 	alt_titles = list("Administrative Assistant", "Accountant", "Auditor", "Secretary")
 	outfit_type = /decl/hierarchy/outfit/job/civ/officeworker
-	allowed_branches = list(
-		/datum/mil_branch/civilian
-	)
-	allowed_ranks = list(
-		/datum/mil_rank/civ/classc
-	)
+	class = CLASS_C
 	hud_icon = "hudcrewman"
 
 	access = list(
@@ -82,8 +75,7 @@
 	requirements = list("Logistics Specialist" = 300)
 	outfit_type = /decl/hierarchy/outfit/job/command/logisticsofficer
 	hud_icon = "huddeckchief"
-	allowed_branches = list(/datum/mil_branch/civilian)
-	allowed_ranks = list(/datum/mil_rank/civ/classb)
+	class = CLASS_B
 
 	access = list(
 		ACCESS_ADMIN_LVL1,
@@ -99,13 +91,10 @@
 
 	min_skill = list(
 		SKILL_FINANCE     = SKILL_BASIC,
-		SKILL_HAULING     = SKILL_BASIC,
-		SKILL_PILOT       = SKILL_BASIC
+		SKILL_HAULING     = SKILL_BASIC
 	)
 
-	max_skill = list(
-		SKILL_PILOT       = SKILL_MASTER
-	)
+	max_skill = list()
 	skill_points = 18
 
 	software_on_spawn = list(/datum/computer_file/program/supply,
@@ -123,8 +112,7 @@
 	minimal_player_age = 3
 	ideal_character_age = 24
 	outfit_type = /decl/hierarchy/outfit/job/command/logisticspecialist
-	allowed_branches = list(/datum/mil_branch/civilian)
-	allowed_ranks = list(/datum/mil_rank/civ/classc)
+	class = CLASS_C
 	hud_icon = "huddecktechnician"
 
 	access = list(
@@ -141,13 +129,10 @@
 
 	min_skill = list(
 		SKILL_FINANCE     = SKILL_BASIC,
-		SKILL_HAULING     = SKILL_BASIC,
-		SKILL_PILOT       = SKILL_BASIC
+		SKILL_HAULING     = SKILL_BASIC
 	)
 
-	max_skill = list(
-		SKILL_PILOT       = SKILL_MASTER
-	)
+	max_skill = list()
 	skill_points = 18
 
 	software_on_spawn = list(/datum/computer_file/program/supply,
@@ -167,19 +152,15 @@
 	ideal_character_age = 16
 	alt_titles = list("Interior caretaker")
 	outfit_type = /decl/hierarchy/outfit/job/civ/janitor
-	allowed_branches = list(
-		/datum/mil_branch/civilian
-	)
-	allowed_ranks = list(
-	/datum/mil_rank/civ/classc
-	)
+	class = CLASS_C
 	hud_icon = "hudsanitationtechnician"
 
 	access = list(
 		ACCESS_CIV_COMMS,
 		ACCESS_SCIENCE_LVL1,
 		ACCESS_MEDICAL_LVL1,
-		ACCESS_DCLASS_JANITORIAL
+		ACCESS_DCLASS_JANITORIAL,
+		ACCESS_DCLASS_MEDICAL
 )
 	minimal_access = list()
 
@@ -198,9 +179,8 @@
 	ideal_character_age = 18
 	alt_titles = list("Cook")
 	outfit_type = /decl/hierarchy/outfit/job/civ/chef
-	allowed_branches = list(/datum/mil_branch/civilian)
+	class = CLASS_C
 	hud_icon = "hudcook"
-	allowed_ranks = list(/datum/mil_rank/civ/classc)
 
 	access = list(
 		ACCESS_CIV_COMMS,
@@ -214,7 +194,6 @@
 
 	min_skill = list(
 		SKILL_COOKING   = SKILL_EXPERIENCED,
-		SKILL_BOTANY    = SKILL_BASIC,
 		SKILL_CHEMISTRY = SKILL_BASIC
 	)
 
@@ -230,8 +209,7 @@
 	ideal_character_age = 21
 	alt_titles = list("Waiter")
 	outfit_type = /decl/hierarchy/outfit/job/civ/bartender
-	allowed_branches = list(/datum/mil_branch/civilian)
-	allowed_ranks = list(/datum/mil_rank/civ/classc)
+	class = CLASS_C
 	hud_icon = "hudbartender"
 
 	access = list(
@@ -246,47 +224,10 @@
 
 	min_skill = list(
 		SKILL_COOKING   = SKILL_EXPERIENCED,
-		SKILL_BOTANY    = SKILL_BASIC,
 		SKILL_CHEMISTRY = SKILL_BASIC
 	)
 
+	roleplay_difficulty = "Easy - Medium"
+	mechanical_difficulty = "Medium"
+	duties = "Mix up drinks for the staff. Manage the bar."
 
-/datum/job/archivist
-	title = "Archivist"
-	department = "Civilian"
-	selection_color = "#2f2f7f"
-	department_flag = CIV|BUR
-	total_positions = 1
-	spawn_positions = 1
-	minimal_player_age = 9
-	//duties = "<big><b>As the Archivist, it is your job to make sure the proper test logs are digitalized and saved in the digital archive, thus safekeeping them forever. You must be picky and selective, and only get those with great quality out! <span style = 'color:red'>REMEMBER!</span> If you put in nonsensical things, or copypasta's such as Woody's got Wood, you will be permanently job banned WITHOUT chance to appeal.</b></big>"
-	//supervisors = "the Research Director"
-	economic_power = 4
-	minimal_player_age = 5
-	ideal_character_age = 30
-	requirements = list("Office Worker" = 120)
-	outfit_type = /decl/hierarchy/outfit/job/civ/archivist
-	allowed_branches = list(/datum/mil_branch/civilian)
-	allowed_ranks = list(/datum/mil_rank/civ/classa)
-	hud_icon = "hudarchivist"
-
-	access = list(
-		ACCESS_CIV_COMMS,
-		ACCESS_SCI_COMMS,
-		ACCESS_MED_COMMS,
-		ACCESS_ADMIN_LVL1,
-		ACCESS_ADMIN_LVL2,
-		ACCESS_ADMIN_LVL3,
-		ACCESS_ADMIN_LVL4,
-		ACCESS_KEYAUTH,
-		ACCESS_RESEARCH,
-		ACCESS_SCIENCE_LVL1,
-		ACCESS_SCIENCE_LVL2,
-		ACCESS_SCIENCE_LVL3,
-		ACCESS_SCIENCE_LVL4,
-		ACCESS_MEDICAL_LVL1,
-		ACCESS_MEDICAL_LVL2,
-		ACCESS_MEDICAL_LVL3,
-		ACCESS_MEDICAL_LVL4
-	)
-	minimal_access = list()

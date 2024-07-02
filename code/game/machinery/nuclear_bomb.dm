@@ -40,9 +40,9 @@ var/bomb_set
 /obj/machinery/nuclearbomb/Process(wait)
 	if(timing)
 		timeleft = max(timeleft - (wait / 10), 0)
-		playsound(loc, 'sound/items/timer.ogg', 50)
+		playsound(loc, 'sounds/items/timer.ogg', 50)
 		if(timeleft <= 0)
-			addtimer(CALLBACK(src, .proc/explode), 0)
+			addtimer(CALLBACK(src, PROC_REF(explode)), 0)
 		SSnano.update_uis(src)
 
 /obj/machinery/nuclearbomb/attackby(obj/item/O as obj, mob/user as mob, params)
@@ -53,12 +53,12 @@ var/bomb_set
 				panel_open = 1
 				add_overlay("panel_open")
 				to_chat(user, "You unscrew the control panel of [src].")
-				playsound(src, 'sound/items/Screwdriver.ogg', 50, 1)
+				playsound(src, 'sounds/items/Screwdriver.ogg', 50, 1)
 			else
 				panel_open = 0
 				cut_overlay("panel_open")
 				to_chat(user, "You screw the control panel of [src] back on.")
-				playsound(src, 'sound/items/Screwdriver.ogg', 50, 1)
+				playsound(src, 'sounds/items/Screwdriver.ogg', 50, 1)
 		else
 			if(panel_open == 0)
 				to_chat(user, "\The [src] emits a buzzing noise, the panel staying locked in.")
@@ -66,7 +66,7 @@ var/bomb_set
 				panel_open = 0
 				cut_overlay("panel_open")
 				to_chat(user, "You screw the control panel of \the [src] back on.")
-				playsound(src, 'sound/items/Screwdriver.ogg', 50, 1)
+				playsound(src, 'sounds/items/Screwdriver.ogg', 50, 1)
 			flick("lock", src)
 		return
 
@@ -93,7 +93,7 @@ var/bomb_set
 
 					user.visible_message("[user] starts cutting loose the anchoring bolt covers on [src].", "You start cutting loose the anchoring bolt covers with [O]...")
 
-					if(do_after(user,40, src))
+					if(do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 						if(!src || !user || !WT.remove_fuel(5, user)) return
 						user.visible_message("\The [user] cuts through the bolt covers on \the [src].", "You cut through the bolt cover.")
 						removal_stage = 1
@@ -103,7 +103,7 @@ var/bomb_set
 				if(isCrowbar(O))
 					user.visible_message("[user] starts forcing open the bolt covers on [src].", "You start forcing open the anchoring bolt covers with [O]...")
 
-					if(do_after(user, 15, src))
+					if(do_after(user, 2 SECONDS, src, bonus_percentage = 25))
 						if(!src || !user) return
 						user.visible_message("\The [user] forces open the bolt covers on \the [src].", "You force open the bolt covers.")
 						removal_stage = 2
@@ -119,7 +119,7 @@ var/bomb_set
 
 					user.visible_message("[user] starts cutting apart the anchoring system sealant on [src].", "You start cutting apart the anchoring system's sealant with [O]...")
 
-					if(do_after(user, 40, src))
+					if(do_after(user, 5 SECONDS, src, bonus_percentage = 25))
 						if(!src || !user || !WT.remove_fuel(5, user)) return
 						user.visible_message("\The [user] cuts apart the anchoring system sealant on \the [src].", "You cut apart the anchoring system's sealant.")
 						removal_stage = 3
@@ -128,7 +128,7 @@ var/bomb_set
 			if(3)
 				if(isWrench(O))
 					user.visible_message("[user] begins unwrenching the anchoring bolts on [src].", "You begin unwrenching the anchoring bolts...")
-					if(do_after(user, 50, src))
+					if(do_after(user, 7 SECONDS, src, bonus_percentage = 25))
 						if(!src || !user) return
 						user.visible_message("[user] unwrenches the anchoring bolts on [src].", "You unwrench the anchoring bolts.")
 						removal_stage = 4
@@ -137,7 +137,7 @@ var/bomb_set
 			if(4)
 				if(isCrowbar(O))
 					user.visible_message("[user] begins lifting [src] off of the anchors.", "You begin lifting the device off the anchors...")
-					if(do_after(user, 80, src))
+					if(do_after(user, 10 SECONDS, src, bonus_percentage = 25))
 						if(!src || !user) return
 						user.visible_message("\The [user] crowbars \the [src] off of the anchors. It can now be moved.", "You jam the crowbar under the nuclear device and lift it off its anchors. You can now move it!")
 						anchored = FALSE
@@ -343,6 +343,7 @@ var/bomb_set
 	update_icon()
 
 	SetUniversalState(/datum/universal_state/nuclear_explosion, arguments=list(src))
+	SSticker.news_report = max(SSticker.news_report, FACILITY_DESTROYED_NUKE)
 
 /obj/machinery/nuclearbomb/on_update_icon()
 	if(lighthack)
@@ -370,21 +371,21 @@ var/bomb_set
 	. = ..()
 	nuke_disks |= src
 	// Can never be quite sure that a game mode has been properly initiated or not at this point, so always register
-	GLOB.moved_event.register(src, src, /obj/item/disk/nuclear/proc/check_z_level)
+	RegisterSignal(src, COMSIG_MOVED, TYPE_PROC_REF(/obj/item/disk/nuclear, check_z_level))
 
 /obj/item/disk/nuclear/proc/check_z_level()
 	if(!(istype(SSticker.mode, /datum/game_mode/nuclear)))
-		GLOB.moved_event.unregister(src, src, /obj/item/disk/nuclear/proc/check_z_level) // However, when we are certain unregister if necessary
+		UnregisterSignal(src, COMSIG_MOVED)	// However, when we are certain unregister if necessary
 		return
 	var/turf/T = get_turf(src)
 	if(!T || isNotStationLevel(T.z))
 		qdel(src)
 
 /obj/item/disk/nuclear/Destroy()
-	GLOB.moved_event.unregister(src, src, /obj/item/disk/nuclear/proc/check_z_level)
+	UnregisterSignal(src, COMSIG_MOVED)
 	nuke_disks -= src
 	if(!nuke_disks.len)
-		var/turf/T = pick_area_turf(/area/maintenance, list(/proc/is_station_turf, /proc/not_turf_contains_dense_objects))
+		var/turf/T = pick_area_turf(/area/maintenance, list(GLOBAL_PROC_REF(is_station_turf), GLOBAL_PROC_REF(not_turf_contains_dense_objects)))
 		if(T)
 			var/obj/D = new /obj/item/disk/nuclear(T)
 			log_and_message_staff("[src], the last authentication disk, has been destroyed. Spawning [D] at ([D.x], [D.y], [D.z]).", location = T)
@@ -555,3 +556,7 @@ var/bomb_set
 				continue
 			T.icon_state = target_icon_state
 		last_turf_state = target_icon_state
+
+/obj/machinery/nuclearbomb/station/explode()
+	. = ..()
+	SSticker.news_report = max(SSticker.news_report, FACILITY_DESTROYED_SELF_DESTRUCT)

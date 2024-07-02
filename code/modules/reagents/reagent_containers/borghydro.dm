@@ -14,12 +14,12 @@
 	var/charge_tick = 0
 	var/recharge_time = 5 //Time it takes for shots to recharge (in seconds)
 
-	var/list/reagent_ids = list(/datum/reagent/medicine/tricordrazine, /datum/reagent/medicine/inaprovaline, /datum/reagent/medicine/spaceacillin)
+	var/list/reagent_ids = list(/datum/reagent/medicine/tricordrazine, /datum/reagent/medicine/inaprovaline, /datum/reagent/medicine/penicillin)
 	var/list/reagent_volumes = list()
 	var/list/reagent_names = list()
 
 /obj/item/reagent_containers/borghypo/surgeon
-	reagent_ids = list(/datum/reagent/medicine/bicaridine, /datum/reagent/medicine/dexalin, /datum/reagent/medicine/painkiller/tramadol)
+	reagent_ids = list(/datum/reagent/medicine/bicaridine, /datum/reagent/medicine/inaprovaline, /datum/reagent/medicine/dexalin, /datum/reagent/medicine/painkiller/tramadol)
 
 /obj/item/reagent_containers/borghypo/crisis
 	reagent_ids = list(/datum/reagent/medicine/tricordrazine, /datum/reagent/medicine/inaprovaline, /datum/reagent/medicine/painkiller/tramadol, /datum/reagent/medicine/adrenaline, /datum/reagent/medicine/dexalin, /datum/reagent/medicine/painkiller/paracetamol)
@@ -102,7 +102,7 @@
 	if(href_list["reagent_index"])
 		var/index = text2num(href_list["reagent_index"])
 		if(index > 0 && index <= reagent_ids.len)
-			playsound(loc, 'sound/effects/pop.ogg', 50, 0)
+			playsound(loc, 'sounds/effects/pop.ogg', 50, 0)
 			mode = index
 			var/datum/reagent/R = reagent_ids[mode]
 			to_chat(usr, SPAN_NOTICE("Synthesizer is now producing '[initial(R.name)]'."))

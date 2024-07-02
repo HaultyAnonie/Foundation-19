@@ -222,7 +222,7 @@
 	var/swap_flags = ~HEAVY	// What can we swap place with?
 
 	var/pass_flags = 0
-	var/breathing_sound = 'sound/voice/monkey.ogg'
+	var/breathing_sound = 'sounds/voice/monkey.ogg'
 	var/list/equip_adjust = list()
 	var/list/equip_overlays = list()
 
@@ -659,7 +659,7 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 
 	if(disarm_value > 25 && !target.species.check_no_slip(target))
 		var/armor_check = 100 * target.get_blocked_ratio(affecting, BRUTE, damage = 20)
-		playsound(target.loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+		playsound(target.loc, 'sounds/weapons/thudswoosh.ogg', 50, 1, -1)
 		if(armor_check < 100)
 			target.visible_message(SPAN_DANGER("[attacker] has pushed [target]!"))
 			target.apply_effect(push_mod, WEAKEN, armor_check)
@@ -669,17 +669,17 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 	if(disarm_value > 50)
 		//See about breaking grips or pulls
 		if(target.break_all_grabs(attacker))
-			playsound(target.loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+			playsound(target.loc, 'sounds/weapons/thudswoosh.ogg', 50, 1, -1)
 			return
 
 		//Actually disarm them
 		for(var/obj/item/I in holding)
 			if(I && target.unEquip(I))
 				target.visible_message(SPAN_DANGER("[attacker] has disarmed [target]!"))
-				playsound(target.loc, 'sound/weapons/thudswoosh.ogg', 50, 1, -1)
+				playsound(target.loc, 'sounds/weapons/thudswoosh.ogg', 50, 1, -1)
 				return
 
-	playsound(target.loc, 'sound/weapons/punchmiss.ogg', 25, 1, -1)
+	playsound(target.loc, 'sounds/weapons/punchmiss.ogg', 25, 1, -1)
 	target.visible_message(SPAN_DANGER("[attacker] attempted to disarm \the [target]!"))
 
 /datum/species/proc/disfigure_msg(mob/living/carbon/human/H) //Used for determining the message a disfigured face has on examine. To add a unique message, just add this onto a specific species and change the "return" message.
@@ -705,7 +705,7 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 				continue
 			if(S.subspecies_allowed && !(name in S.subspecies_allowed))
 				continue
-			ADD_SORTED(L, hairstyle, /proc/cmp_text_asc)
+			ADD_SORTED(L, hairstyle, GLOBAL_PROC_REF(cmp_text_asc))
 			L[hairstyle] = S
 	return L
 
@@ -730,7 +730,7 @@ The slots that you can use are found in items_clothing.dm and are the inventory 
 				continue
 			if(S.subspecies_allowed && !(name in S.subspecies_allowed))
 				continue
-			ADD_SORTED(facial_hair_style_by_gender, facialhairstyle, /proc/cmp_text_asc)
+			ADD_SORTED(facial_hair_style_by_gender, facialhairstyle, GLOBAL_PROC_REF(cmp_text_asc))
 			facial_hair_style_by_gender[facialhairstyle] = S
 
 	return facial_hair_style_by_gender

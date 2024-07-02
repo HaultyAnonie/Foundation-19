@@ -64,7 +64,7 @@
 
 		penman.visible_message(SPAN_WARNING("[penman] begins writing something on [head_name]!"), "You begin writing something on [head_name].")
 
-		if(do_after(penman, 3 SECONDS, target))
+		if(do_after(penman, 4 SECONDS, target, bonus_percentage = 25))
 			if(owner && owner.check_head_coverage())
 				to_chat(penman, SPAN_NOTICE("[head_name] is covered up."))
 				return
@@ -151,7 +151,7 @@
 					var/icon/I = icon(M.icon, M.icon_state)
 					I.Blend(HI, ICON_AND)
 					I.Blend(color, ICON_MULTIPLY)
-					ADD_SORTED(sorted_hair_markings, list(list(M.draw_order, I)), /proc/cmp_marking_order)
+					ADD_SORTED(sorted_hair_markings, list(list(M.draw_order, I)), GLOBAL_PROC_REF(cmp_marking_order))
 			for (var/entry in sorted_hair_markings)
 				HI.Blend(entry[2], ICON_OVERLAY)
 			res.add_overlay(HI)
@@ -171,7 +171,7 @@
 			else
 				I.Blend(color, ICON_ADD)
 			icon_cache_key += "[M.name][color]"
-			ADD_SORTED(sorted_head_markings, list(list(M.draw_order, I)), /proc/cmp_marking_order)
+			ADD_SORTED(sorted_head_markings, list(list(M.draw_order, I)), GLOBAL_PROC_REF(cmp_marking_order))
 	for (var/entry in sorted_head_markings)
 		res.add_overlay(entry[2])
 

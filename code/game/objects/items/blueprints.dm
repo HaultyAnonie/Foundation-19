@@ -24,7 +24,7 @@
 	desc = "Blueprints of \the [station_name()]. There is a \"Classified\" stamp and several coffee stains on it."
 
 /obj/item/blueprints/attack_self(mob/M as mob)
-	if (!istype(M,/mob/living/carbon/human))
+	if (!istype(M,/mob/living/carbon/human) || !check_rights(R_ADMIN, FALSE, C = M.client))
 		to_chat(M, "This stack of blue paper means nothing to you.")//monkeys cannot into projecting
 
 		return
@@ -157,7 +157,7 @@
 	//TODO: much much more. Unnamed airlocks, cameras, etc.
 
 /obj/item/blueprints/proc/check_tile_is_border(turf/T2,dir)
-	if (istype(T2, /turf/space))
+	if (isspaceturf(T2))
 		return BORDER_SPACE //omg hull breach we all going to die here
 	if (istype(T2, /turf/simulated/shuttle))
 		return BORDER_SPACE

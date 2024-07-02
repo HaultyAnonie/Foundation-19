@@ -44,7 +44,7 @@
 	else
 		user.visible_message(SPAN_NOTICE("\The [user] begins pushing \the [patient] into \the [src]."))
 
-	if(!do_after(user, 3 SECONDS, src))
+	if(!do_after(user, 4 SECONDS, src, bonus_percentage = 25))
 		return FALSE
 
 	if(!user.Adjacent(src) || !(self_drop || user.Adjacent(patient)))
@@ -59,7 +59,7 @@
 	else
 		user.visible_message(SPAN_NOTICE("\The [user] pushes \the [patient] into \the [src]."))
 
-	playsound(loc, 'sound/effects/slosh.ogg', 50, 1)
+	playsound(loc, 'sounds/effects/slosh.ogg', 50, 1)
 	patient.forceMove(src)
 	occupant = patient
 	START_PROCESSING(SSobj, src)
@@ -79,7 +79,7 @@
 /obj/structure/adherent_bath/proc/eject_occupant()
 	if(occupant)
 		occupant.dropInto(loc)
-		playsound(loc, 'sound/effects/slosh.ogg', 50, 1)
+		playsound(loc, 'sounds/effects/slosh.ogg', 50, 1)
 		if(occupant.loc != src)
 			if(occupant.client)
 				occupant.client.eye = occupant.client.mob

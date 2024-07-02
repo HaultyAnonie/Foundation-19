@@ -56,14 +56,14 @@
 
 		else
 			user.visible_message(SPAN_WARNING("\The [user] begins to feed \the [M]!"))
-			if(!M.can_force_feed(user, loaded) || !do_after(user, 5 SECONDS, M))
+			if(!M.can_force_feed(user, loaded) || !do_after(user, 7 SECONDS, M, do_flags = DO_DEFAULT | DO_SHOW_TARGET, bonus_percentage = 25))
 				return
 
 			if (user.get_active_hand() != src)
 				return
 			M.visible_message(SPAN_NOTICE("\The [user] feeds some [loaded] to \the [M] with \the [src]."))
 		reagents.trans_to_mob(M, reagents.total_volume, CHEM_INGEST)
-		playsound(M.loc,'sound/items/eatfood.ogg', rand(10,40), 1)
+		playsound(M.loc,'sounds/items/eatfood.ogg', rand(10,40), 1)
 		cut_overlays()
 		return
 	else

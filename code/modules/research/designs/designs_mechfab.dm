@@ -437,6 +437,14 @@
 	id = "mech_machete"
 	req_tech = list(TECH_COMBAT = 2)
 	build_path = /obj/item/mech_equipment/mounted_system/melee/mechete
+
+/datum/design/item/exosuit/weapon/flamethrower
+	name = "mounted flamethrower"
+	id = "mech_flamer"
+	materials = list(MATERIAL_STEEL = 20000, MATERIAL_PLASTIC = 10000)
+	req_tech = list(TECH_COMBAT = 2, TECH_MATERIAL = 2)
+	build_path = /obj/item/mech_equipment/mounted_system/flamethrower
+
 /datum/design/item/exosuit/rcd
 	name = "RCD"
 	id = "mech_rcd"
@@ -661,6 +669,12 @@
 	materials = list(DEFAULT_WALL_MATERIAL = 3000)
 	id = "augment_circuitry"
 
+/datum/design/item/mechfab/augment/memory_inhibitor
+	name = "class H amnestic implant"
+	build_path = /obj/item/organ/internal/augment/active/memory_inhibitor
+	materials = list(DEFAULT_WALL_MATERIAL = 5000, "glass" = 1000, "gold" = 100, "diamond" = 500)
+	req_tech = list(TECH_MATERIAL = 5, TECH_BIO = 5, TECH_ESOTERIC = 5)
+	id = "augment_memory_inhibitor"
 //BigRigs
 /datum/design/item/mechfab/rig/zero
 	category = "Hardsuits"

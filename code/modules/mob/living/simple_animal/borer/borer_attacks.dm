@@ -33,7 +33,7 @@
 	to_chat(src, SPAN_NOTICE("You slither up [M] and begin probing at their ear canal..."))
 	set_ability_cooldown(5 SECONDS)
 
-	if(!do_after(src, 3 SECONDS, M))
+	if(!do_after(src, 4 SECONDS, M, bonus_percentage = 25))
 		return
 
 	to_chat(src, SPAN_NOTICE("You wiggle into \the [M]'s ear."))
@@ -71,8 +71,8 @@
 			if(M.deflect_psionic_attack())
 				return TRUE
 
-			sound_to(src, sound('sound/effects/psi/power_evoke.ogg'))
-			sound_to(M, sound('sound/effects/psi/power_evoke.ogg'))
+			sound_to(src, sound('sounds/effects/psi/power_evoke.ogg'))
+			sound_to(M, sound('sounds/effects/psi/power_evoke.ogg'))
 
 			if(do_psionics_check(5, src))
 				to_chat(src, SPAN_DANGER("You try to focus on [M], but you cannot expel any psionic power!"))

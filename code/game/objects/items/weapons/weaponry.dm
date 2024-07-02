@@ -101,8 +101,8 @@
 	var/countdown = 15
 	var/temporary = 1
 	var/mob/living/carbon/captured = null
-	var/min_free_time = 50
-	var/max_free_time = 85
+	var/min_free_time = 6 SECONDS
+	var/max_free_time = 9 SECONDS
 
 /obj/effect/energy_net/safari
 	name = "animal net"
@@ -193,7 +193,7 @@
 	var/mob/living/carbon/human/H = user
 	if(istype(H))
 		if(H.species.can_shred(H))
-			playsound(src.loc, 'sound/weapons/slash.ogg', 80, 1)
+			playsound(src.loc, 'sounds/weapons/slash.ogg', 80, 1)
 			health -= rand(10, 20)
 		else
 			health -= rand(1,3)
@@ -222,7 +222,7 @@
 		SPAN_WARNING("\The [user] attempts to free themselves from \the [src]!"),
 		SPAN_WARNING("You attempt to free yourself from \the [src]!")
 		)
-	if(do_after(user, rand(min_free_time, max_free_time), src, incapacitation_flags = INCAPACITATION_DISABLED))
+	if(do_after(user, rand(min_free_time, max_free_time), src, incapacitation_flags = INCAPACITATION_DISABLED, bonus_percentage = 25))
 		health = 0
 		healthcheck()
 		return 1

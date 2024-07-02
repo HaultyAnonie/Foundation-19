@@ -1,18 +1,36 @@
-GLOBAL_LIST_EMPTY(scp106s)
-
-/mob/living/carbon/human/scp_106
+/mob/living/carbon/human/scp106
+	name = "rotting elderly man"
 	desc = "A rotting, elderly old man."
-	SCP = /datum/scp/scp_106
 	icon = 'icons/SCP/scp-106.dmi'
+
 	icon_state = null
 	see_invisible = SEE_INVISIBLE_NOLIGHTING
 	see_in_dark = 7
-	status_flags = NO_ANTAG
+	status_flags = NO_ANTAG | SPECIES_FLAG_NO_EMBED | SPECIES_FLAG_NEED_DIRECT_ABSORB
+
+	//Config
+
+	///Our phase cooldown
+	var/phase_cooldown_time = 2 SECONDS
+	///How long it takes us to phase
+	var/phase_time = 2 SECONDS
+	///Cooldown on entering our pocket dimension
+	var/pocket_dimension_cooldown_time = 20 SECONDS
+	///Sound cooldown
+	var/sound_cooldown_time = 4 SECONDS
+
+	//Mechanical
+
+	///Our current target
 	var/mob/living/target = null
+
+	//Last coordinates before phasing
 	var/last_x = -1
 	var/last_y = -1
 	var/last_z = -1
+	///Are we phasing?
 	var/phasing = FALSE
+	///Our walleye for when we travel through walls
 	var/mob/observer/eye/scp106/WallEye
 	/// Turf where we were created
 	var/turf/spawn_turf = null
@@ -20,35 +38,36 @@ GLOBAL_LIST_EMPTY(scp106s)
 	var/area/spawn_area = null
 	/// Area type of the pocket dimension to look for
 	var/pocket_dimension_area_type = /area/pocketdimension
-
-	// Cooldowns and time variables
+	///Phase cooldown track
 	var/phase_cooldown
-	var/phase_cooldown_time = 2 SECONDS
-	var/phase_time = 2 SECONDS
+	///pocket dimension cooldown track
 	var/pocket_dimension_cooldown
-	var/pocket_dimension_cooldown_time = 20 SECONDS
+	///sound cooldown track
 	var/sound_cooldown
-	var/sound_cooldown_time = 4 SECONDS
 
-/datum/scp/scp_106
-	name = "SCP-106"
-	designation = "106"
-	classification = KETER
-
-/mob/living/carbon/human/scp_106/Initialize(mapload, new_species = "SCP-106")
+/mob/living/carbon/human/scp106/Initialize(mapload, new_species = "SCP-106")
 	. = ..()
-	GLOB.scp106s |= src
+	SCP = new /datum/scp(
+		src, // Ref to actual SCP atom
+		"rotting elderly man", //Name (Should not be the scp desg, more like what it can be described as to viewers)
+		SCP_KETER, //Obj Class
+		"106", //Numerical Designation
+		SCP_PLAYABLE
+	)
+
+	SCP.min_time = 40 MINUTES
+	SCP.min_playercount = 20
+
 	spawn_turf = get_turf(src)
 	spawn_area = get_area(src)
-	fully_replace_character_name("SCP-106")
 
 	add_verb(src, list(
-		/mob/living/carbon/human/scp_106/proc/enter_pocket_dimension,
-		/mob/living/carbon/human/scp_106/proc/object_phase,
-		/mob/living/carbon/human/scp_106/proc/wall_phase,
-		/mob/living/carbon/human/scp_106/proc/wall_unphase,
-		/mob/living/carbon/human/scp_106/proc/audible_breathe,
-		/mob/living/carbon/human/scp_106/proc/audible_laugh,
+		/mob/living/carbon/human/scp106/verb/enter_pocket_dimension,
+		/mob/living/carbon/human/scp106/proc/object_phase,
+		/mob/living/carbon/human/scp106/proc/wall_phase,
+		/mob/living/carbon/human/scp106/proc/wall_unphase,
+		/mob/living/carbon/human/scp106/proc/audible_breathe,
+		/mob/living/carbon/human/scp106/proc/audible_laugh,
 	))
 
 	add_language(LANGUAGE_EAL, FALSE)
@@ -61,17 +80,16 @@ GLOBAL_LIST_EMPTY(scp106s)
 	WallEye.visualnet.add_source(src)
 	WallEye.visualnet.add_source(WallEye)
 
-/mob/living/carbon/human/scp_106/Destroy()
-	GLOB.scp106s -= src
+/mob/living/carbon/human/scp106/Destroy()
 	QDEL_NULL(WallEye)
 	target = null
 	WallEye = null
 	return ..()
 
-/mob/living/carbon/human/scp_106/update_icons()
+/mob/living/carbon/human/scp106/update_icons()
 	return
 
-/mob/living/carbon/human/scp_106/on_update_icon()
+/mob/living/carbon/human/scp106/on_update_icon()
 	if(lying || resting)
 		var/matrix/M =  matrix()
 		transform = M.Turn(90)
@@ -79,23 +97,11 @@ GLOBAL_LIST_EMPTY(scp106s)
 		transform = null
 	return
 
-/mob/living/carbon/human/scp_106/IsAdvancedToolUser()
-	return FALSE
-
-/mob/living/carbon/human/scp_106/get_pressure_weakness()
-	return 0
-
-/mob/living/carbon/human/scp_106/handle_breath()
-	return TRUE
-
-/mob/living/carbon/human/scp_106/movement_delay()
-	return 4.0
-
-/mob/living/carbon/human/scp_106/say(message, datum/language/speaking = null, whispering)
+/mob/living/carbon/human/scp106/say(message, datum/language/speaking = null, whispering)
 	to_chat(src, SPAN_NOTICE("You cannot speak."))
 	return 0
 
-/mob/living/carbon/human/scp_106/apply_damage(damage = 0, damagetype = BRUTE, def_zone = null, blocked = 0, damage_flags = 0, obj/used_weapon = null, armor_pen, silent = FALSE, obj/item/organ/external/given_organ = null)
+/mob/living/carbon/human/scp106/apply_damage(damage = 0, damagetype = BRUTE, def_zone = null, blocked = 0, damage_flags = 0, obj/used_weapon = null, armor_pen, silent = FALSE, obj/item/organ/external/given_organ = null)
 	. = ..()
 	if(getBruteLoss() + getFireLoss() + getToxLoss() + getCloneLoss() < 200)
 		return
@@ -104,87 +110,112 @@ GLOBAL_LIST_EMPTY(scp106s)
 	to_chat(src, SPAN_DANGER("<i>You flee back to your pocket dimension!</i>"))
 	enter_pocket_dimension(TRUE)
 
-/mob/living/carbon/human/scp_106/bullet_act(obj/item/projectile/Proj)
+/mob/living/carbon/human/scp106/bullet_act(obj/item/projectile/Proj)
 	if(!Proj)
 		return
 	visible_message(SPAN_WARNING("\The [Proj] harmlessly sinks into [src]'s acidic skin!"))
 	return FALSE
 
 // Cannot get stunned normally, but we need it for the femur sequence
-/mob/living/carbon/human/scp_106/handle_stunned()
+
+/mob/living/carbon/human/scp106/handle_stunned()
 	if(stunned)
 		stunned = max(0, stunned - 1)
 	return stunned
 
 // So that he isn't as stealthy anymore
-/mob/living/carbon/human/scp_106/play_special_footstep_sound(turf/T, volume = 30, range = 1)
+
+/mob/living/carbon/human/scp106/play_special_footstep_sound(turf/T, volume = 30, range = 1)
 	var/play_sound = pick(\
-				'sound/effects/footstep/scp106/step1.ogg',
-				'sound/effects/footstep/scp106/step2.ogg',
-				'sound/effects/footstep/scp106/step3.ogg')
+				'sounds/effects/footstep/scp106/step1.ogg',
+				'sounds/effects/footstep/scp106/step2.ogg',
+				'sounds/effects/footstep/scp106/step3.ogg')
 	playsound(T, play_sound, max(20, volume), TRUE, range)
 	return TRUE
 
 // This is us attacking
-/mob/living/carbon/human/scp_106/UnarmedAttack(atom/A, proximity_flag)
+
+/mob/living/carbon/human/scp106/UnarmedAttack(atom/A, proximity_flag)
 	var/mob/living/L = A
-	if(!istype(L))
-		return
 	if(!proximity_flag)
 		return
-	if(L == src)
-		return
-	if(L.stat == DEAD)
-		return
-	if(istype(L.buckled, /obj/structure/femur_breaker))
-		return
-	if(istype(get_area(L), pocket_dimension_area_type))
-		return
+	if(istype(L))
+		if(L == src)
+			return
+		if(L.stat == DEAD)
+			return
+		if(istype(L.buckled, /obj/structure/femur_breaker))
+			return
+		if(istype(get_area(L), pocket_dimension_area_type))
+			do_attack_animation(A)
+			playsound(L, pick('sounds/bullets/bullet_impact2.ogg', 'sounds/bullets/bullet_impact3.ogg'), rand(15, 30), TRUE)
+			var/mob/living/target = A
+			target.apply_damage(rand(15,25), TOX, damage_flags = DAM_BIO)
+			return
+	else
+		return ..()
 
 	if(L.weakened || !ishuman(L) || !(L.status_flags & CANWEAKEN))
 		WarpMob(L)
 		return
 	L.Weaken(4)
-	playsound(L, pick('sound/bullets/bullet_impact2.ogg', 'sound/bullets/bullet_impact3.ogg'), rand(15, 30), TRUE)
+	playsound(L, pick('sounds/bullets/bullet_impact2.ogg', 'sounds/bullets/bullet_impact3.ogg'), rand(15, 30), TRUE)
 	visible_message(SPAN_DANGER("\The [src] knocks [L] down!"))
 
 // This is us GETTING attacked
-/mob/living/carbon/human/scp_106/attack_hand(mob/living/L)
+
+/mob/living/carbon/human/scp106/attack_hand(mob/living/L)
 	if(L == src)
 		return
 	WarpMob(L)
 
-/mob/living/carbon/human/scp_106/proc/WarpMob(mob/living/L)
-	var/turf/T = pick_area_turf(pocket_dimension_area_type, list(/proc/not_turf_contains_dense_objects))
+/mob/living/carbon/human/scp106/proc/WarpMob(mob/living/L)
+	var/turf/T = pick_area_turf(pocket_dimension_area_type, list(GLOBAL_PROC_REF(not_turf_contains_dense_objects)))
 	if(!istype(T)) // Fail-safe
 		T = get_turf(T)
 	visible_message(SPAN_DANGER("[L] is warped away!"))
-	playsound(L, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 50, TRUE)
+	playsound(L, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 50, TRUE)
 	if(L.buckled)
 		L.buckled.unbuckle_mob()
 	L.forceMove(T)
 	L.Weaken(2)
 
-/mob/living/carbon/human/scp_106/proc/set_last_xyz()
+/mob/living/carbon/human/scp106/proc/set_last_xyz()
 	last_x = x
 	last_y = y
 	last_z = z
 
+//Util Overrides
+
+/mob/living/carbon/human/scp106/IsAdvancedToolUser()
+	return FALSE
+
+/mob/living/carbon/human/scp106/get_pressure_weakness()
+	return 0
+
+/mob/living/carbon/human/scp106/handle_breath()
+	return TRUE
+
+/mob/living/carbon/human/scp106/movement_delay()
+	return 4.0
+
 /* Abilities */
 // Apparently verbs can't have variables
-/mob/living/carbon/human/scp_106/proc/enter_pocket_dimension()
+/mob/living/carbon/human/scp106/verb/enter_pocket_dimension()
 	set name = "Enter Pocket Dimension"
 	set category = "SCP"
 	set desc = "Enter your pocket dimension."
 
 	enter_pocket_dimension_proc()
 
-/mob/living/carbon/human/scp_106/proc/enter_pocket_dimension_proc(forced = FALSE)
+/mob/living/carbon/human/scp106/proc/enter_pocket_dimension_proc(forced = FALSE)
 	if(phasing)
 		return
 
 	var/turf/my_turf = get_turf(src)
 	if(istype(get_area(my_turf), pocket_dimension_area_type))
+		remove_verb(src, /mob/living/carbon/human/scp106/verb/enter_pocket_dimension)
+		add_verb(src, /mob/living/carbon/human/scp106/proc/go_back)
 		return FALSE
 
 	if(!forced)
@@ -194,9 +225,9 @@ GLOBAL_LIST_EMPTY(scp106s)
 		if(incapacitated())
 			return FALSE
 		pocket_dimension_cooldown = world.time + 50
-		if(!do_after(src, 30, my_turf))
+		if(!do_after(src, 4 SECONDS, my_turf, bonus_percentage = 25))
 			return FALSE
-	var/turf/T = pick_area_turf(pocket_dimension_area_type, list(/proc/not_turf_contains_dense_objects))
+	var/turf/T = pick_area_turf(pocket_dimension_area_type, list(GLOBAL_PROC_REF(not_turf_contains_dense_objects)))
 	if(!istype(T))
 		return FALSE
 	pocket_dimension_cooldown = world.time + pocket_dimension_cooldown_time
@@ -205,11 +236,11 @@ GLOBAL_LIST_EMPTY(scp106s)
 	sleep(5) // Le cool visual effects
 	animate(src, alpha = 255, time = 5)
 	forceMove(T)
-	remove_verb(src, /mob/living/carbon/human/scp_106/proc/enter_pocket_dimension)
-	add_verb(src, /mob/living/carbon/human/scp_106/proc/go_back)
+	remove_verb(src, /mob/living/carbon/human/scp106/verb/enter_pocket_dimension)
+	add_verb(src, /mob/living/carbon/human/scp106/proc/go_back)
 	return TRUE
 
-/mob/living/carbon/human/scp_106/proc/go_back()
+/mob/living/carbon/human/scp106/proc/go_back()
 	set name = "Return"
 	set category = "SCP"
 	set desc = "Return to the area you last teleported from."
@@ -221,15 +252,20 @@ GLOBAL_LIST_EMPTY(scp106s)
 		to_chat(src, SPAN_WARNING("You are not ready to leave pocket dimension just yet."))
 		return
 
+	if(!istype(get_area(src), pocket_dimension_area_type))
+		add_verb(src, /mob/living/carbon/human/scp106/verb/enter_pocket_dimension)
+		remove_verb(src, /mob/living/carbon/human/scp106/proc/go_back)
+		return
+
 	if(last_x != -1) // shouldn't be possible but just in case
 		alpha = 0
 		forceMove(locate(last_x, last_y, last_z))
 		stunned = 5
 		animate(src, alpha = 255, time = 5)
-	remove_verb(src, /mob/living/carbon/human/scp_106/proc/go_back)
-	add_verb(src, /mob/living/carbon/human/scp_106/proc/enter_pocket_dimension)
+	remove_verb(src, /mob/living/carbon/human/scp106/proc/go_back)
+	add_verb(src, /mob/living/carbon/human/scp106/verb/enter_pocket_dimension)
 
-/mob/living/carbon/human/scp_106/proc/object_phase()
+/mob/living/carbon/human/scp106/proc/object_phase()
 	set name = "Phase Through Object"
 	set category = "SCP"
 	set desc = "Phase through an object in front of you."
@@ -292,9 +328,9 @@ GLOBAL_LIST_EMPTY(scp106s)
 		anim_x = -32
 	animate(src, pixel_x = anim_x, pixel_y = anim_y, time = phase_time)
 
-	playsound(target_object, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 35, FALSE)
+	playsound(target_object, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 35, FALSE)
 
-	if(do_after(src, phase_time, target_object))
+	if(do_after(src, phase_time, target_object, bonus_percentage = 25))
 		forceMove(get_step(src, dir))
 		visible_message("<span class = 'danger'>[src] phases through \the [target_object].</span>")
 
@@ -305,7 +341,7 @@ GLOBAL_LIST_EMPTY(scp106s)
 	pixel_x = 0
 	pixel_y = 0
 
-/mob/living/carbon/human/scp_106/proc/wall_phase()
+/mob/living/carbon/human/scp106/proc/wall_phase()
 	set name = "Enter wall"
 	set category = "SCP"
 	set desc = "Enter the wall to reappear elsewhere"
@@ -337,10 +373,10 @@ GLOBAL_LIST_EMPTY(scp106s)
 
 	animate(src, pixel_x = anim_x, pixel_y = anim_y, time = phase_time)
 	animate(step_turf, color = "#555555", time = phase_time)
-	playsound(step_turf, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 35, FALSE)
+	playsound(step_turf, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 35, FALSE)
 
 	var/anim_duration = 20 SECONDS
-	if(do_after(src, phase_time, step_turf))
+	if(do_after(src, phase_time, step_turf, bonus_percentage = 25))
 		WallEye.possess(src)
 		WallEye.forceMove(step_turf)
 		forceMove(WallEye)
@@ -353,7 +389,7 @@ GLOBAL_LIST_EMPTY(scp106s)
 	pixel_x = 0
 	pixel_y = 0
 
-/mob/living/carbon/human/scp_106/proc/wall_unphase()
+/mob/living/carbon/human/scp106/proc/wall_unphase()
 	set name = "Leave wall"
 	set category = "SCP"
 	set desc = "Leave the wall to reappear in that location."
@@ -366,10 +402,10 @@ GLOBAL_LIST_EMPTY(scp106s)
 		return
 
 	var/old_color = exit.color
-	playsound(exit, pick('sound/scp/106/wall_decay.ogg'), 35, FALSE)
+	playsound(exit, pick('sounds/scp/106/wall_decay.ogg'), 35, FALSE)
 	animate(exit, color = "#555555", time = 5 SECONDS)
 
-	if(!do_after(src, 5 SECONDS, WallEye))
+	if(!do_after(src, 8 SECONDS, WallEye, bonus_percentage = 25))
 		animate(exit, color = old_color, time = 2 SECONDS)
 		return
 
@@ -380,24 +416,24 @@ GLOBAL_LIST_EMPTY(scp106s)
 	animate(exit, color = old_color, time = (30 SECONDS))
 
 // Spooky sounds
-/mob/living/carbon/human/scp_106/proc/audible_breathe()
+/mob/living/carbon/human/scp106/proc/audible_breathe()
 	set name = "\[Sound\] Breathing"
 	set category = "SCP"
 	set desc = "Breathe. Creepily."
 
 	if(world.time < sound_cooldown)
 		return
-	playsound(get_turf(src), 'sound/scp/106/breathing.ogg', rand(35, 65), TRUE)
+	playsound(get_turf(src), 'sounds/scp/106/breathing.ogg', rand(35, 65), TRUE)
 	sound_cooldown = world.time + sound_cooldown_time
 
-/mob/living/carbon/human/scp_106/proc/audible_laugh()
+/mob/living/carbon/human/scp106/proc/audible_laugh()
 	set name = "\[Sound\] Laugh"
 	set category = "SCP"
 	set desc = "Laugh. Creepily."
 
 	if(world.time < sound_cooldown)
 		return
-	playsound(get_turf(src), 'sound/scp/106/laugh.ogg', rand(35, 65), TRUE)
+	playsound(get_turf(src), 'sounds/scp/106/laugh.ogg', rand(35, 65), TRUE)
 	sound_cooldown = world.time + sound_cooldown_time
 
 // Special objects
@@ -419,24 +455,24 @@ GLOBAL_LIST_EMPTY(scp106s)
 		return
 	// 15% chance of getting back to the station
 	if(prob(15))
-		var/turf/T = pick_subarea_turf(/area, list(/proc/is_station_turf, /proc/not_turf_contains_dense_objects))
+		var/turf/T = pick_subarea_turf(/area, list(GLOBAL_PROC_REF(is_station_turf), GLOBAL_PROC_REF(not_turf_contains_dense_objects)))
 		if(!istype(T))
 			return
 
 		visible_message(SPAN_WARNING("[L] is warped away!"))
-		playsound(L, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 25, TRUE)
-		playsound(T, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 25, TRUE)
+		playsound(L, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 25, TRUE)
+		playsound(T, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 25, TRUE)
 		L.forceMove(T)
 		return
 	// 70% chance of going somewhere in the PD
 	if(prob(70))
-		var/turf/T = pick_area_turf(/area/pocketdimension, list(/proc/not_turf_contains_dense_objects))
+		var/turf/T = pick_area_turf(/area/pocketdimension, list(GLOBAL_PROC_REF(not_turf_contains_dense_objects)))
 		if(!istype(T))
 			return
 
 		visible_message(SPAN_WARNING("[L] is warped away!"))
-		playsound(L, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 25, TRUE)
-		playsound(T, pick('sound/scp/106/decay1.ogg', 'sound/scp/106/decay2.ogg', 'sound/scp/106/decay3.ogg'), 25, TRUE)
+		playsound(L, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 25, TRUE)
+		playsound(T, pick('sounds/scp/106/decay1.ogg', 'sounds/scp/106/decay2.ogg', 'sounds/scp/106/decay3.ogg'), 25, TRUE)
 		L.alpha = 0
 		L.forceMove(T)
 		animate(L, alpha = 255, time = (2 SECONDS))
@@ -479,7 +515,7 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 		return
 
 	visible_message(SPAN_WARNING("[user] starts to put [target] onto the femur breaker..."))
-	if(!do_after(user, 3 SECONDS, target))
+	if(!do_after(user, 5 SECONDS, target, bonus_percentage = 25))
 		return
 
 	// TODO: Rework buckling code to avoid copy-pasta
@@ -539,7 +575,7 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 	for(var/mob/M in GLOB.player_list)
 		if(!isStationLevel(M.z))
 			continue
-		M.playsound_local(get_turf(M), 'sound/scp/machinery/femur_breaker.ogg', 35, FALSE)
+		M.playsound_local(get_turf(M), 'sounds/scp/machinery/femur_breaker.ogg', 35, FALSE)
 
 	H.Stun(60) // Death
 
@@ -553,8 +589,8 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 				return
 
 	sleep(20 SECONDS)
-	var/mob/living/carbon/human/scp_106/A
-	for(var/mob/living/carbon/human/scp_106/S in GLOB.scp106s)
+	var/mob/living/carbon/human/scp106/A
+	for(var/mob/living/carbon/human/scp106/S in GLOB.SCP_list)
 		A = S
 		break
 
@@ -582,7 +618,7 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 	for(var/mob/M in GLOB.player_list)
 		if(!isStationLevel(M.z))
 			continue
-		M.playsound_local(get_turf(M), 'sound/scp/machinery/femur_breaker_death.ogg', 35, FALSE)
+		M.playsound_local(get_turf(M), 'sounds/scp/machinery/femur_breaker_death.ogg', 35, FALSE)
 	A.stunned = 20
 	sleep(7 SECONDS)
 	for(var/obj/item/organ/external/E in H.organs)
@@ -620,14 +656,14 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 	for(var/mob/M in GLOB.player_list)
 		if(!isStationLevel(M.z))
 			continue
-		M.playsound_local(get_turf(M), 'sound/scp/machinery/magnet_up.ogg', 35, FALSE)
+		M.playsound_local(get_turf(M), 'sounds/scp/machinery/magnet_up.ogg', 35, FALSE)
 
 	sleep(9 SECONDS)
 
 	for(var/mob/M in GLOB.player_list)
 		if(!isStationLevel(M.z))
 			continue
-		M.playsound_local(get_turf(M), 'sound/scp/machinery/femur_breaker_success.ogg', 35, FALSE)
+		M.playsound_local(get_turf(M), 'sounds/scp/machinery/femur_breaker_success.ogg', 35, FALSE)
 
 /obj/machinery/button/femur_breaker
 	name = "Femur Breaker Button"
@@ -663,7 +699,7 @@ GLOBAL_LIST_EMPTY(femur_breakers)
 	return TRUE
 
 /datum/visualnet/scp106
-	valid_source_types =  list(/mob/observer/eye/scp106,/mob/living/carbon/human/scp_106) //list(/turf/simulated/wall,/turf/unsimulated/wall)
+	valid_source_types =  list(/mob/observer/eye/scp106,/mob/living/carbon/human/scp106) //list(/turf/simulated/wall,/turf/unsimulated/wall)
 	chunk_type = /datum/chunk/scp106
 
 /datum/chunk/scp106/acquire_visible_turfs(list/visible)

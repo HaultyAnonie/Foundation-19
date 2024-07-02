@@ -10,12 +10,15 @@
 	number_of_channels = 0
 	time_between_channels = 200
 	hud_state = "const_floor"
-	cast_sound = 'sound/effects/meteorimpact.ogg'
+	cast_sound = 'sounds/effects/meteorimpact.ogg'
 	var/list/possible_spawns = list(
 		/mob/living/simple_animal/hostile/scarybat/cult,
 		/mob/living/simple_animal/hostile/creature/cult,
 		/mob/living/simple_animal/hostile/faithless/cult
 		)
+
+	spell_cost = 5
+	mana_cost = 35
 
 /datum/spell/tear_veil/choose_targets(mob/user = usr)
 	var/turf/T = get_turf(holder)

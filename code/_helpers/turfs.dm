@@ -58,14 +58,43 @@
 	return locate(tX, tY, tZ)
 
 /*
+	Z-level Helpers
+*/
+///Like get_step but can handle z-levels
+/proc/get_step_multiz(ref, dir)
+	if(dir & UP)
+		dir &= ~UP
+		return GetAbove(ref)
+	if(dir & DOWN)
+		dir &= ~DOWN
+		return GetBelow(ref)
+	return get_step(ref, dir)
+
+///Like get_dir but works with zlevels
+/proc/get_dir_multiz(turf/us, turf/them)
+	us = get_turf(us)
+	them = get_turf(them)
+	var/dir = NONE
+	if(!us || !them)
+		return NONE
+	if(us.z == them.z)
+		return get_dir(us, them)
+	else
+		if(us.z < them.z)
+			dir = UP
+		else if(us.z > them.z)
+			dir = DOWN
+	return (dir | get_dir(us, them))
+
+/*
 	Predicate helpers
 */
 
 /proc/is_space_turf(turf/T)
-	return istype(T, /turf/space)
+	return isspaceturf(T)
 
 /proc/is_not_space_turf(turf/T)
-	return !is_space_turf(T)
+	return !isspaceturf(T)
 
 /proc/is_open_space(turf/T)
 	return isopenspace(T)
@@ -95,7 +124,7 @@
 	if (!T)
 		return "The spawn location doesn't seem to exist. Please contact an admin via adminhelp if this error persists."
 
-	if(istype(T, /turf/space)) // Space tiles
+	if(isspaceturf(T)) // Space tiles
 		return "Spawn location is open to space."
 	var/datum/gas_mixture/air = T.return_air()
 	if(!air)
@@ -109,6 +138,11 @@
 	var/datum/gas_mixture/environment = T ? T.return_air() : null
 	var/pressure =  environment ? environment.return_pressure() : 0
 	if(pressure < SOUND_MINIMUM_PRESSURE)
+		return TRUE
+	return FALSE
+
+/proc/is_dark(turf/T, darkness_threshold = 0.03)
+	if(T.get_lumcount() <= darkness_threshold)
 		return TRUE
 	return FALSE
 

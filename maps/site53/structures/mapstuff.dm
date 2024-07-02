@@ -12,7 +12,7 @@
 			return
 
 		to_chat(user, SPAN_NOTICE("You pry out the data drive from \the [src]."))
-		playsound(loc, 'sound/items/Crowbar.ogg', 50, 1)
+		playsound(loc, 'sounds/items/Crowbar.ogg', 50, 1)
 		show_sound_effect(loc, user, soundicon = SFX_ICON_SMALL)
 		drive.origin_tech = list(TECH_DATA = rand(4,5), TECH_ENGINEERING = rand(4,5), TECH_PHORON = rand(4,5), TECH_COMBAT = rand(2,5), TECH_ESOTERIC = rand(0,6))
 		var/obj/item/stock_parts/computer/hard_drive/cluster/extracted_drive = drive
@@ -21,7 +21,7 @@
 
 /obj/structure/monolith
 	name = "monolith"
-	desc = "An obviously artifical structure of unknown origin. The symbols '<font face='Shage'>DWNbTX</font>' are engraved on the base."
+	desc = "An obviously artifical structure of unknown origin. The symbols 'DWNbTX' are engraved on the base."
 	icon = 'icons/obj/monolith.dmi'
 	icon_state = "jaggy1"
 	layer = ABOVE_HUMAN_LAYER
@@ -64,7 +64,7 @@
 		if(istype(E))
 			var/mob/living/carbon/human/H = user
 			if(!H.isSynthetic())
-				playsound(src, 'sound/effects/zapbeep.ogg', 100, 1)
+				playsound(src, 'sounds/effects/zapbeep.ogg', 100, 1)
 				active = 1
 				update_icon()
 				if(prob(70))

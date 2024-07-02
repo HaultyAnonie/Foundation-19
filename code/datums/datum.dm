@@ -32,6 +32,7 @@
 	SHOULD_CALL_PARENT(TRUE)
 	SHOULD_NOT_SLEEP(TRUE)
 	tag = null
+	datum_flags &= ~DF_USE_TAG //In case something tries to REF us
 	weakref = null // Clear this reference to ensure it's kept for as brief duration as possible.
 
 	SSnano.close_uis(src)
@@ -53,11 +54,6 @@
 			else
 				qdel(extension)
 		extensions = null
-
-	GLOB.destroyed_event && GLOB.destroyed_event.raise_event(src)
-
-	if (!isturf(src))	// Not great, but the 'correct' way to do it would add overhead for little benefit.
-		cleanup_events(src)
 
 	//BEGIN: ECS SHIT
 	///Only override this if you know what you're doing. You do not know what you're doing
@@ -96,3 +92,7 @@
 /datum/proc/Process()
 	set waitfor = 0
 	return PROCESS_KILL
+
+/// QDELs yourself. Useful for signals (sometimes you just want to end yourself).
+/datum/proc/qdel_self()
+	qdel(src)

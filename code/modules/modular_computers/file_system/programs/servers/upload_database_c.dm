@@ -9,6 +9,7 @@
 	requires_ntnet = TRUE
 	requires_ntnet_feature = NTNET_PEERTOPEER
 	network_destination = "other device via server-to-client tunnel"
+	usage_flags = PROGRAM_ALL
 	available_on_ntnet = TRUE
 	tgui_id = "SCiPUploadClient"
 
@@ -42,11 +43,12 @@
 		download_completion += actual_netspeed
 
 		if(download_completion >= downloading_file.size)
-			if(!computer || !computer.hard_drive || !computer.hard_drive.store_file(downloading_file))	// see if we can download the file
+			var/new_file = downloading_file.clone()
+			if(!computer || !computer.hard_drive || !computer.hard_drive.store_file(new_file))	// see if we can download the file
 				crash("I/O Error: Unable to save file. Check your hard drive and try again.")
 			else
-				if(istype(downloading_file, /datum/computer_file/program))
-					var/datum/computer_file/program/df_program = downloading_file
+				if(istype(new_file, /datum/computer_file/program))
+					var/datum/computer_file/program/df_program = new_file
 					if(df_program.program_malicious)
 						computer.run_program(df_program.filename)
 				cleanup_download()

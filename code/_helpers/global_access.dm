@@ -89,10 +89,6 @@
 			return global.SSgarbage;
 		if("SSghost_images")
 			return global.SSghost_images;
-		if("SSgraphs_process")
-			return global.SSgraphs_process;
-		if("SSgraphs_update")
-			return global.SSgraphs_update;
 		if("SSicon_update")
 			return global.SSicon_update;
 		if("SSinactivity")
@@ -173,6 +169,8 @@
 			return global.SStrade;
 		if("SSturf")
 			return global.SSturf;
+		if("SSturf_fire")
+			return global.SSturf_fire;
 		if("SSvines")
 			return global.SSvines;
 		if("SSvote")
@@ -293,8 +291,6 @@
 			return global.appearance_manager;
 		if("area_repository")
 			return global.area_repository;
-		if("artefact_feedback")
-			return global.artefact_feedback;
 		if("ascii_esc")
 			return global.ascii_esc;
 		if("ascii_green")
@@ -331,8 +327,6 @@
 			return global.camera_repository;
 		if("cameranet")
 			return global.cameranet;
-		if("can_call_ert")
-			return global.can_call_ert;
 		if("changelog_hash")
 			return global.changelog_hash;
 		if("channel_color_presets")
@@ -349,8 +343,6 @@
 			return global.client_preference_stats_;
 		if("client_repository")
 			return global.client_repository;
-		if("climbsounds")
-			return global.climbsounds;
 		if("combatlog")
 			return global.combatlog;
 		if("comm_message_listeners")
@@ -409,8 +401,6 @@
 			return global.endgame_exits;
 		if("endgame_safespawns")
 			return global.endgame_safespawns;
-		if("ert_base_chance")
-			return global.ert_base_chance;
 		if("escape_pods")
 			return global.escape_pods;
 		if("escape_pods_by_name")
@@ -563,8 +553,6 @@
 			return global.message_delay;
 		if("message_servers")
 			return global.message_servers;
-		if("mil_branches")
-			return global.mil_branches;
 		if("mimic_defines")
 			return global.mimic_defines;
 		if("mining_floors")
@@ -587,8 +575,8 @@
 			return global.narsie_behaviour;
 		if("narsie_cometh")
 			return global.narsie_cometh;
-		if("narsie_list")
-			return global.narsie_list;
+		if("scarletking_list")
+			return global.scarletking_list;
 		if("navbeacons")
 			return global.navbeacons;
 		if("news_network")
@@ -725,8 +713,6 @@
 			return global.sounds_cache;
 		if("sparring_attack_cache")
 			return global.sparring_attack_cache;
-		if("spells")
-			return global.spells;
 		if("splatter_cache")
 			return global.splatter_cache;
 		if("sqladdress")
@@ -779,10 +765,6 @@
 			return global.swapmaps_mode;
 		if("syndicate_access")
 			return global.syndicate_access;
-		if("syndicate_code_phrase")
-			return global.syndicate_code_phrase;
-		if("syndicate_code_response")
-			return global.syndicate_code_response;
 		if("syndicate_name")
 			return global.syndicate_name;
 		if("tail_icon_cache")
@@ -946,10 +928,6 @@
 			global.SSgarbage=newval;
 		if("SSghost_images")
 			global.SSghost_images=newval;
-		if("SSgraphs_process")
-			global.SSgraphs_process=newval;
-		if("SSgraphs_update")
-			global.SSgraphs_update=newval;
 		if("SSicon_update")
 			global.SSicon_update=newval;
 		if("SSinactivity")
@@ -1030,6 +1008,8 @@
 			global.SStrade=newval;
 		if("SSturf")
 			global.SSturf=newval;
+		if("SSturf_fire")
+			global.SSturf_fire=newval;
 		if("SSvines")
 			global.SSvines=newval;
 		if("SSvote")
@@ -1150,8 +1130,6 @@
 			global.appearance_manager=newval;
 		if("area_repository")
 			global.area_repository=newval;
-		if("artefact_feedback")
-			global.artefact_feedback=newval;
 		if("ascii_esc")
 			global.ascii_esc=newval;
 		if("ascii_green")
@@ -1188,8 +1166,6 @@
 			global.camera_repository=newval;
 		if("cameranet")
 			global.cameranet=newval;
-		if("can_call_ert")
-			global.can_call_ert=newval;
 		if("changelog_hash")
 			global.changelog_hash=newval;
 		if("channel_color_presets")
@@ -1206,8 +1182,6 @@
 			global.client_preference_stats_=newval;
 		if("client_repository")
 			global.client_repository=newval;
-		if("climbsounds")
-			global.climbsounds=newval;
 		if("combatlog")
 			global.combatlog=newval;
 		if("comm_message_listeners")
@@ -1266,8 +1240,6 @@
 			global.endgame_exits=newval;
 		if("endgame_safespawns")
 			global.endgame_safespawns=newval;
-		if("ert_base_chance")
-			global.ert_base_chance=newval;
 		if("escape_pods")
 			global.escape_pods=newval;
 		if("escape_pods_by_name")
@@ -1420,8 +1392,6 @@
 			global.message_delay=newval;
 		if("message_servers")
 			global.message_servers=newval;
-		if("mil_branches")
-			global.mil_branches=newval;
 		if("mimic_defines")
 			global.mimic_defines=newval;
 		if("mining_floors")
@@ -1444,8 +1414,8 @@
 			global.narsie_behaviour=newval;
 		if("narsie_cometh")
 			global.narsie_cometh=newval;
-		if("narsie_list")
-			global.narsie_list=newval;
+		if("scarletking_list")
+			global.scarletking_list=newval;
 		if("navbeacons")
 			global.navbeacons=newval;
 		if("news_network")
@@ -1582,8 +1552,6 @@
 			global.sounds_cache=newval;
 		if("sparring_attack_cache")
 			global.sparring_attack_cache=newval;
-		if("spells")
-			global.spells=newval;
 		if("splatter_cache")
 			global.splatter_cache=newval;
 		if("sqladdress")
@@ -1636,10 +1604,6 @@
 			global.swapmaps_mode=newval;
 		if("syndicate_access")
 			global.syndicate_access=newval;
-		if("syndicate_code_phrase")
-			global.syndicate_code_phrase=newval;
-		if("syndicate_code_response")
-			global.syndicate_code_response=newval;
 		if("syndicate_name")
 			global.syndicate_name=newval;
 		if("tail_icon_cache")
@@ -1758,8 +1722,6 @@
 	"SSfluids",
 	"SSgarbage",
 	"SSghost_images",
-	"SSgraphs_process",
-	"SSgraphs_update",
 	"SSicon_update",
 	"SSinactivity",
 	"SSinput",
@@ -1800,6 +1762,7 @@
 	"SStimer",
 	"SStrade",
 	"SSturf",
+	"SSturf_fire",
 	"SSvines",
 	"SSvote",
 	"SSwebhooks",
@@ -1860,7 +1823,6 @@
 	"antag_add_finished",
 	"appearance_manager",
 	"area_repository",
-	"artefact_feedback",
 	"ascii_esc",
 	"ascii_green",
 	"ascii_red",
@@ -1879,7 +1841,6 @@
 	"camera_range_display_status",
 	"camera_repository",
 	"cameranet",
-	"can_call_ert",
 	"changelog_hash",
 	"channel_color_presets",
 	"channel_to_radio_key",
@@ -1918,7 +1879,6 @@
 	"empty_playable_ai_cores",
 	"endgame_exits",
 	"endgame_safespawns",
-	"ert_base_chance",
 	"escape_pods",
 	"escape_pods_by_name",
 	"evacuation_controller",
@@ -2004,7 +1964,6 @@
 	"meteors_moderate",
 	"meteors_normal",
 	"meteors_threatening",
-	"mil_branches",
 	"mimic_defines",
 	"mining_floors",
 	"mining_walls",
@@ -2016,7 +1975,7 @@
 	"multi_point_spawns",
 	"narsie_behaviour",
 	"narsie_cometh",
-	"narsie_list",
+	"scarletking_list",
 	"navbeacons",
 	"news_network",
 	"newscaster_standard_feeds",
@@ -2085,7 +2044,6 @@
 	"sortInstance",
 	"sounds_cache",
 	"sparring_attack_cache",
-	"spells",
 	"splatter_cache",
 	"sqladdress",
 	"sqldb",

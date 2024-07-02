@@ -29,7 +29,7 @@
 /turf/simulated/floor/exoplanet/attackby(obj/item/C, mob/user)
 	if(diggable && istype(C,/obj/item/shovel))
 		visible_message(SPAN_NOTICE("\The [user] starts digging \the [src]"))
-		if(do_after(user, 50))
+		if(do_after(user, 6 SECONDS, bonus_percentage = 25))
 			to_chat(user,SPAN_NOTICE("You dig a deep pit."))
 			new /obj/structure/pit(src)
 			diggable = 0
@@ -38,7 +38,7 @@
 	else if(istype(C, /obj/item/stack/tile))
 		var/obj/item/stack/tile/T = C
 		if(T.use(1))
-			playsound(src, 'sound/items/Deconstruct.ogg', 80, 1)
+			playsound(src, 'sounds/items/Deconstruct.ogg', 80, 1)
 			ChangeTurf(/turf/simulated/floor, FALSE, FALSE, TRUE)
 	else if (isCrowbar(C) || isWelder(C) || istype(C, /obj/item/gun/energy/plasmacutter))
 		return

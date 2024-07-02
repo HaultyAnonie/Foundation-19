@@ -12,7 +12,7 @@
 	collection_mode = 1
 	max_w_class = ITEM_SIZE_NORMAL
 	max_storage_space = 100
-	var/replace_sound = 'sound/items/rped.ogg'
+	var/replace_sound = 'sounds/items/rped.ogg'
 	var/remote_interaction = FALSE
 	var/remote_distance = 1 // How far it can replace items
 
@@ -29,7 +29,7 @@
 	if(istype(target, /obj/machinery))
 		var/obj/machinery/machine = target
 		if(machine.component_attackby(src, user))
-			user.Beam(machine, icon_state = "rped_upgrade", icon = 'icons/effects/effects.dmi', time = 5)
+			user.Beam(machine, icon_state = "rped_upgrade", time = 5)
 
 /obj/item/storage/part_replacer/bluespace
 	name = "bluespace rapid part exchange device"
@@ -40,7 +40,7 @@
 	storage_slots = 400
 	max_storage_space = 200
 
-	replace_sound = 'sound/items/PSHOOM.ogg'
+	replace_sound = 'sounds/items/PSHOOM.ogg'
 	remote_interaction = TRUE
 	remote_distance = 5
 

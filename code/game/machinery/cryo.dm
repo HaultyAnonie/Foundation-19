@@ -16,7 +16,7 @@
 	var/on = 0
 	idle_power_usage = 20
 	active_power_usage = 200
-	clicksound = 'sound/machines/buttonbeep.ogg'
+	clicksound = 'sounds/machines/buttonbeep.ogg'
 	clickvol = 30
 
 	machine_name = "cryo cell"
@@ -339,7 +339,7 @@
 		to_chat(user, SPAN_WARNING("Unbuckle the subject before attempting to move them."))
 		return
 	user.visible_message(SPAN_NOTICE("\The [user] begins placing \the [target] into \the [src]."), SPAN_NOTICE("You start placing \the [target] into \the [src]."))
-	if(!do_after(user, 30, src))
+	if(!do_after(user, 4 SECONDS, src, bonus_percentage = 25))
 		return
 	put_mob(target)
 

@@ -52,29 +52,29 @@
 //Medical
 /obj/item/clothing/head/surgery
 	name = "surgical cap"
-	desc = "A cap surgeons wear during operations. Keeps their hair from tickling your internal organs."
+	desc = "A surgical cap worn by surgeons for the room to be sterile. Keeps the wearer's hair from falling into the open wounds of the patient."
 	icon_state = "surgcap"
 	flags_inv = BLOCKHEADHAIR
 
 /obj/item/clothing/head/surgery/purple
 	name = "purple surgical cap"
-	color = "#7a1b3f"
+	icon_state = "surgcap_purple"
 
 /obj/item/clothing/head/surgery/blue
 	name = "blue surgical cap"
-	color = "#4891e1"
+	icon_state = "surgcap_blue"
 
 /obj/item/clothing/head/surgery/green
 	name = "green surgical cap"
-	color = "#255a3e"
+	icon_state = "surgcap_green"
 
 /obj/item/clothing/head/surgery/black
 	name = "black surgical cap"
-	color = "#242424"
+	icon_state = "surgcap_black"
 
 /obj/item/clothing/head/surgery/navyblue
 	name = "navy blue surgical cap"
-	color = "#1f3a69"
+	icon_state = "surgcap_navyblue"
 
 /obj/item/clothing/head/surgery/lilac
 	name = "lilac surgical cap"
@@ -129,6 +129,70 @@
 	name = "Security Senior Beret"
 	desc = "Issued to SD senior guards, agents and NCO's"
 	icon_state = "beret_corporate_warden"
+
+// STARTING NEW SECURITY BERETS //
+
+/obj/item/clothing/head/beret/sec/guard
+	name = "Guard Beret"
+	desc = "A black beret with a red badge, in the shape of two chevrons, it feels durable due to the materials it's been made from."
+	icon_state = "beret_guard"
+
+/obj/item/clothing/head/beret/sec/sergeant
+	name = "Non-Commissioned Officer Beret"
+	desc = "A black beret with a silver badge, in the shape of three chevrons, it feels durable due to the materials it's been made from."
+	icon_state = "beret_sergeant"
+
+/obj/item/clothing/head/beret/sec/commander
+	name = "Zone Officer Beret"
+	desc = "A black beret with a golden badge in the shape of a shield, it feels durable due to the materials it's been made from."
+	icon_state = "beret_commander"
+
+/obj/item/clothing/head/beret/sec/guardcom
+	name = "Guard Commander Beret"
+	desc = "A white beret with a golden badge in the shape of a shield, it feels durable due to the materials it's been made from."
+	icon_state = "beret_guardcom"
+
+// ENDING NEW SECURITY BERETS //
+
+/obj/item/clothing/head/beret/goc
+	name = "Global Occult Coalition Beret"
+	desc = "A cyan beret with a golden Global Occult Coalition badge on the front, smells of lead."
+	icon_state = "goc-beret"
+
+/obj/item/clothing/head/beret/goc/lead
+	name = "Global Occult Coalition Leader Beret"
+	desc = "A dark blue beret with a white United Nations badge on the front, smells of bad decisions."
+	icon_state = "goc_lead_beret"
+	armor = list(melee = 50, bullet = 80, laser = 50,energy = 25, bomb = 50, bio = 50, rad = 60)
+
+/obj/item/clothing/head/beret/isd
+	name = "Internal Security field cap"
+	desc = "A dull black cap. It has ISD in white printed on it on the front. Used by the Internal Security Department. It's padded with some extreme armor."
+	icon_state = "isd_cap"
+	armor = list(melee = 50, bullet = 60, laser = 50,energy = 25, bomb = 50, bio = 50, rad = 60)
+	body_parts_covered = HEAD
+
+/obj/item/clothing/head/beret/isd/fedora
+	name = "Internal Security fedora"
+	desc = "A fancy black fedora with a red strap along it. Used by the Internal Security Department. It's padded with some extreme armor."
+	icon_state = "isd_fedora"
+
+/obj/item/clothing/head/beret/mtf
+	name = "'Nine Tailed Fox' tactical beret"
+	desc = "A heavy padded beret used by MTF Epsilon-11, it's quite armored, more than traditional helmets."
+	icon_state = "beret_epsilon11"
+	armor = list(melee = 90, bullet = 90, laser = 50,energy = 25, bomb = 50, bio = 50, rad = 60)
+	body_parts_covered = HEAD
+
+/obj/item/clothing/head/beret/mtf/alpha
+	name = "'Red Right Hand' tactical beret"
+	desc = "A heavy padded beret used by MTF Alpha-1, it's quite armored, more than traditional helmets."
+	icon_state = "beret_alpha1"
+
+/obj/item/clothing/head/beret/mtf/omega
+	name = "'Laws Left Hand' tactical beret"
+	desc = "A heavy padded beret used by MTF Omega-1, it's quite armored, more than traditional helmets."
+	icon_state = "beret_guardcom"
 
 /obj/item/clothing/head/beret/engineering
 	name = "corporate engineering beret"

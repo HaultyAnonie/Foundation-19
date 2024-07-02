@@ -229,6 +229,7 @@
 	slot_flags = SLOT_EARS | SLOT_TWOEARS
 	audio_insulation = A_INSL_PERFECT
 	volume_multiplier = 0.1
+	matter = list(MATERIAL_PLASTIC = 25)
 
 
 ///////////////////////////////////////////////////////////////////////
@@ -255,7 +256,6 @@ BLIND     // can't see anything
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_eyes_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_eyes_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_eyes_unathi.dmi',
 	)
 
 /obj/item/clothing/glasses/get_icon_state(mob/user_mob, slot)
@@ -285,13 +285,12 @@ BLIND     // can't see anything
 	body_parts_covered = HANDS
 	slot_flags = SLOT_GLOVES
 	attack_verb = list("challenged")
-	species_restricted = list("exclude",SPECIES_NABBER, SPECIES_MONARCH_QUEEN, SPECIES_UNATHI, SPECIES_VOX, SPECIES_VOX_ARMALIS)
+	species_restricted = list("exclude",SPECIES_NABBER, SPECIES_MONARCH_QUEEN, SPECIES_VOX, SPECIES_VOX_ARMALIS)
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_hands_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_hands_vox_armalis.dmi',
 		SPECIES_NABBER = 'icons/mob/species/nabber/onmob_hands_gas.dmi',
 		SPECIES_MONARCH_QUEEN = 'icons/mob/species/nabber/msq/onmob_hands_msq.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_hands_unathi.dmi',
 		)
 	blood_overlay_type = "bloodyhands"
 
@@ -328,7 +327,7 @@ BLIND     // can't see anything
 			update_icon()
 			return
 
-		playsound(src.loc, 'sound/items/Wirecutter.ogg', 100, 1)
+		playsound(src.loc, 'sounds/items/Wirecutter.ogg', 100, 1)
 		user.visible_message(SPAN_WARNING("\The [user] modifies \the [src] with \the [W]."),SPAN_WARNING("You modify \the [src] with \the [W]."))
 
 		cut_fingertops() // apply change, so relevant xenos can wear these
@@ -344,7 +343,7 @@ BLIND     // can't see anything
 	name = "modified [name]"
 	desc = "[desc]<br>They have been modified to accommodate a different shape."
 	if("exclude" in species_restricted)
-		species_restricted -= SPECIES_UNATHI
+		species_restricted -= null
 	return
 
 /obj/item/clothing/gloves/mob_can_equip(mob/user)
@@ -395,7 +394,6 @@ BLIND     // can't see anything
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_head_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_head_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_head_unathi.dmi',
 		SPECIES_NABBER = 'icons/mob/species/nabber/onmob_head_gas.dmi'
 		)
 	body_parts_covered = HEAD
@@ -517,7 +515,6 @@ BLIND     // can't see anything
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_mask_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_mask_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_mask_unathi.dmi',
 		)
 
 	var/voicechange = 0
@@ -597,11 +594,10 @@ BLIND     // can't see anything
 	slot_flags = SLOT_FEET
 	permeability_coefficient = 0.50
 	force = 2
-	species_restricted = list("exclude", SPECIES_NABBER, SPECIES_UNATHI, SPECIES_VOX, SPECIES_VOX_ARMALIS)
+	species_restricted = list("exclude", SPECIES_NABBER, SPECIES_VOX, SPECIES_VOX_ARMALIS)
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_feet_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_feet_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_feet_unathi.dmi',
 		)
 	blood_overlay_type = "shoeblood"
 	var/overshoes = 0
@@ -652,7 +648,7 @@ BLIND     // can't see anything
 	if (attached_cuffs)
 		to_chat(user, SPAN_WARNING("\The [src] already has [attached_cuffs] attached."))
 		return
-	if (do_after(user, 5 SECONDS))
+	if (do_after(user, 7 SECONDS, bonus_percentage = 25))
 		if(!user.unEquip(cuffs, src))
 			return
 		user.visible_message(SPAN_ITALIC("\The [user] attaches \the [cuffs] to \the [src]."), range = 2)
@@ -673,7 +669,7 @@ BLIND     // can't see anything
 		return
 	if (user.incapacitated())
 		return
-	if (do_after(user, 5 SECONDS))
+	if (do_after(user, 7 SECONDS, bonus_percentage = 25))
 		if (!user.put_in_hands(attached_cuffs))
 			to_chat(usr, SPAN_WARNING("You need an empty, unbroken hand to remove the [attached_cuffs] from the [src]."))
 			return
@@ -696,7 +692,7 @@ BLIND     // can't see anything
 	if (I.w_class > hidden_item_max_w_class)
 		to_chat(user, SPAN_WARNING("\The [I] is too large to fit in the [src]."))
 		return
-	if (do_after(user, 1 SECONDS))
+	if (do_after(user, 1 SECOND, bonus_percentage = 100))
 		if(!user.unEquip(I, src))
 			return
 		user.visible_message(SPAN_ITALIC("\The [user] shoves \the [I] into \the [src]."), range = 1)
@@ -718,12 +714,12 @@ BLIND     // can't see anything
 		return FALSE
 	if (loc != user)
 		return FALSE
-	if (do_after(user, 2 SECONDS))
+	if (do_after(user, 2.5 SECONDS, bonus_percentage = 25))
 		if (!user.put_in_hands(hidden_item))
 			to_chat(usr, SPAN_WARNING("You need an empty, unbroken hand to pull the [hidden_item] from the [src]."))
 			return TRUE
 		user.visible_message(SPAN_ITALIC("\The [user] pulls \the [hidden_item] from \the [src]."), range = 1)
-		playsound(get_turf(src), 'sound/effects/holster/tactiholsterout.ogg', 25)
+		playsound(get_turf(src), 'sounds/effects/holster/tactiholsterout.ogg', 25)
 		verbs -= /obj/item/clothing/shoes/proc/remove_hidden
 		hidden_item = null
 	return TRUE
@@ -757,7 +753,6 @@ BLIND     // can't see anything
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_suit_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_suit_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_suit_unathi.dmi',
 		SPECIES_NABBER = 'icons/mob/species/nabber/onmob_suit_gas.dmi',
 		SPECIES_MANTID_ALATE = 'icons/mob/species/mantid/onmob_suit_alate.dmi',
 		SPECIES_MANTID_GYNE = 'icons/mob/species/mantid/onmob_suit_gyne.dmi'
@@ -825,7 +820,6 @@ BLIND     // can't see anything
 		SPECIES_ADHERENT = 'icons/mob/species/adherent/onmob_under_adherent.dmi',
 		SPECIES_NABBER = 'icons/mob/species/nabber/onmob_under_gas.dmi',
 		SPECIES_MONARCH_QUEEN = 'icons/mob/species/nabber/msq/onmob_under_msq.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_under_unathi.dmi',
 		SPECIES_MANTID_ALATE = 'icons/mob/species/mantid/onmob_under_alate.dmi',
 		SPECIES_MANTID_GYNE = 'icons/mob/species/mantid/onmob_under_gyne.dmi'
 	)

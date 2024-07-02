@@ -1,8 +1,6 @@
 /datum/spell/targeted/torment
 	name = "Torment"
 	desc = "this spell causes pain to all those in its radius."
-	feedback = "TM"
-	school = "illusion"
 	charge_max = 150
 	spell_flags = NOFACTION
 	invocation = "Rai Di-Kaal!"
@@ -18,14 +16,17 @@
 	var/loss = 30
 
 	hud_state = "wiz_horse"
-	cast_sound = 'sound/magic/cowhead_curse.ogg'
+	cast_sound = 'sounds/magic/cowhead_curse.ogg'
+
+	spell_cost = 2
+	mana_cost = 10
 
 /datum/spell/targeted/torment/cast(list/targets, mob/user)
 	gibs(user.loc)
 	for(var/mob/living/carbon/human/H in targets)
 		H.adjustHalLoss(loss)
 
-/datum/spell/targeted/torment/empower_spell()
+/datum/spell/targeted/torment/ImproveSpellPower()
 	if(!..())
 		return 0
 

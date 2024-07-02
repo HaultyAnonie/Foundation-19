@@ -4,7 +4,6 @@
 	name = "Artificer"
 	desc = "This spell conjures a construct which may be controlled by Shades."
 
-	school = "conjuration"
 	charge_max = 600
 	spell_flags = 0
 	invocation = "none"
@@ -13,8 +12,10 @@
 
 	summon_type = list(/obj/structure/constructshell)
 
+	spell_book_visible = FALSE
+
 	hud_state = "artificer"
-	cast_sound = 'sound/items/Deconstruct.ogg'
+	cast_sound = 'sounds/items/Deconstruct.ogg'
 
 /datum/spell/aoe_turf/conjure/construct/lesser
 	charge_max = 1800
@@ -33,8 +34,10 @@
 	range = 0
 	summon_type = list(/turf/simulated/floor/cult)
 
+	spell_book_visible = FALSE
+
 	hud_state = "const_floor"
-	cast_sound = 'sound/items/Welder.ogg'
+	cast_sound = 'sounds/items/Welder.ogg'
 
 /datum/spell/aoe_turf/conjure/wall
 	name = "Lesser Construction"
@@ -47,22 +50,10 @@
 	range = 0
 	summon_type = list(/turf/simulated/wall/cult)
 
+	spell_book_visible = FALSE
+
 	hud_state = "const_wall"
-	cast_sound = 'sound/items/Welder.ogg'
-
-/datum/spell/aoe_turf/conjure/wall/reinforced
-	name = "Greater Construction"
-	desc = "This spell constructs a reinforced metal wall."
-
-	charge_max = 300
-	spell_flags = Z2NOCAST
-	invocation = "none"
-	invocation_type = INVOKE_NONE
-	range = 0
-	cast_delay = 50
-
-	summon_type = list(/turf/simulated/wall/r_wall)
-	cast_sound = 'sound/items/Welder.ogg'
+	cast_sound = 'sounds/items/Welder.ogg'
 
 /datum/spell/aoe_turf/conjure/soulstone
 	name = "Summon Soulstone"
@@ -76,9 +67,11 @@
 
 	summon_type = list(/obj/item/device/soulstone)
 
+	spell_book_visible = FALSE
+
 	hud_state = "const_stone"
 	override_base = "const"
-	cast_sound = 'sound/items/Welder.ogg'
+	cast_sound = 'sounds/items/Welder.ogg'
 
 /datum/spell/aoe_turf/conjure/pylon
 	name = "Red Pylon"
@@ -92,8 +85,10 @@
 
 	summon_type = list(/obj/structure/cult/pylon)
 
+	spell_book_visible = FALSE
+
 	hud_state = "const_pylon"
-	cast_sound = 'sound/items/Welder.ogg'
+	cast_sound = 'sounds/items/Welder.ogg'
 
 /datum/spell/aoe_turf/conjure/forcewall/lesser
 	name = "Shield"
@@ -107,8 +102,10 @@
 	summon_type = list(/obj/effect/forcefield/cult)
 	duration = 200
 
+	spell_book_visible = FALSE
+
 	hud_state = "const_juggwall"
-	cast_sound = 'sound/magic/forcewall.ogg'
+	cast_sound = 'sounds/magic/forcewall.ogg'
 
 //Code for the Juggernaut construct's forcefield, that seemed like a good place to put it.
 /obj/effect/forcefield/cult

@@ -11,7 +11,7 @@
 /obj/structure/pit/attackby(obj/item/W, mob/user)
 	if( istype(W,/obj/item/shovel) )
 		visible_message(SPAN_NOTICE("\The [user] starts [open ? "filling" : "digging open"] \the [src]"))
-		if( do_after(user, 50) )
+		if( do_after(user, 7 SECONDS, bonus_percentage = 25) )
 			visible_message(SPAN_NOTICE("\The [user] [open ? "fills" : "digs open"] \the [src]!"))
 			if(open)
 				close(user)
@@ -25,7 +25,7 @@
 			to_chat(user, SPAN_NOTICE("There's already a grave marker here."))
 		else
 			visible_message(SPAN_NOTICE("\The [user] starts making a grave marker on top of \the [src]"))
-			if( do_after(user, 50) )
+			if( do_after(user, 7 SECONDS, bonus_percentage = 25) )
 				visible_message(SPAN_NOTICE("\The [user] finishes the grave marker"))
 				var/obj/item/stack/material/wood/plank = W
 				plank.use(1)
@@ -79,9 +79,9 @@
 	visible_message(SPAN_DANGER("Something is scratching its way out of \the [src]!"))
 
 	for(var/i in 1 to (6*breakout_time * 2)) //minutes * 6 * 5seconds * 2
-		playsound(src.loc, 'sound/weapons/bite.ogg', 100, 1)
+		playsound(src.loc, 'sounds/weapons/bite.ogg', 100, 1)
 
-		if(!do_after(escapee, 50))
+		if(!do_after(escapee, 7 SECONDS, bonus_percentage = 25, focus_sound = 'sounds/weapons/bite.ogg'))
 			to_chat(escapee, SPAN_WARNING("You have stopped digging."))
 			return
 		if(open)
@@ -92,7 +92,7 @@
 
 	to_chat(escapee, SPAN_WARNING("You successfuly dig yourself out!"))
 	visible_message(SPAN_DANGER("\the [escapee] emerges from \the [src]!"))
-	playsound(src.loc, 'sound/effects/squelch1.ogg', 100, 1)
+	playsound(src.loc, 'sounds/effects/squelch1.ogg', 100, 1)
 	open()
 
 /obj/structure/pit/closed
@@ -160,7 +160,7 @@
 /obj/structure/gravemarker/attackby(obj/item/W, mob/user)
 	if(istype(W,/obj/item/material/hatchet))
 		visible_message("<span class = 'warning'>\The [user] starts hacking away at \the [src] with \the [W].</span>")
-		if(!do_after(user, 30))
+		if(!do_after(user, 4 SECONDS, bonus_percentage = 25))
 			visible_message("<span class = 'warning'>\The [user] hacks \the [src] apart.</span>")
 			new /obj/item/stack/material/wood(src)
 			qdel(src)

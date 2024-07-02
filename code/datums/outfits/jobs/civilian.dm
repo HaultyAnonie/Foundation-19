@@ -7,12 +7,23 @@
 	l_pocket = /obj/item/paper/dclass_orientation
 	id_type = /obj/item/card/id/classd
 	pda_type = null
+	back = null
 
 /decl/hierarchy/outfit/job/civ/classd/post_equip(mob/living/carbon/human/H)
 	..()
 	if(prob(15))
 		var/path = pick( /obj/item/wrench, /obj/item/screwdriver)
 		H.equip_to_slot_or_store_or_drop(new path (H), slot_l_store)
+
+/decl/hierarchy/outfit/job/civ/classd/high
+	name = OUTFIT_JOB_NAME("High-Security Class D")
+	uniform = /obj/item/clothing/under/scp/hdclass
+	shoes = /obj/item/clothing/shoes/workboots
+	l_ear = null
+	l_pocket = /obj/item/paper/dclass_orientation
+	id_type = /obj/item/card/id/classd
+	pda_type = null
+	back = null
 
 /decl/hierarchy/outfit/job/civ/janitor
 	name = OUTFIT_JOB_NAME("Janitor")
@@ -38,22 +49,15 @@
 	id_type = /obj/item/card/id/bartender
 	l_ear = /obj/item/device/radio/headset/headset_service
 
-/decl/hierarchy/outfit/job/civ/archivist
-	name = OUTFIT_JOB_NAME("Archivist")
-	uniform = /obj/item/clothing/under/suit_jacket/really_black
-	shoes = /obj/item/clothing/shoes/laceup
-	l_pocket = /obj/item/device/radio
-	id_type = /obj/item/card/id/archivist
-	l_ear = /obj/item/device/radio/headset/headset_arch
-
 /decl/hierarchy/outfit/job/civ/gocrep
 	name = OUTFIT_JOB_NAME("Global Occult Coalition Representative")
-	uniform = /obj/item/clothing/under/rank/head_of_security/navyblue
-	suit = /obj/item/clothing/suit/security/navyhos
-	head = /obj/item/clothing/head/beret/scp/goc
+	uniform = /obj/item/clothing/under/rank/civilian/goc
+	suit = /obj/item/clothing/suit/gocjacket
+	head = /obj/item/clothing/head/beret/goc
 	shoes = /obj/item/clothing/shoes/combat
 	glasses = /obj/item/clothing/glasses/sunglasses
 	gloves = /obj/item/clothing/gloves/thick/combat
+	l_hand = /obj/item/weapon/stamp/gocrep
 	l_pocket = /obj/item/device/radio
 	id_type = /obj/item/card/id/adminlvl3
 	l_ear = /obj/item/device/radio/headset/heads/goc
@@ -62,15 +66,16 @@
 
 /decl/hierarchy/outfit/job/civ/uiu
 	name = OUTFIT_JOB_NAME("Unusual Incidents Unit Relations Agent")
-	uniform = /obj/item/clothing/under/suit_jacket/charcoal
+	uniform = /obj/item/clothing/under/rank/civilian/uiu/formal
+	suit = /obj/item/clothing/suit/uiucoat
 	shoes = /obj/item/clothing/shoes/dress
 	glasses = /obj/item/clothing/glasses/sunglasses
-	gloves = /obj/item/clothing/gloves/thick/combat
+	gloves = /obj/item/clothing/gloves/tactical/scp
 	l_pocket = /obj/item/device/radio
 	id_type = /obj/item/card/id/adminlvl3
 	l_ear = /obj/item/device/radio/headset/heads/uiu
-	backpack_contents = list(/obj/item/ammo_magazine/scp/m1911 = 1)
-	belt = /obj/item/gun/projectile/pistol/m1911
+	backpack_contents = list(/obj/item/ammo_magazine/scp/mk9 = 1)
+	belt = /obj/item/gun/projectile/pistol/glock
 
 /decl/hierarchy/outfit/job/civ/thirep
 	name = OUTFIT_JOB_NAME("thirep")

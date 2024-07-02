@@ -2,7 +2,7 @@
 	name = "railing"
 	desc = "A simple bar railing designed to protect against careless trespass."
 	icon = 'icons/obj/railing.dmi'
-	icon_state = "railing_preview"
+	icon_state = "railing"
 	density = TRUE
 	throwpass = 1
 	layer = OBJ_LAYER
@@ -14,6 +14,9 @@
 
 	var/broken =    FALSE
 	var/neighbor_status = 0
+
+/obj/structure/railing/mapped/corner
+	icon_state = "railing_corner"
 
 /obj/structure/railing/mapped
 	color = COLOR_GUNMETAL
@@ -78,7 +81,7 @@
 /obj/structure/railing/handle_death_change(new_death_state)
 	if(new_death_state)
 		visible_message(SPAN_DANGER("\The [src] [material.destruction_desc]!"))
-		playsound(loc, 'sound/effects/grillehit.ogg', 50, 1)
+		playsound(loc, 'sounds/effects/grillehit.ogg', 50, 1)
 		material.place_shard(get_turf(usr))
 		qdel(src)
 
@@ -121,13 +124,13 @@
 	NeighborsCheck(update_neighbors)
 	cut_overlays()
 	if (!neighbor_status || !anchored)
-		icon_state = "railing0-[density]"
+		icon_state = "railing"
 		if (density)//walking over a railing which is above you is really weird, do not do this if density is 0
-			add_overlay(image(icon, "_railing0-1", layer = ABOVE_HUMAN_LAYER))
+			add_overlay(image(icon, "railing", layer = ABOVE_HUMAN_LAYER))
 	else
-		icon_state = "railing1-[density]"
+		icon_state = "railing"
 		if (density)
-			add_overlay(image(icon, "_railing1-1", layer = ABOVE_HUMAN_LAYER))
+			add_overlay(image(icon, "railing", layer = ABOVE_HUMAN_LAYER))
 		if (neighbor_status & 32)
 			add_overlay(image(icon, "corneroverlay[density]"))
 		if ((neighbor_status & 16) || !(neighbor_status & 32) || (neighbor_status & 64))
@@ -201,7 +204,7 @@
 			if(G.force_danger())
 				if(user.a_intent == I_HURT)
 					visible_message(SPAN_DANGER("[G.assailant] slams [G.affecting]'s face against \the [src]!"))
-					playsound(loc, 'sound/effects/grillehit.ogg', 50, 1)
+					playsound(loc, 'sounds/effects/grillehit.ogg', 50, 1)
 					var/blocked = G.affecting.get_blocked_ratio(BP_HEAD, BRUTE, damage = 8)
 					if (prob(30 * (1 - blocked)))
 						G.affecting.Weaken(5)
@@ -220,8 +223,8 @@
 	// Dismantle
 	if(isWrench(W))
 		if(!anchored)
-			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
-			if(do_after(user, 20, src))
+			playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
+			if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25))
 				if(anchored)
 					return
 				user.visible_message(SPAN_NOTICE("\The [user] dismantles \the [src]."), SPAN_NOTICE("You dismantle \the [src]."))
@@ -229,7 +232,7 @@
 				qdel(src)
 	// Wrench Open
 		else
-			playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
+			playsound(src.loc, 'sounds/items/Ratchet.ogg', 50, 1)
 			if(density)
 				user.visible_message(SPAN_NOTICE("\The [user] wrenches \the [src] open."), SPAN_NOTICE("You wrench \the [src] open."))
 				density = FALSE
@@ -245,8 +248,8 @@
 			if(!health_damaged())
 				to_chat(user, SPAN_WARNING("\The [src] does not need repairs."))
 				return
-			playsound(src.loc, 'sound/items/Welder.ogg', 50, 1)
-			if(do_after(user, 20, src))
+			playsound(src.loc, 'sounds/items/Welder.ogg', 50, 1)
+			if(do_after(user, 2.5 SECONDS, src, bonus_percentage = 25))
 				if(!health_damaged())
 					return
 				user.visible_message(SPAN_NOTICE("\The [user] repairs some damage to \the [src]."), SPAN_NOTICE("You repair some damage to \the [src]."))
@@ -259,8 +262,8 @@
 			to_chat(user, SPAN_NOTICE("You need to wrench \the [src] from back into place first."))
 			return
 		user.visible_message(anchored ? SPAN_NOTICE("\The [user] begins unscrew \the [src].") : SPAN_NOTICE("\The [user] begins fasten \the [src].") )
-		playsound(loc, 'sound/items/Screwdriver.ogg', 75, 1)
-		if(do_after(user, 10, src) && density)
+		playsound(loc, 'sounds/items/Screwdriver.ogg', 75, 1)
+		if(do_after(user, 1 SECOND, src, bonus_percentage = 100) && density)
 			to_chat(user, (anchored ? SPAN_NOTICE("You have unfastened \the [src] from the floor.") : SPAN_NOTICE("You have fastened \the [src] to the floor.")))
 			anchored = !anchored
 			update_icon()
@@ -283,7 +286,7 @@
 			kill_health() // Fatboy
 
 		user.jump_layer_shift()
-		addtimer(CALLBACK(user, /mob/living/proc/jump_layer_shift_end), 2)
+		addtimer(CALLBACK(user, TYPE_PROC_REF(/mob/living, jump_layer_shift_end)), 2)
 
 /obj/structure/railing/slam_into(mob/living/L)
 	var/turf/target_turf = get_turf(src)
@@ -293,9 +296,12 @@
 		L.forceMove(target_turf)
 		L.visible_message(SPAN_WARNING("\The [L] [pick("falls", "flies")] over \the [src]!"))
 		L.Weaken(2)
-		playsound(L, 'sound/effects/grillehit.ogg', 25, 1, FALSE)
+		playsound(L, 'sounds/effects/grillehit.ogg', 25, 1, FALSE)
 	else
 		..()
 
 /obj/structure/railing/set_color(color)
 	src.color = color ? color : material.icon_colour
+
+/obj/structure/railing/CanPathingPass(obj/item/card/id/ID, to_dir, atom/movable/caller, no_id = FALSE)
+	return !density || (dir != to_dir)

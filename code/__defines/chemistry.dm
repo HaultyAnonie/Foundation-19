@@ -25,9 +25,10 @@
 #define IS_SLIME   5
 #define IS_NABBER  6
 #define IS_MANTID  7
+#define IS_ABOMINATION 8
 
 #define CE_STABLE        "stable"       // Inaprovaline
-#define CE_ANTIBIOTIC    "antibiotic"   // Spaceacillin
+#define CE_ANTIBIOTIC    "antibiotic"   // Penicillin
 #define CE_BLOODRESTORE  "bloodrestore" // Iron/nutriment
 #define CE_PAINKILLER    "painkiller"
 #define CE_ALCOHOL       "alcohol"      // Liver filtering
@@ -59,3 +60,15 @@
 
 #define HANDLE_REACTIONS(_reagents)  SSchemistry.active_holders[_reagents] = TRUE
 #define UNQUEUE_REACTIONS(_reagents) SSchemistry.active_holders -= _reagents
+
+/// Minimum requirement for addiction buzz to be met
+#define MIN_ADDICTION_REAGENT_AMOUNT 2
+/// Maximum amount of addiction points for any addiction type
+#define MAX_ADDICTION_POINTS 2000
+
+/// Addiction start/ends
+#define WITHDRAWAL_STAGE1_START_CYCLE 50
+#define WITHDRAWAL_STAGE1_END_CYCLE 120
+#define WITHDRAWAL_STAGE2_START_CYCLE 121
+#define WITHDRAWAL_STAGE2_END_CYCLE 200
+#define WITHDRAWAL_STAGE3_START_CYCLE 201

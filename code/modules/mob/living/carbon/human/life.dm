@@ -37,6 +37,7 @@
 	var/temperature_alert = 0
 	var/heartbeat = 0
 	var/stamina = 100
+	var/max_stamina = 100
 	var/obj/screen/fov/fov = null//The screen object because I can't figure out how the hell TG does their screen objects so I'm just using legacy code.
 	var/obj/screen/fov_mask/fov_mask
 	var/usefov = 1
@@ -85,12 +86,8 @@
 		var/obj/item/organ/internal/eyes/eyes = internal_organs_by_name[BP_EYES]
 		eyes?.handle_blink()
 
-		if(!client && !mind)
-			species.handle_npc(src)
-
-
-	if (prob(1) && prob(5) && type == /mob/living/carbon/human && !isscp049_1(src) && !pestilence) // a 1 in 2,000 chance every 2 seconds = 66 minutes?
-		pestilence = TRUE
+	if (prob(0.25) && !isspecies(src, SPECIES_SCP049_1) && !isscp049(src))
+		humanStageHandler.setStage("Pestilence", 1)
 
 	if(!handle_some_updates())
 		return											//We go ahead and process them 5 times for HUD images and other stuff though.
@@ -106,7 +103,7 @@
 	if(stat == DEAD)
 		stamina = 0
 	else
-		stamina = Clamp(stamina + amt, 0, 100)
+		stamina = Clamp(stamina + amt, 0, max_stamina)
 		if(stamina <= 0)
 			to_chat(src, SPAN_WARNING("You are exhausted!"))
 			if(MOVING_QUICKLY(src))
@@ -126,7 +123,7 @@
 		update_skin(1)
 	if(client && client.is_afk())
 		if(old_stat == UNCONSCIOUS && stat == CONSCIOUS)
-			playsound_local(null, 'sound/effects/bells.ogg', 100, is_global=TRUE)
+			playsound_local(null, 'sounds/effects/bells.ogg', 100, is_global=TRUE)
 
 /mob/living/carbon/human/proc/handle_some_updates()
 	if(life_tick > 5 && timeofdeath && (timeofdeath < 5 || world.time - timeofdeath > 6000))	//We are long dead, or we're junk mobs spawned like the clowns on the clown shuttle
@@ -356,7 +353,7 @@
 			pl_effects()
 			break
 
-	if(istype(src.loc, /turf/space)) //being in a closet will interfere with radiation, may not make sense but we don't model radiation for atoms in general so it will have to do for now.
+	if(isspaceturf(loc)) //being in a closet will interfere with radiation, may not make sense but we don't model radiation for atoms in general so it will have to do for now.
 		//Don't bother if the temperature drop is less than 0.1 anyways. Hopefully BYOND is smart enough to turn this constant expression into a constant
 		if(bodytemperature > (0.1 * HUMAN_HEAT_CAPACITY/(HUMAN_EXPOSED_SURFACE_AREA*STEFAN_BOLTZMANN_CONSTANT))**(1/4) + COSMIC_RADIATION_TEMPERATURE)
 
@@ -620,7 +617,7 @@
 			adjustHalLoss(-3)
 			if(sleeping)
 				if (!dream_timer && client)
-					dream_timer = addtimer(CALLBACK(src, .proc/dream), 10 SECONDS, TIMER_STOPPABLE)
+					dream_timer = addtimer(CALLBACK(src, PROC_REF(dream)), 10 SECONDS, TIMER_STOPPABLE)
 				if (mind)
 					//Are they SSD? If so we'll keep them asleep but work off some of that sleep var in case of stoxin or similar.
 					if(client || sleeping > 3)
@@ -896,7 +893,7 @@
 	//0.1% chance of playing a scary sound to someone who's in complete darkness
 	if(isturf(loc) && rand(1,1000) == 1)
 		var/turf/T = loc
-		if(T.get_lumcount() <= LIGHTING_SOFT_THRESHOLD)
+		if(is_dark(T, LIGHTING_SOFT_THRESHOLD))
 			playsound_local(src, SFX_SCARY_SOUND, 50, 1, -1)
 
 	var/area/A = get_area(src)
@@ -1004,34 +1001,57 @@
 		var/image/holder = hud_list[LIFE_HUD]
 		if(effectively_dead)
 			holder.icon_state = "huddead"
+		else if(LAZYLEN(diseases))
+			var/disease_num = 0
+			for(var/datum/disease/D in diseases)
+				if(D.visibility_flags & HIDDEN_HUD)
+					continue
+				disease_num = max(disease_num, GetDiseaseSeverityValue(D.severity))
+			if(!disease_num) // Stealthy diseases
+				holder.icon_state = "hudhealthy"
+			else
+				holder.icon_state = "hudill[disease_num]"
 		else
 			holder.icon_state = "hudhealthy"
 		hud_list[LIFE_HUD] = holder
 
 	if (BITTEST(hud_updateflag, STATUS_HUD) && hud_list[STATUS_HUD] && hud_list[STATUS_HUD_OOC])
 		var/image/holder = hud_list[STATUS_HUD]
+		var/mob/living/simple_animal/borer/B = has_brain_worms()
 		if(effectively_dead)
 			holder.icon_state = "huddead"
-
-		else if(has_brain_worms())
-			var/mob/living/simple_animal/borer/B = has_brain_worms()
-			if(B.controlling)
-				holder.icon_state = "hudbrainworm"
-			else
+		else if(istype(B) && B?.controlling)
+			holder.icon_state = "hudbrainworm"
+		else if(LAZYLEN(diseases))
+			var/disease_num = 0
+			for(var/datum/disease/D in diseases)
+				if(D.visibility_flags & HIDDEN_HUD)
+					continue
+				disease_num = max(disease_num, GetDiseaseSeverityValue(D.severity))
+			if(!disease_num) // Stealthy diseases
 				holder.icon_state = "hudhealthy"
+			else
+				holder.icon_state = "hudill[disease_num]"
 		else
 			holder.icon_state = "hudhealthy"
 
 		var/image/holder2 = hud_list[STATUS_HUD_OOC]
 		if(effectively_dead)
 			holder2.icon_state = "huddead"
-		else if(has_brain_worms())
+		else if(istype(B))
 			holder2.icon_state = "hudbrainworm"
+		else if(LAZYLEN(diseases))
+			var/disease_num = 0
+			for(var/datum/disease/D in diseases)
+				if(D.visibility_flags & HIDDEN_HUD)
+					continue
+				disease_num = max(disease_num, GetDiseaseSeverityValue(D.severity))
+			if(!disease_num) // Stealthy diseases
+				holder2.icon_state = "hudhealthy"
+			else
+				holder2.icon_state = "hudill[disease_num]"
 		else
 			holder2.icon_state = "hudhealthy"
-
-		hud_list[STATUS_HUD] = holder
-		hud_list[STATUS_HUD_OOC] = holder2
 
 	if (BITTEST(hud_updateflag, ID_HUD) && hud_list[ID_HUD])
 		var/image/holder = hud_list[ID_HUD]
@@ -1049,10 +1069,10 @@
 		var/image/holder = hud_list[WANTED_HUD]
 		holder.icon_state = "hudblank"
 		var/perpname = name
-		if(wear_id)
-			var/obj/item/card/id/I = wear_id.GetIdCard()
-			if(I)
-				perpname = I.registered_name
+
+		var/obj/item/card/id/I = GetIdCard()
+		if(I)
+			perpname = I.registered_name
 
 		var/datum/computer_file/report/crew_record/E = get_crewmember_record(perpname)
 		if(E)
@@ -1065,6 +1085,8 @@
 					holder.icon_state = "hudparolled"
 				if("Released")
 					holder.icon_state = "hudreleased"
+		if(holder.icon_state == "hudblank" && GLOB.informants.is_antagonist(mind))		// hacky, but functional
+			holder.icon_state = "hudinformant"
 		hud_list[WANTED_HUD] = holder
 
 	if (  BITTEST(hud_updateflag, IMPLOYAL_HUD) \

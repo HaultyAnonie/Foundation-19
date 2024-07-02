@@ -217,13 +217,9 @@
 			return 1
 
 		to_chat(user, SPAN_NOTICE("Now welding \the [src]."))
-		playsound(src, 'sound/items/Welder.ogg', 50, 1)
+		playsound(src, 'sounds/items/Welder.ogg', 50, 1)
 
-		if(!do_after(user, 20, src))
-			to_chat(user, SPAN_NOTICE("You must remain close to finish this task."))
-			return 1
-
-		if(!src)
+		if(!do_after(user, 2.5 SECONDS, src, bonus_percentage = 25) || !src)
 			return 1
 
 		if(!WT.isOn())
@@ -232,7 +228,7 @@
 
 		welded = !welded
 		update_icon()
-		playsound(src, 'sound/items/Welder2.ogg', 50, 1)
+		playsound(src, 'sounds/items/Welder2.ogg', 50, 1)
 		user.visible_message(SPAN_NOTICE("\The [user] [welded ? "welds \the [src] shut" : "unwelds \the [src]"]."), \
 			SPAN_NOTICE("You [welded ? "weld \the [src] shut" : "unweld \the [src]"]."), \
 			"You hear welding.")
@@ -315,13 +311,13 @@
 /decl/public_access/public_method/toggle_panic_siphon
 	name = "toggle panic siphon"
 	desc = "Toggles the panic siphon function."
-	call_proc = /obj/machinery/atmospherics/unary/vent_scrubber/proc/toggle_panic
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/unary/vent_scrubber, toggle_panic)
 
 /decl/public_access/public_method/set_scrub_gas
 	name = "set filter gases"
 	desc = "Given a list of gases, sets whether the gas is being scrubbed to the value of the gas in the list."
 	forward_args = TRUE
-	call_proc = /obj/machinery/atmospherics/unary/vent_scrubber/proc/set_scrub_gas
+	call_proc = TYPE_PROC_REF(/obj/machinery/atmospherics/unary/vent_scrubber, set_scrub_gas)
 
 /decl/stock_part_preset/radio/event_transmitter/vent_scrubber
 	frequency = PUMP_FREQ

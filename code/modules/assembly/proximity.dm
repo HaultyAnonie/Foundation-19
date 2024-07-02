@@ -53,13 +53,13 @@
 /obj/item/device/assembly/prox_sensor/proc/sense()
 	var/turf/mainloc = get_turf(src)
 	mainloc.visible_message(SPAN_DANGER("You hear a proximity sensor beep!"), SPAN_DANGER("You hear a proximity sensor beep!"))
-	playsound(mainloc, 'sound/machines/twobeep.ogg', 50, 1)
+	playsound(mainloc, 'sounds/machines/twobeep.ogg', 50, 1)
 
 	delaying = TRUE
-	addtimer(CALLBACK(src, .proc/pulse, 0), delay*10)
+	addtimer(CALLBACK(src, PROC_REF(pulse), 0), delay*10)
 
 	cooldown = 2
-	addtimer(CALLBACK(src, .proc/process_cooldown),10)
+	addtimer(CALLBACK(src, PROC_REF(process_cooldown)),10)
 	return
 
 

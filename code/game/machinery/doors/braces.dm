@@ -86,7 +86,7 @@
 			update_access()
 			if(check_access(C))
 				to_chat(user, "You swipe \the [C] through \the [src].")
-				if(do_after(user, 10, airlock))
+				if(do_after(user, 1 SECOND, airlock, bonus_percentage = 75))
 					to_chat(user, "\The [src] clicks a few times and detaches itself from \the [airlock]!")
 					unlock_brace(usr)
 			else
@@ -98,7 +98,7 @@
 			return
 		var/obj/item/crowbar/brace_jack/C = W
 		to_chat(user, "You begin forcibly removing \the [src] with \the [C].")
-		if(do_after(user, rand(150,300), airlock))
+		if(do_after(user, 25 SECONDS, airlock, bonus_percentage = 25))
 			to_chat(user, "You finish removing \the [src].")
 			unlock_brace(user)
 		return
@@ -109,7 +109,7 @@
 			to_chat(user, "\The [src] does not require repairs.")
 			return
 		if(C.remove_fuel(0,user))
-			playsound(src, 'sound/items/Welder.ogg', 100, 1)
+			playsound(src, 'sounds/items/Welder.ogg', 100, 1)
 			cur_health = min(cur_health + rand(80,120), max_health)
 			if(cur_health == max_health)
 				to_chat(user, "You repair some dents on \the [src]. It is in perfect condition now.")

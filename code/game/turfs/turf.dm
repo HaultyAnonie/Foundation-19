@@ -36,10 +36,15 @@
 
 	var/tmp/changing_turf
 
+	var/pathing_pass_method = TURF_PATHING_PASS_DEFAULT
+
 	/// List of 'dangerous' objs that the turf holds that can cause something bad to happen when stepped on, used for AI mobs.
 	var/list/dangerous_objects
 
 	var/list/explosion_throw_details
+
+	/// Reference to the turf fire on the turf
+	var/obj/effect/turf_fire/turf_fire
 
 /turf/Initialize(mapload, ...)
 	. = ..()
@@ -291,18 +296,19 @@ var/const/enterloopsanity = 100
 	return FALSE
 
 //expects an atom containing the reagents used to clean the turf
+/* CODED OUT FOR NOW
 /turf/proc/clean(atom/source, mob/user = null, time = null, message = null)
-	if(source.reagents.has_reagent(/datum/reagent/water, 1) || source.reagents.has_reagent(/datum/reagent/space_cleaner, 1))
-		if(user && time && !do_after(user, time, src))
+	if(source.reagents.has_reagent(/datum/reagent/water, 1) || source.reagents.has_reagent(/datum/reagent/hydroxylsan, 1))
+		if(user && time && !do_after(user, time, src, bonus_percentage = 25))
 			return
-		clean_blood()
+		clean()
 		remove_cleanables()
 		if(message)
 			to_chat(user, message)
 	else
 		to_chat(user, SPAN_WARNING("\The [source] is too dry to wash that."))
 	source.reagents.trans_to_turf(src, 1, 10)	//10 is the multiplier for the reaction effect. probably needed to wet the floor properly.
-
+*/
 /turf/proc/remove_cleanables()
 	for(var/obj/effect/O in src)
 		if(istype(O,/obj/effect/rune) || istype(O,/obj/effect/decal/cleanable))
@@ -357,7 +363,7 @@ var/const/enterloopsanity = 100
 
 	vandal.visible_message(SPAN_WARNING("\The [vandal] begins carving something into \the [src]."))
 
-	if(!do_after(vandal, max(20, length(message)), src))
+	if(!do_after(vandal, max(3 SECONDS, length(message)), src, bonus_percentage = 25))
 		return FALSE
 
 	vandal.visible_message(SPAN_DANGER("\The [vandal] carves some graffiti into \the [src]."))
@@ -422,3 +428,29 @@ var/const/enterloopsanity = 100
 		return FALSE
 	LAZYREMOVE(dangerous_objects, O)
 	UNSETEMPTY(dangerous_objects) // This nulls the list var if it's empty.
+
+/turf/AllowDrop()
+	return TRUE
+
+/**
+ * Returns adjacent turfs to this turf that are reachable, in all cardinal directions
+ *
+ * Arguments:
+ * * caller: The movable, if one exists, being used for mobility checks to see what tiles it can reach
+ * * ID: An ID card that decides if we can gain access to doors that would otherwise block a turf
+ * * simulated_only: Do we only worry about turfs with simulated atmos, most notably things that aren't space?
+*/
+/turf/proc/reachableAdjacentTurfs(caller, ID, simulated_only, no_id = FALSE)
+	var/static/space_type_cache = typecacheof(/turf/space)
+	. = list()
+
+	for(var/iter_dir in GLOB.cardinal)
+		var/turf/turf_to_check = get_step(src,iter_dir)
+		if(!turf_to_check || (simulated_only && space_type_cache[turf_to_check.type]))
+			continue
+		if(turf_to_check.density || LinkBlockedWithAccess(turf_to_check, caller, ID, no_id = no_id))
+			continue
+		. += turf_to_check
+
+/turf/proc/IgniteTurf(power, fire_colour, fire_type = /obj/effect/turf_fire)
+	return

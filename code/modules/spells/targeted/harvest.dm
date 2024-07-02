@@ -2,7 +2,6 @@
 	name = "Harvest"
 	desc = "Back to where I come from, and you're coming with me."
 
-	school = "transmutation"
 	charge_max = 200
 	spell_flags = Z2NOCAST | CONSTRUCT_CHECK | INCLUDEUSER
 	invocation = ""
@@ -21,7 +20,7 @@
 	..()
 
 	var/destination = null
-	for(var/obj/singularity/narsie/large/N in narsie_list)
+	for(var/obj/singularity/scarletking/large/N in scarletking_list)
 		destination = N.loc
 		break
 	if(destination)
@@ -31,7 +30,6 @@
 				M.forceMove(destination)
 				if(M != user)
 					prey = 1
-		to_chat(user, SPAN_CLASS("sinister","You warp back to Nar-Sie[prey ? " along with your prey":""]."))
+		to_chat(user, "<span class='sinister'>You warp back to Nar-Sie[prey ? " along with your prey":""].</span>")
 	else
-		to_chat(user, SPAN_DANGER("...something's wrong!"))//There shouldn't be an instance of Harvesters when Nar-Sie isn't in the world.
-
+		to_chat(user, "<span class='danger'>...something's wrong!</span>")//There shouldn't be an instance of Harvesters when Nar-Sie isn't in the world.

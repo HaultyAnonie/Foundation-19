@@ -52,7 +52,7 @@
 
 	icon_state = lobby_screens[lobby_index]
 
-	addtimer(CALLBACK(src, .proc/cycle_lobby_screen, lobby_screens), lobby_transition_delay, TIMER_UNIQUE | TIMER_CLIENT_TIME | TIMER_OVERRIDE)
+	addtimer(CALLBACK(src, PROC_REF(cycle_lobby_screen), lobby_screens), lobby_transition_delay, TIMER_UNIQUE | TIMER_CLIENT_TIME | TIMER_OVERRIDE)
 
 	return ..()
 
@@ -69,7 +69,7 @@
 		spawn(lobby_transition_delay)
 			cycle_lobby_screen(lobby_screens)
 	else
-		addtimer(CALLBACK(src, .proc/cycle_lobby_screen, lobby_screens), lobby_transition_delay, TIMER_UNIQUE | TIMER_CLIENT_TIME | TIMER_OVERRIDE)
+		addtimer(CALLBACK(src, PROC_REF(cycle_lobby_screen), lobby_screens), lobby_transition_delay, TIMER_UNIQUE | TIMER_CLIENT_TIME | TIMER_OVERRIDE)
 
 /obj/screen/new_player/selection/New(datum/hud/H)
 	color = null
@@ -91,7 +91,7 @@
 
 /obj/screen/new_player/selection/join_game/Initialize()
 	. = ..()
-	RegisterSignal(SSticker, COMSIG_TICKER_STARTED, .proc/update_lobby_icon)
+	RegisterSignal(SSticker, COMSIG_TICKER_STARTED, PROC_REF(update_lobby_icon))
 	update_lobby_icon()
 
 /obj/screen/new_player/selection/join_game/Click()
@@ -99,7 +99,7 @@
 	if(!istype(hud))
 		return
 	var/mob/new_player/player = hud.mymob
-	sound_to(player, 'sound/effects/menu_click.ogg')
+	sound_to(player, 'sounds/effects/menu_click.ogg')
 
 	if(!check_rights(R_ADMIN|R_MOD, FALSE, player) && GAME_STATE > RUNLEVEL_LOBBY)
 		var/dsdiff = config.respawn_menu_delay MINUTES - (world.time - player.respawned_time)
@@ -142,7 +142,7 @@
 	if(!istype(hud))
 		return
 	var/mob/new_player/player = hud.mymob
-	sound_to(player, 'sound/effects/menu_click.ogg')
+	sound_to(player, 'sounds/effects/menu_click.ogg')
 	player.setupcharacter()
 
 /mob/new_player/proc/setupcharacter()
@@ -159,7 +159,7 @@
 	if(!istype(hud))
 		return
 	var/mob/new_player/player = hud.mymob
-	sound_to(player, 'sound/effects/menu_click.ogg')
+	sound_to(player, 'sounds/effects/menu_click.ogg')
 	if(GAME_STATE != (RUNLEVEL_GAME || RUNLEVEL_POSTGAME))
 		to_chat(player, SPAN_WARNING("The game hasn't started yet!"))
 		return
@@ -175,7 +175,7 @@
 	if(!istype(hud))
 		return
 	var/mob/new_player/player = hud.mymob
-	sound_to(player, 'sound/effects/menu_click.ogg')
+	sound_to(player, 'sounds/effects/menu_click.ogg')
 	player.new_player_observe()
 
 /mob/new_player/proc/new_player_observe()

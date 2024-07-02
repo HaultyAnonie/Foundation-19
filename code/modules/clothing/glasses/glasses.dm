@@ -4,14 +4,13 @@
 	sprite_sheets = list(
 		SPECIES_VOX = 'icons/mob/species/vox/onmob_eyes_vox.dmi',
 		SPECIES_VOX_ARMALIS = 'icons/mob/species/vox/onmob_eyes_vox_armalis.dmi',
-		SPECIES_UNATHI = 'icons/mob/species/unathi/generated/onmob_eyes_unathi.dmi'
 		)
 	var/hud_type
 	var/prescription = FALSE
 	var/toggleable = FALSE
 	var/off_state = "degoggles"
 	var/active = TRUE
-	var/activation_sound = 'sound/items/goggles_charge.ogg'
+	var/activation_sound = 'sounds/items/goggles_charge.ogg'
 	var/deactivation_sound // set this if you want a sound on deactivation
 	var/obj/screen/overlay = null
 	var/obj/item/clothing/glasses/hud/hud = null	// Hud glasses, if any

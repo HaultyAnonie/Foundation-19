@@ -5,7 +5,7 @@
 
 	var/material/material
 	var/icon_base
-	hitsound = 'sound/weapons/genhit.ogg'
+	hitsound = 'sounds/weapons/genhit.ogg'
 	var/datum/lock/lock
 	var/initial_lock_value //for mapping purposes. Basically if this value is set, it sets the lock to this value.
 	autoset_access = FALSE // Doesn't even use access
@@ -248,6 +248,3 @@
 
 /obj/machinery/door/unpowered/simple/cult/New(newloc,material_name,complexity)
 	..(newloc, MATERIAL_CULT, complexity)
-
-/obj/machinery/door/unpowered/simple/supermatter/New(newloc,material_name,complexity)
-	..(newloc, MATERIAL_SUPERMATTER, complexity)

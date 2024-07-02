@@ -47,14 +47,14 @@
 
 /obj/structure/chorus/gastric_emitter/activate()
 	flick("growth_gastric_emit", src)
-	playsound(src, 'sound/machines/pump.ogg', 35, 1)
+	playsound(src, 'sounds/machines/pump.ogg', 35, 1)
 	visible_message(SPAN_DANGER("\The [src] exudes a nasty chemical!"))
 	var/turf/cur_turf = get_turf(src)
 	for(var/t in cur_turf.AdjacentTurfs())
 		var/turf/T = t
 		if(T.density)
 			continue
-		addtimer(CALLBACK(src, .proc/emit_acid, T), 0)
+		addtimer(CALLBACK(src, PROC_REF(emit_acid), T), 0)
 
 /obj/structure/chorus/gastric_emitter/proc/emit_acid(turf/T)
 	var/obj/effect/effect/water/chempuff/chem = new(get_turf(src))

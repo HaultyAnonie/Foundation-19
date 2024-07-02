@@ -21,7 +21,7 @@
 	/// Delay before the explosion
 	var/explosion_delay = 15
 	/// What sound is played on death, before explosion
-	var/explosion_warning_sound = 'sound/effects/bubbles.ogg'
+	var/explosion_warning_sound = 'sounds/effects/bubbles.ogg'
 	var/explosion_devastation_range = -1
 	var/explosion_heavy_range = 1
 	var/explosion_light_range = 2
@@ -45,7 +45,7 @@
 	playsound(T, explosion_warning_sound, (50 + explosion_delay), 1)
 	var/obj/effect/temp_visual/decoy/D = new /obj/effect/temp_visual/decoy(user.loc, user.dir, user, explosion_delay + 2)
 	animate(D, alpha = 0, color = "#ff0000", transform = matrix()*1.8, time = explosion_delay)
-	addtimer(CALLBACK(src, .proc/do_explode, user, T), explosion_delay)
+	addtimer(CALLBACK(src, PROC_REF(do_explode), user, T), explosion_delay)
 
 /datum/random_ability/death/explosion/proc/do_explode(mob/living/user, turf/T)
 	if(!user || !T)
@@ -63,7 +63,7 @@
 	/// What type of mob it spawns
 	var/mob/living/mitosis_type = /mob/living/simple_animal/hostile/random_monster
 	/// What sound plays on death
-	var/mitosis_sound = 'sound/effects/attackblob.ogg'
+	var/mitosis_sound = 'sounds/effects/attackblob.ogg'
 	/// Minimal maxHealth requirement for mitosis to work
 	var/mitosis_required_health = 25
 
